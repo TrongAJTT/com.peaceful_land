@@ -1,6 +1,6 @@
 package com.example.peaceful_land.Service;
 
-import com.example.peaceful_land.Entity.EmailDetails;
+import com.example.peaceful_land.DTO.EmailDetails;
 
 // Chương trình Java minh họa việc tạo một Interface dịch vụ
 

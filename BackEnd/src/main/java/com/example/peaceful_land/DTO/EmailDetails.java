@@ -1,4 +1,4 @@
-package com.example.peaceful_land.Entity;
+package com.example.peaceful_land.DTO;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

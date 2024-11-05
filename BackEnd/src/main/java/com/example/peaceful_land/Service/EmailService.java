@@ -1,8 +1,8 @@
 package com.example.peaceful_land.Service;
 
-import com.example.peaceful_land.DTO.EmailDetails;
-
 // Chương trình Java minh họa việc tạo một Interface dịch vụ
+
+import com.example.peaceful_land.Model.EmailDetails;
 
 public interface EmailService {
     // Gửi email đơn giản

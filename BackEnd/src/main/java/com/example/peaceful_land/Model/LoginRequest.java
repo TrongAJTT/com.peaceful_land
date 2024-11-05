@@ -1,4 +1,4 @@
-package com.example.peaceful_land.DTO;
+package com.example.peaceful_land.Model;
 
 public class LoginRequest {
     private String username;

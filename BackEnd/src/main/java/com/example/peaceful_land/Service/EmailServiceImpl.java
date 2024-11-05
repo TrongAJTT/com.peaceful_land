@@ -1,6 +1,6 @@
 package com.example.peaceful_land.Service;
 
-import com.example.peaceful_land.DTO.EmailDetails;
+import com.example.peaceful_land.Model.EmailDetails;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;

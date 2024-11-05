@@ -1,7 +1,7 @@
 package com.example.peaceful_land.Service;
 
-import com.example.peaceful_land.Model.Account;
-import com.example.peaceful_land.Model.LoginRequest;
+import com.example.peaceful_land.DTO.LoginRequest;
+import com.example.peaceful_land.Entity.Account;
 import com.example.peaceful_land.Repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

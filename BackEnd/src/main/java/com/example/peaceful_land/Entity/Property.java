@@ -14,7 +14,7 @@ public class Property extends BaseEntity {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "user_id")
-    private Account userId;
+    private Account user;
 
     @Column
     private Boolean offer; // Hình thức: 0 - Mua bán, 1 - Cho thuê
@@ -68,7 +68,7 @@ public class Property extends BaseEntity {
     public String toString() {
         return "Property{" +
                 "id=" + id +
-                ", userId=" + userId +
+                ", userId=" + user.getId() +
                 ", offer=" + offer +
                 ", status=" + status +
                 ", rentalPeriod=" + rentalPeriod +

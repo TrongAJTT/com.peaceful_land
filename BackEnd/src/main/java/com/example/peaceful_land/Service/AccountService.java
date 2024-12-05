@@ -1,15 +1,23 @@
 package com.example.peaceful_land.Service;
 
+import com.example.peaceful_land.DTO.ChangeAvatarRequest;
 import com.example.peaceful_land.DTO.PurchaseRoleRequest;
 import com.example.peaceful_land.DTO.RegisterRequest;
 import com.example.peaceful_land.Entity.Account;
 import com.example.peaceful_land.Repository.AccountRepository;
+import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.PriceUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
+
+import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_AVATAR;
 
 @Service @RequiredArgsConstructor
 public class AccountService implements IAccountService {
@@ -122,5 +130,48 @@ public class AccountService implements IAccountService {
         }
         account.setAccountBalance(account.getAccountBalance() - requiredMoney);
         return accountRepository.save(account);
+    }
+
+    @Override
+    public int getExpirationRange(String userId) {
+        Account account = accountRepository.findByEmail(userId)
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+        if (account.getRole() == VariableUtils.ROLE_NORMAL) return 7;
+        else if (account.getRole() == VariableUtils.ROLE_BROKER) return 10;
+        else return 14;
+    }
+
+    @Override
+    public int getApprovalRange(String userId) {
+        Account account = accountRepository.findByEmail(userId)
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+        if (account.getRole() == VariableUtils.ROLE_NORMAL) return 2;
+        else return 1;
+    }
+
+    @Override
+    public String changeAvatar(ChangeAvatarRequest request) {
+        // Kiểm tra tài khoản tồn tại
+        Account account = accountRepository.findById(request.getUserId()).orElse(null);
+        if (account == null) throw new RuntimeException("Tài khoản không tồn tại");
+        // Kiểm tra file hợp lệ
+        MultipartFile file = request.getImage();
+        ImageUtils.checkImageFile(file);
+        // Thực hiện thay đổi avatar
+        try {
+            // Lưu file vào server
+            String fileName = ImageUtils.saveFileServer(file, TYPE_UPLOAD_AVATAR);
+            // Xóa file cũ
+            if (!account.getAvatarUrl().equals(VariableUtils.DEFAULT_AVATAR)) {
+                ImageUtils.deleteFileServer(account.getAvatarUrl());
+            }
+            // Cập nhật đường dẫn file mới vào database
+            account.setAvatarUrl(fileName);
+            accountRepository.save(account);
+            // Trả về thông báo thành công
+            return "Đổi avatar thành công. Đường dẫn mới: " + account.getAvatarUrl();
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi lưu tập tin: " + e.getMessage());
+        }
     }
 }

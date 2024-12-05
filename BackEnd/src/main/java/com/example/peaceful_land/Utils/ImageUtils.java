@@ -24,15 +24,15 @@ public class ImageUtils {
         if (fileName.isBlank()) {
             throw new IllegalArgumentException("Tên tập tin rỗng");
         }
-
         // Tạo tên file mới để tránh trùng lặp
         String uniqueFileName = "";
         if (uploadType == VariableUtils.TYPE_UPLOAD_AVATAR) {
             uniqueFileName = "avatars/" + UUID.randomUUID() + "_" + fileName;
         } else if (uploadType == VariableUtils.TYPE_UPLOAD_PROPERTY_IMAGE) {
             uniqueFileName = "property_imgs/" + UUID.randomUUID() + "_" + fileName;
+        } else if (uploadType == VariableUtils.TYPE_UPLOAD_POST_THUMBNAIL) {
+            uniqueFileName = "post_thumbns/" + UUID.randomUUID() + "_" + fileName;
         }
-
         // Tạo đường dẫn lưu file nếu chưa tồn tại
         Path uploadDir = Paths.get("uploads");
         if (!Files.exists(uploadDir)) {
@@ -49,5 +49,21 @@ public class ImageUtils {
         Path uploadDir = Paths.get("uploads");
         Path filePath = Paths.get(uploadDir.toString(), fileName);
         Files.deleteIfExists(filePath);
+    }
+
+    public static void checkImageFile(MultipartFile file) {
+        // Kiểm tra file rỗng
+        if (file == null) {
+            throw new RuntimeException("Tập tin không tồn tại");
+        }
+        // Kiểm tra kích thước file (nax 5MB)
+        if(file.getSize() > 5*1024*1024) {
+            throw new RuntimeException("Tập tin quá lớn. Kích thước tối đa là 5MB");
+        }
+        // Kiểm tra content type
+        String contentType = file.getContentType();
+        if(contentType == null || !contentType.startsWith("image/")){
+            throw new RuntimeException("Tập tin không phải là hình ảnh");
+        }
     }
 }

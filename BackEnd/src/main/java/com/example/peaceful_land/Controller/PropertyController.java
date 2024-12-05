@@ -26,8 +26,6 @@ import java.util.List;
 public class PropertyController {
 
     private final IPropertyService propertyService;
-    private final PropertyRepository propertyRepository;
-    private final PropertyImageRepository propertyImageRepository;
 
     @PostMapping("/create-property")
     public ResponseEntity<?> createProperty(@RequestBody PropertyRequest request) {
@@ -42,72 +40,11 @@ public class PropertyController {
 
     @PostMapping(value = "/upload-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImages(@ModelAttribute PropertyImagesRequest request) {
-        if (request.getProperty_id() == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID bất động sản không được để trống");
+        try{
+            return ResponseEntity.ok(propertyService.uploadImages(request));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        Property property = propertyRepository.findById(request.getProperty_id())
-                .orElse(null);
-        if (property == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy bất động sản");
-        }
-        List<MultipartFile> files = request.getImages();
-        StringBuilder log = new StringBuilder();
-        int successCount = 0;
-        for(int i = 0; i < files.size(); i++) {
-            MultipartFile file = files.get(i);
-            // Kiểm tra file rỗng
-            if (file.getName().isEmpty()) {
-                log.append("Tập tin thứ ")
-                        .append(i + 1)
-                        .append(" không tồn tại\n");
-                continue;
-            }
-            // Kiểm tra kích thước file (nax 5MB)
-            if (file.getSize() > 5 * 1024 * 1024) {
-                log.append("Tập tin thứ ")
-                        .append(i + 1).append(" quá lớn (")
-                        .append(file.getSize() / 1024 / 1024)
-                        .append("MB). Kích thước tối đa là 5MB\n");
-                continue;
-            }
-            // Kiểm tra content type
-            String contentType = file.getContentType();
-            if (contentType == null || !contentType.startsWith("image/")) {
-                log.append("Tập tin thứ ")
-                        .append(i + 1)
-                        .append(" không phải là hình ảnh\n");
-                continue;
-            }
-            // Lưu file vào server
-            try {
-                String fileName = ImageUtils.saveFileServer(file, VariableUtils.TYPE_UPLOAD_PROPERTY_IMAGE);
-                // Cập nhật đường dẫn file mới vào database
-                propertyImageRepository.save(
-                        PropertyImage.builder()
-                                .property(property)
-                                .fileUrl(fileName)
-                                .build()
-                );
-                log.append("Tập tin thứ ")
-                        .append(i + 1)
-                        .append(" đã được lưu\n");
-                successCount++;
-            }
-            catch (IOException e) {
-                log.append("Lỗi khi lưu tập tin thứ ")
-                        .append(i + 1).append(": ").append(e.getMessage())
-                        .append("\n");
-            }
-        }
-        if (successCount == 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Lôi khi lưu tập tin:\n" + log);
-        }
-        else if (successCount < files.size()) {
-            return ResponseEntity.ok(
-                    String.format("Lưu (%d/%d) tập tin thành công:\n%s", successCount, files.size(), log)
-            );
-        }
-        return ResponseEntity.ok("Lưu tập tin thành công");
     }
 
 }

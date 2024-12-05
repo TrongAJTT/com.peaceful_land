@@ -3,7 +3,7 @@ package com.example.peaceful_land.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity @Table(name = "post_logs")
 @Getter @Setter @Builder
@@ -14,7 +14,7 @@ public class PostLog extends BaseEntity {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "post_id")
-    private Post postId;
+    private Post post;
 
     @Column
     private String title;
@@ -29,6 +29,6 @@ public class PostLog extends BaseEntity {
     private String thumbnUrl;
 
     @Column
-    private LocalDateTime expiration;
+    private LocalDate expiration;
 
 }

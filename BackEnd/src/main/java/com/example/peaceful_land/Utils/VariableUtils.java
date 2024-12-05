@@ -8,5 +8,6 @@ public class VariableUtils {
     public static final String DEFAULT_AVATAR = "template/blank_avatar.webp";
 
     public static final int TYPE_UPLOAD_AVATAR = 1;
+    public static final int TYPE_UPLOAD_PROPERTY_IMAGE = 2;
 
 }

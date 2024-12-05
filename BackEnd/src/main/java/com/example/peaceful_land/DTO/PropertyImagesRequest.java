@@ -5,8 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Data @Getter @Setter
-public class ChangeAvatarRequest {
-    private Long userId;
-    private MultipartFile image;
+public class PropertyImagesRequest {
+    private Long property_id;
+    private List<MultipartFile> images;
 }

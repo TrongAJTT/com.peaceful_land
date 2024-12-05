@@ -18,17 +18,19 @@ public class ImageUtils {
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         // Kiểm tra tên file
         if (fileName.contains("..")) {
-            throw new IllegalArgumentException("File name contains invalid path sequence " + fileName);
+            throw new IllegalArgumentException("tên tập tin chứa ký tự không hợp lệ");
         }
         // Kiểm tra tên file rỗng
         if (fileName.isBlank()) {
-            throw new IllegalArgumentException("File name is empty");
+            throw new IllegalArgumentException("Tên tập tin rỗng");
         }
 
         // Tạo tên file mới để tránh trùng lặp
         String uniqueFileName = "";
         if (uploadType == VariableUtils.TYPE_UPLOAD_AVATAR) {
             uniqueFileName = "avatars/" + UUID.randomUUID() + "_" + fileName;
+        } else if (uploadType == VariableUtils.TYPE_UPLOAD_PROPERTY_IMAGE) {
+            uniqueFileName = "property_imgs/" + UUID.randomUUID() + "_" + fileName;
         }
 
         // Tạo đường dẫn lưu file nếu chưa tồn tại

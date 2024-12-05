@@ -17,9 +17,10 @@ public class AuthController {
     private final IAccountService accountService;
 
     @PostMapping("/login")
-    public String login(String userId, String password) {
+    public ResponseEntity<?> login(String userId, String password) {
         // TODO: Hưng, làm đê
-        return accountService.tryLogin(userId, password);
+        // accountService.tryLogin(userId, password);
+        return ResponseEntity.ok("Đăng nhập thành công");
     }
 
     @PostMapping("/register")

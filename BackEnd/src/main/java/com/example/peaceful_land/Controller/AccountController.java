@@ -1,7 +1,6 @@
 package com.example.peaceful_land.Controller;
 
 import com.example.peaceful_land.DTO.PurchaseRoleRequest;
-import com.example.peaceful_land.ErrorHandler.RestExceptionHandler;
 import com.example.peaceful_land.Service.IAccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,6 @@ public class AccountController {
             return ResponseEntity.ok(accountService.purchaseRole(request));
         }
         catch (Exception e) {
-            RestExceptionHandler restExceptionHandler = new RestExceptionHandler();
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

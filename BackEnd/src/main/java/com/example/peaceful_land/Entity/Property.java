@@ -87,4 +87,15 @@ public class Property extends BaseEntity {
                 ", balconyOrientation='" + balconyOrientation + '\'' +
                 '}';
     }
+
+    public PropertyLog parsePropertyLog(){
+        return PropertyLog.builder()
+                .property(this)
+                .action("Cập nhật giá")
+                .offer(this.offer)
+                .status(this.status)
+                .rentalPeriod(this.rentalPeriod)
+                .price(this.price)
+                .build();
+    }
 }

@@ -14,7 +14,7 @@ public class PropertyLog extends BaseEntity {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "property_id")
-    private Property propertyId;
+    private Property property;
 
     @Column
     private String action;

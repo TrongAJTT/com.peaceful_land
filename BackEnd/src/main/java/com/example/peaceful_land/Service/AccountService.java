@@ -1,21 +1,19 @@
 package com.example.peaceful_land.Service;
 
+import com.example.peaceful_land.DTO.PurchaseRoleRequest;
 import com.example.peaceful_land.DTO.RegisterRequest;
 import com.example.peaceful_land.Entity.Account;
-import com.example.peaceful_land.Entity.UserInterest;
-import com.example.peaceful_land.Entity.UserUninterest;
 import com.example.peaceful_land.Repository.AccountRepository;
-import com.example.peaceful_land.Repository.UserInterestRepository;
-import com.example.peaceful_land.Repository.UserUninterestRepository;
+import com.example.peaceful_land.Utils.PriceUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 
 @Service @RequiredArgsConstructor
 public class AccountService implements IAccountService {
 
     private final AccountRepository accountRepository;
-    private final UserInterestRepository userInterestRepository;
-    private final UserUninterestRepository userUninterestRepository;
     private final EmailService emailService;
     private final RedisService redisService;
 
@@ -37,7 +35,8 @@ public class AccountService implements IAccountService {
             throw new RuntimeException("Số điện thoại đã tồn tại");
         }
 
-        Account account = accountRepository.save(
+        // TODO: Mã hóa mật khẩu
+        return accountRepository.save(
                 Account.builder()
                         .role((byte) 0)
                         .email(userInfo.getEmail())
@@ -48,25 +47,9 @@ public class AccountService implements IAccountService {
                         .phone(userInfo.getPhone())
                         .status(true)
                         .avatar(1L)
+                        .roleExpiration(LocalDate.of(9999, 12, 31))
                         .build()
         );
-
-        // Tạo thông tin quan tâm và không quan tâm mặc định
-        userInterestRepository.save(
-                UserInterest.builder()
-                        .user(account)
-                        .propertyListId("")
-                        .count(0)
-                        .build()
-        );
-        userUninterestRepository.save(
-                UserUninterest.builder()
-                        .user(account)
-                        .propertyListId("")
-                        .count(0)
-                        .build()
-        );
-        return account;
     }
 
     @Override
@@ -101,5 +84,42 @@ public class AccountService implements IAccountService {
             account.setPassword(newPassword); // TODO: Mã hóa mật khẩu
             accountRepository.save(account);
         });
+    }
+
+    @Override
+    public boolean resetRoleIfExpired(Long id) {
+        return accountRepository.findById(id).map(account -> {
+            if (account.getRoleExpiration().isBefore(LocalDate.now())) {
+                account.setRole((byte) 0);
+                account.setRoleExpiration(LocalDate.of(9999, 12, 31));
+                accountRepository.save(account);
+                return true;
+            }
+            return false;
+        }).orElse(false);
+    }
+
+    @Override
+    public Account purchaseRole(PurchaseRoleRequest request) {
+        Account account = accountRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+        Long requiredMoney = PriceUtils.getRolePriceFromDayRange(request.getRole(), request.getDay());
+        if (account.getAccountBalance() < requiredMoney) {
+            throw new RuntimeException("Số dư không đủ. Yêu cầu tối thiểu " + requiredMoney);
+        }
+        // Nếu đã có role thì cộng thêm thời gian
+        if (account.getRole() == request.getRole()){
+            account.setRoleExpiration(account.getRoleExpiration().plusDays(request.getDay()));
+        }
+        // Nếu role mới cao hơn role cũ thì cập nhật role mới và thời gian
+        else if (account.getRole() < request.getRole()){
+            account.setRole(request.getRole());
+            account.setRoleExpiration(LocalDate.now().plusDays(request.getDay()));
+        }
+        else {
+            throw new RuntimeException("Không thể mua role thấp hơn role hiện tại");
+        }
+        account.setAccountBalance(account.getAccountBalance() - requiredMoney);
+        return accountRepository.save(account);
     }
 }

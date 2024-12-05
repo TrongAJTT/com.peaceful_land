@@ -13,8 +13,8 @@ public class Post extends BaseEntity {
     @Id @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne @JoinColumn(name = "user_id")
-    private Account userId;
+    @ManyToOne @JoinColumn(name = "property_id")
+    private Property propertyId;
 
     @Column
     private String title;

@@ -29,11 +29,11 @@ CREATE TABLE `accounts` (
   `password` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `account_balance` bigint NOT NULL COMMENT 'Số dư trong tài khoản',
   `name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `birth_date` datetime DEFAULT NULL COMMENT 'Ngày tháng năm sinh',
+  `birth_date` date DEFAULT NULL COMMENT 'Ngày tháng năm sinh',
   `phone` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `gender` bit(1) DEFAULT NULL COMMENT 'Giới tính (0-nam, 1-nữ)',
   `status` bit(1) NOT NULL COMMENT 'Tình trạng tài khoản: 1 - hoạt động, 0 - đã khóa',
   `avatar` bigint NOT NULL COMMENT 'Ảnh đại diện tài khoản',
+  `role_expiration` date DEFAULT NULL,
   `meta` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `hide` bit(1) DEFAULT NULL,
   `order_index` int DEFAULT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE `accounts` (
   UNIQUE KEY `account_unique_email` (`email`),
   KEY `account_files_FK` (`avatar`),
   CONSTRAINT `account_files_FK` FOREIGN KEY (`avatar`) REFERENCES `files` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ thông tin tài khoản';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ thông tin tài khoản';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -52,6 +52,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
+INSERT INTO `accounts` VALUES (1,1,'dangvantrong2004@gmail.com','123123',1000,'Trọng Đặng','2004-10-04','0123123124',_binary '',1,'2025-02-03','',_binary '\0',0,'2024-12-05 14:09:45');
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -68,7 +69,7 @@ CREATE TABLE `discounts` (
   `original_price` bigint NOT NULL COMMENT 'Giá gốc trước khi giảm',
   `discount_price` bigint DEFAULT NULL COMMENT 'Mức giá giảm xuống',
   `expiration` datetime DEFAULT NULL COMMENT 'Thời gian hết hạn đợt giảm giá',
-  `meta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `meta` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `hide` bit(1) DEFAULT NULL,
   `order_index` int DEFAULT NULL,
   `date_begin` datetime DEFAULT NULL,
@@ -126,9 +127,9 @@ CREATE TABLE `payment_methods` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id phương thức',
   `user_id` bigint NOT NULL COMMENT 'Id người dùng',
   `is_wallet` bit(1) NOT NULL COMMENT '0 - Ví điện tử, 1 - Ngân hàng',
-  `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Tên ví, ngân hàng',
-  `account_number` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Số tài khoản',
-  `meta` text COLLATE utf8mb4_general_ci,
+  `name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `account_number` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `meta` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `hide` bit(1) DEFAULT NULL,
   `order_index` int DEFAULT NULL,
   `date_begin` datetime DEFAULT NULL,
@@ -192,7 +193,7 @@ DROP TABLE IF EXISTS `posts`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `posts` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id của bài rao',
-  `userId` bigint NOT NULL COMMENT 'Id người rao bài',
+  `property_id` bigint NOT NULL COMMENT 'Id bất động sản',
   `title` varchar(150) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Tiêu đề bài rao',
   `status` bit(1) NOT NULL DEFAULT b'1' COMMENT 'Trạng thái: 1 - còn hạn , 0 - hết hạn',
   `description` longtext COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Mô tả bài rao',
@@ -203,10 +204,10 @@ CREATE TABLE `posts` (
   `order_index` int DEFAULT NULL,
   `date_begin` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `posts_account_FK` (`userId`),
   KEY `posts_files_FK` (`thunbn`),
-  CONSTRAINT `posts_account_FK` FOREIGN KEY (`userId`) REFERENCES `accounts` (`id`),
-  CONSTRAINT `posts_files_FK` FOREIGN KEY (`thunbn`) REFERENCES `files` (`id`)
+  KEY `posts_properties_FK` (`property_id`),
+  CONSTRAINT `posts_files_FK` FOREIGN KEY (`thunbn`) REFERENCES `files` (`id`),
+  CONSTRAINT `posts_properties_FK` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ thông tin bài đăng mới nhất';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -232,21 +233,21 @@ CREATE TABLE `properties` (
   `type` bit(1) NOT NULL DEFAULT b'0' COMMENT 'Hình thức: 0 - Mua bán, 1 - Cho thuê',
   `status` bit(1) NOT NULL DEFAULT b'1' COMMENT 'Trạng thái: 0 - Đã bán hoặc cho thuê, 1 - sẵn sàng',
   `rental_period` date DEFAULT NULL COMMENT 'Hạn cho thuê (bắt buộc nếu type=1)',
-  `location` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Địa chỉ: Tỉnh thành, quận huyện, phường xã',
-  `location_detail` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Địa chỉ chi tiết: Số, tên đường, phố',
-  `map_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Địa chỉ trên Google Map',
-  `category` enum('Nhà riêng','Nhà biệt thự, liền kề','Nhà mặt phố','Shophouse, nhà phố thương mại','Chung cư mini, căn hộ dịch vụ','Condotel','Đất nền dự án','Bán đất','Trang trại, khu nghỉ đưỡng','Kho, nhà xưởng','Bất động sản khác') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Nhà riêng' COMMENT 'Các loại bất động sản',
+  `location` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `location_detail` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `map_url` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `category` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `price` bigint NOT NULL COMMENT 'Giá tiền',
   `area` int NOT NULL COMMENT 'Diện tích bất động sản (mét vuông)',
-  `legal` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Giấy tờ pháp lý',
-  `bedrooms` tinyint DEFAULT NULL COMMENT 'Số lượng phòng ngủ',
-  `toilets` tinyint DEFAULT NULL COMMENT 'Số lượng nhà vệ sinh',
+  `legal` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `bedrooms` int DEFAULT NULL,
+  `toilets` int DEFAULT NULL,
   `entrance` tinyint DEFAULT NULL COMMENT 'Lối vào',
   `frontage` tinyint DEFAULT NULL COMMENT 'Mặt tiền',
-  `house_orientation` enum('Bắc','Đông Bắc','Đông','Đông Nam','Nam','Tây Nam','Tây','Tây Bắc') COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Hướng nhà',
-  `balcony_orientation` enum('Bắc','Đông Bắc','Đông','Đông Nam','Nam','Tây Nam','Tây','Tây Bắc') COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Hướng ban công',
+  `house_orientation` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `balcony_orientation` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `hide` bit(1) DEFAULT NULL,
-  `meta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `meta` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `order_index` int DEFAULT NULL,
   `date_begin` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -364,6 +365,38 @@ LOCK TABLES `requests_contact` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `requests_post`
+--
+
+DROP TABLE IF EXISTS `requests_post`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `requests_post` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id yêu cầu duyệt',
+  `post_id` bigint NOT NULL COMMENT 'Id bài rao',
+  `expiration` date NOT NULL COMMENT 'Ngày hết hạn yêu cầu',
+  `approved` bit(1) DEFAULT NULL COMMENT 'Trạng thái duyệt',
+  `deny_message` text COLLATE utf8mb4_general_ci COMMENT 'Lý do bài đăng không được duyệt',
+  `meta` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `hide` bit(1) DEFAULT NULL,
+  `order_index` int DEFAULT NULL,
+  `date_begin` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `requests_post_posts_FK` (`post_id`),
+  CONSTRAINT `requests_post_posts_FK` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng chứa thông tin yêu cầu duyệt bài rao và bất động sản';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `requests_post`
+--
+
+LOCK TABLES `requests_post` WRITE;
+/*!40000 ALTER TABLE `requests_post` DISABLE KEYS */;
+/*!40000 ALTER TABLE `requests_post` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `requests_report`
 --
 
@@ -469,6 +502,36 @@ LOCK TABLES `requests_withdraw` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `tokens`
+--
+
+DROP TABLE IF EXISTS `tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tokens` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `token_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `expiration_date` datetime DEFAULT NULL,
+  `revoked` bit(1) NOT NULL,
+  `expired` bit(1) NOT NULL,
+  `user_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tokens_accounts_FK` (`user_id`),
+  CONSTRAINT `tokens_accounts_FK` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ thông tin Token, cần sửa lại sau khi triển khai Spring Security';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tokens`
+--
+
+LOCK TABLES `tokens` WRITE;
+/*!40000 ALTER TABLE `tokens` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tokens` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `transactions`
 --
 
@@ -502,28 +565,6 @@ LOCK TABLES `transactions` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `user_id_class`
---
-
-DROP TABLE IF EXISTS `user_id_class`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `user_id_class` (
-  `user_id` bigint NOT NULL,
-  PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user_id_class`
---
-
-LOCK TABLES `user_id_class` WRITE;
-/*!40000 ALTER TABLE `user_id_class` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_id_class` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user_interests`
 --
 
@@ -531,16 +572,16 @@ DROP TABLE IF EXISTS `user_interests`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user_interests` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id',
   `user_id` bigint NOT NULL COMMENT 'Id người dùng',
-  `property_list_id` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `count` int NOT NULL DEFAULT '0',
-  `meta` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `property_id` bigint DEFAULT NULL COMMENT 'Id bất động sản',
+  `type` bit(1) NOT NULL COMMENT '0 - Không thích, 1 - Thích',
+  `meta` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `hide` bit(1) DEFAULT NULL,
   `order_index` int DEFAULT NULL,
   `date_begin` datetime DEFAULT NULL,
-  PRIMARY KEY (`user_id`),
-  CONSTRAINT `user_interests_accounts_FK` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng ghi lại danh sách bất động sản mà người dùng quan tâm';
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -550,35 +591,6 @@ CREATE TABLE `user_interests` (
 LOCK TABLES `user_interests` WRITE;
 /*!40000 ALTER TABLE `user_interests` DISABLE KEYS */;
 /*!40000 ALTER TABLE `user_interests` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `user_uninterests`
---
-
-DROP TABLE IF EXISTS `user_uninterests`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `user_uninterests` (
-  `user_id` bigint NOT NULL COMMENT 'Id người dùng',
-  `property_list_id` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `count` int NOT NULL DEFAULT '0',
-  `meta` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `hide` bit(1) DEFAULT NULL,
-  `order_index` int DEFAULT NULL,
-  `date_begin` datetime DEFAULT NULL,
-  PRIMARY KEY (`user_id`),
-  CONSTRAINT `user_uninterests_accounts_FK_copy` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng ghi lại danh sách bất động sản mà người dùng không quan tâm';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user_uninterests`
---
-
-LOCK TABLES `user_uninterests` WRITE;
-/*!40000 ALTER TABLE `user_uninterests` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_uninterests` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -594,4 +606,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-05  6:35:06
+-- Dump completed on 2024-12-05 22:53:39

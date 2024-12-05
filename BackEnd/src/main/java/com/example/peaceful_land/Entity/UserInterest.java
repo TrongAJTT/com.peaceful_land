@@ -8,18 +8,16 @@ import lombok.*;
 @NoArgsConstructor @AllArgsConstructor
 public class UserInterest extends BaseEntity {
 
-    @Id
-    private Long userId;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @OneToOne
-    @MapsId // Sử dụng userId từ thực thể liên quan làm khóa chính.
-    @JoinColumn(name = "user_id")
-    private Account user;
+    @ManyToOne @JoinColumn(name = "user_id")
+    private Account userId;
 
-    @Column(name = "property_list_id")
-    private String propertyListId;
+    @ManyToOne @JoinColumn(name = "property_id")
+    private Property propertyId;
 
     @Column
-    private Integer count;
+    private Boolean type;
 
 }

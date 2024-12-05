@@ -36,10 +36,13 @@ public class Account extends BaseEntity {
     private String phone;
 
     @Column
-    private Long avatar;
+    private boolean status;
 
     @Column
-    private boolean status;
+    private Long avatar;
+
+    @Column(name = "role_expiration")
+    private LocalDate roleExpiration;
 
     @Override
     public String toString(){
@@ -54,6 +57,7 @@ public class Account extends BaseEntity {
                 ", phone='" + phone + '\'' +
                 ", avatar=" + avatar +
                 ", status=" + status +
+                ", roleExpiration=" + roleExpiration +
                 '}';
     }
 

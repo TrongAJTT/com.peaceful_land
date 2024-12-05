@@ -50,7 +50,6 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES (3,0,'dangvantrong2004@gmail.com','123123',0,'Trọng Đặng','2004-10-04','0123123124','avatars/0de6f4de-074e-408d-944b-3566d2489de5_CladdDiagram.jpg',_binary '','9999-12-31','',_binary '\0',0,'2024-12-05 18:35:50');
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -131,7 +130,7 @@ CREATE TABLE `post_logs` (
   `title` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Tiêu đề bài rao',
   `status` bit(1) NOT NULL DEFAULT b'1' COMMENT 'Trạng thái: 1 - còn hạn , 0 - hết hạn',
   `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Mô tả bài rao',
-  `expiration` datetime NOT NULL COMMENT 'Ngày hết hạn rao bài',
+  `expiration` date NOT NULL COMMENT 'Ngày hết hạn rao bài',
   `thumbn_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `meta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `hide` bit(1) DEFAULT NULL,
@@ -139,8 +138,8 @@ CREATE TABLE `post_logs` (
   `date_begin` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `post_logs_posts_FK` (`post_id`),
-  CONSTRAINT `post_logs_posts_FK` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ nhật ký cập nhật bài đăng. Bài đăng khi được chỉnh sửa thì phải thêm vào đây trước sau đó mới cập nhật bảng Posts.';
+  CONSTRAINT `post_logs_posts_FK` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ nhật ký cập nhật bài đăng. Bài đăng khi được chỉnh sửa thì phải thêm vào đây trước sau đó mới cập nhật bảng Posts.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -165,8 +164,8 @@ CREATE TABLE `posts` (
   `title` varchar(150) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Tiêu đề bài rao',
   `status` bit(1) NOT NULL DEFAULT b'1' COMMENT 'Trạng thái: 1 - còn hạn , 0 - hết hạn',
   `description` longtext COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Mô tả bài rao',
-  `thumbn_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `expiration` datetime NOT NULL COMMENT 'Ngày hết hạn rao bài',
+  `thumbn_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Đường dẫn lưu thumbnail',
+  `expiration` date NOT NULL COMMENT 'Ngày hết hạn rao bài',
   `meta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `hide` bit(1) DEFAULT NULL,
   `order_index` int DEFAULT NULL,
@@ -174,7 +173,7 @@ CREATE TABLE `posts` (
   PRIMARY KEY (`id`),
   KEY `posts_properties_FK` (`property_id`),
   CONSTRAINT `posts_properties_FK` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ thông tin bài đăng mới nhất';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ thông tin bài đăng mới nhất';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -219,7 +218,7 @@ CREATE TABLE `properties` (
   PRIMARY KEY (`id`),
   KEY `properties_account_FK` (`user_id`),
   CONSTRAINT `properties_account_FK` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng cập nhật thông tin mới nhất về bất động sản.';
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng cập nhật thông tin mới nhất về bất động sản.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -243,7 +242,7 @@ CREATE TABLE `property_images` (
   `property_id` bigint NOT NULL COMMENT 'Id bất động sản',
   `file_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Đường dẫn lưu trữ',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ tập tin và đường dẫn';
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ tập tin và đường dẫn';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -252,6 +251,7 @@ CREATE TABLE `property_images` (
 
 LOCK TABLES `property_images` WRITE;
 /*!40000 ALTER TABLE `property_images` DISABLE KEYS */;
+INSERT INTO `property_images` VALUES (7,8,'property_imgs/f564d500-3b9b-448f-9dee-d0877abd6cc4_images.jpg');
 /*!40000 ALTER TABLE `property_images` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -277,7 +277,7 @@ CREATE TABLE `property_logs` (
   PRIMARY KEY (`id`),
   KEY `property_logs_properties_FK` (`property_id`),
   CONSTRAINT `property_logs_properties_FK` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng ghi lại nhật ký cập nhật bất động sản, khi cập nhật cần thêm dữ liệu vào bảng này trước.';
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng ghi lại nhật ký cập nhật bất động sản, khi cập nhật cần thêm dữ liệu vào bảng này trước.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -300,7 +300,7 @@ CREATE TABLE `purchases` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id thanh toán',
   `user_id` bigint NOT NULL COMMENT 'Id người dùng',
   `amount` bigint NOT NULL COMMENT 'Lượng tiền giao dịch',
-  `action` enum('Mua gói môi giới','Mua gói môi giới VIP','Gia hạn bài đăng') COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Hành động thanh toán',
+  `action` enum('Mua gói môi giới','Mua gói môi giới VIP','Gia hạn gói','Gia hạn bài đăng') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Hành động thanh toán',
   `meta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `hide` bit(1) DEFAULT NULL,
   `order_index` int DEFAULT NULL,
@@ -308,7 +308,7 @@ CREATE TABLE `purchases` (
   PRIMARY KEY (`id`),
   KEY `purchases_accounts_FK` (`user_id`),
   CONSTRAINT `purchases_accounts_FK` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng ghi lại những lần thanh toán trên trang web.';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng ghi lại những lần thanh toán trên trang web.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -596,4 +596,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-06  1:44:50
+-- Dump completed on 2024-12-06  4:47:49

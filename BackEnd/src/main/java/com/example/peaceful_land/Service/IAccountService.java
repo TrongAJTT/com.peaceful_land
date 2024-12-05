@@ -6,4 +6,7 @@ import com.example.peaceful_land.Entity.Account;
 public interface IAccountService {
     String tryLogin(String userId, String password);
     Account register(RegisterRequest userInfo);
+    void forgotPassword(String email);
+    void verifyOtp(String email, String otp);
+    void resetPassword(String email, String newPassword);
 }

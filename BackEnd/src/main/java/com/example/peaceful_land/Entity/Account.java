@@ -40,4 +40,20 @@ public class Account extends BaseEntity {
     @Column
     private boolean status;
 
+    @Override
+    public String toString(){
+        return "Account{" +
+                "id=" + id +
+                ", role=" + role +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", accountBalance=" + accountBalance +
+                ", name='" + name + '\'' +
+                ", birthDate=" + birthDate +
+                ", phone='" + phone + '\'' +
+                ", avatar=" + avatar +
+                ", status=" + status +
+                '}';
+    }
+
 }

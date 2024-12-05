@@ -86,7 +86,7 @@ public class EmailService implements IEmailService {
     }
 
     @Override
-    public String sendEmailConfirmation(String emailTo, String VerificationCode) {
+    public String sendForgotPassVerifyEmail(String emailTo, String VerificationCode) {
         try {
             System.out.println("Sending Email...");
             // Creating a simple mail message

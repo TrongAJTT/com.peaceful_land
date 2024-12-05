@@ -11,5 +11,5 @@ public interface IEmailService {
     // Gửi email đính kèm file
     String sendMailWithAttachment(EmailDetails details);
 
-    String sendEmailConfirmation(String emailTo, String VerificationCode);
+    String sendForgotPassVerifyEmail(String emailTo, String VerificationCode);
 }

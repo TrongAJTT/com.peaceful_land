@@ -16,6 +16,8 @@ public class AccountService implements IAccountService {
     private final AccountRepository accountRepository;
     private final UserInterestRepository userInterestRepository;
     private final UserUninterestRepository userUninterestRepository;
+    private final EmailService emailService;
+    private final RedisService redisService;
 
     @Override
     public String tryLogin(String userId, String password) {
@@ -67,6 +69,37 @@ public class AccountService implements IAccountService {
         return account;
     }
 
+    @Override
+    public void forgotPassword(String email) {
+        if (!accountRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email không tồn tại");
+        }
+        // Tạo mã OTP có 6 ksy tự
+        String otp = String.valueOf((int) (Math.random() * 900000 + 100000));
+        // Lưu mã OTP vào Redis với email là key, thời gian sống là 5 phút
+        redisService.storeOtp(email, otp, 300);
+        // Gửi email chứa mã OTP
+        emailService.sendForgotPassVerifyEmail(email, otp);
+    }
 
+    @Override
+    public void verifyOtp(String email, String otp) {
+        if (!accountRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email không hợp lệ");
+        }
+        if (!redisService.verifyOtp(email, otp)) {
+            throw new RuntimeException("Mã OTP không hợp lệ hoặc đã hết hạn");
+        }
+    }
 
+    @Override
+    public void resetPassword(String email, String newPassword) {
+        if (!accountRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email không hợp lệ");
+        }
+        accountRepository.findByEmail(email).ifPresent(account -> {
+            account.setPassword(newPassword); // TODO: Mã hóa mật khẩu
+            accountRepository.save(account);
+        });
+    }
 }

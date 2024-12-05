@@ -17,7 +17,7 @@ public class Property extends BaseEntity {
     private Account userId;
 
     @Column
-    private Boolean type; // Hình thức: 0 - Mua bán, 1 - Cho thuê
+    private Boolean offer; // Hình thức: 0 - Mua bán, 1 - Cho thuê
 
     @Column
     private Boolean status; // Trạng thái: 0 - Đã bán hoặc cho thuê, 1 - sẵn sàng
@@ -69,7 +69,7 @@ public class Property extends BaseEntity {
         return "Property{" +
                 "id=" + id +
                 ", userId=" + userId +
-                ", type=" + type +
+                ", offer=" + offer +
                 ", status=" + status +
                 ", rentalPeriod=" + rentalPeriod +
                 ", location='" + location + '\'' +

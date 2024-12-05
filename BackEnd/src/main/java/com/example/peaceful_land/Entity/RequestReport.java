@@ -15,7 +15,7 @@ public class RequestReport extends BaseEntity {
     private Property propertyId;
 
     @Column
-    private String type;
+    private String object;
 
     @Column
     private String reasons;

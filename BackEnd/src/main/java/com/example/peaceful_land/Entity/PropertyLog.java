@@ -20,7 +20,7 @@ public class PropertyLog extends BaseEntity {
     private String action;
 
     @Column
-    private Boolean type;   // Hình thức: 0 - Mua bán, 1 - Cho thuê
+    private Boolean offer;   // Hình thức: 0 - Mua bán, 1 - Cho thuê
 
     @Column
     private Boolean status; // Trạng thái: 0 - Đã bán hoặc cho thuê, 1 - sẵn sàng

@@ -18,6 +18,6 @@ public class UserInterest extends BaseEntity {
     private Property propertyId;
 
     @Column
-    private Boolean type;
+    private Boolean interested;
 
 }

@@ -4,17 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data @Getter @Setter
-public class PostRequest {
+public class ChangeAvatarRequest {
 
-    @JsonProperty("property_id")
-    private Long propertyId;
+    @JsonProperty("user_id")
+    private Long userId;
 
-    private String title;
-
-    private String description;
-
-    private String content;
+    private MultipartFile image;
 
 }

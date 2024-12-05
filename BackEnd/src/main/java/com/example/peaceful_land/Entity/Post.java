@@ -25,8 +25,8 @@ public class Post extends BaseEntity {
     @Column
     private String description;
 
-    @OneToOne @JoinColumn(name = "thumbn_id")
-    private File thumbn;
+    @Column(name = "thumbn_url")
+    private String thumbnUrl;
 
     @Column
     private LocalDateTime expiration;

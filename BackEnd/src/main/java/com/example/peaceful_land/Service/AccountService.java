@@ -5,6 +5,7 @@ import com.example.peaceful_land.DTO.RegisterRequest;
 import com.example.peaceful_land.Entity.Account;
 import com.example.peaceful_land.Repository.AccountRepository;
 import com.example.peaceful_land.Utils.PriceUtils;
+import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,7 @@ public class AccountService implements IAccountService {
                         .birthDate(userInfo.getBirthDate())
                         .phone(userInfo.getPhone())
                         .status(true)
-                        .avatar(1L)
+                        .avatarUrl(VariableUtils.DEFAULT_AVATAR)
                         .roleExpiration(LocalDate.of(9999, 12, 31))
                         .build()
         );

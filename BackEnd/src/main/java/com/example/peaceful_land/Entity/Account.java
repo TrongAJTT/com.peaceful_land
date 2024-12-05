@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity @Table(name = "accounts")
 @Getter @Setter @Builder
@@ -35,11 +34,11 @@ public class Account extends BaseEntity {
     @Column
     private String phone;
 
-    @Column
-    private boolean status;
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @Column
-    private Long avatar;
+    private boolean status;
 
     @Column(name = "role_expiration")
     private LocalDate roleExpiration;
@@ -55,7 +54,7 @@ public class Account extends BaseEntity {
                 ", name='" + name + '\'' +
                 ", birthDate=" + birthDate +
                 ", phone='" + phone + '\'' +
-                ", avatar=" + avatar +
+                ", avatar=" + avatarUrl +
                 ", status=" + status +
                 ", roleExpiration=" + roleExpiration +
                 '}';

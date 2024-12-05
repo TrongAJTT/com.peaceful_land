@@ -4,18 +4,19 @@ import com.example.peaceful_land.DTO.ChangeAvatarRequest;
 import com.example.peaceful_land.DTO.PurchaseRoleRequest;
 import com.example.peaceful_land.DTO.RegisterRequest;
 import com.example.peaceful_land.Entity.Account;
+import com.example.peaceful_land.Entity.Purchase;
 import com.example.peaceful_land.Repository.AccountRepository;
+import com.example.peaceful_land.Repository.PurchaseRepository;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.PriceUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_AVATAR;
 
@@ -23,6 +24,7 @@ import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_AVATAR;
 public class AccountService implements IAccountService {
 
     private final AccountRepository accountRepository;
+    private final PurchaseRepository purchaseRepository;
     private final EmailService emailService;
     private final RedisService redisService;
 
@@ -119,11 +121,27 @@ public class AccountService implements IAccountService {
         // Nếu đã có role thì cộng thêm thời gian
         if (account.getRole() == request.getRole()){
             account.setRoleExpiration(account.getRoleExpiration().plusDays(request.getDay()));
+            // Lưu thông tin giao dịch
+            purchaseRepository.save(Purchase.builder()
+                    .user(account)
+                    .action(VariableUtils.PURCHASE_ACTION_EXTEND_ROLE)
+                    .amount(requiredMoney)
+                    .build()
+            );
         }
         // Nếu role mới cao hơn role cũ thì cập nhật role mới và thời gian
         else if (account.getRole() < request.getRole()){
             account.setRole(request.getRole());
             account.setRoleExpiration(LocalDate.now().plusDays(request.getDay()));
+            // Lưu thông tin giao dịch
+            purchaseRepository.save(Purchase.builder()
+                    .user(account)
+                    .action(Objects.equals(request.getRole(), VariableUtils.ROLE_BROKER) ?
+                            VariableUtils.PURCHASE_ACTION_BROKER :
+                            VariableUtils.PURCHASE_ACTION_BROKER_VIP)
+                    .amount(requiredMoney)
+                    .build()
+            );
         }
         else {
             throw new RuntimeException("Không thể mua role thấp hơn role hiện tại");

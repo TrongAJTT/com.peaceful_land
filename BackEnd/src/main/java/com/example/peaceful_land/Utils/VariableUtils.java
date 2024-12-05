@@ -14,4 +14,9 @@ public class VariableUtils {
     public static final int TYPE_UPLOAD_PROPERTY_IMAGE = 2;
     public static final int TYPE_UPLOAD_POST_THUMBNAIL = 3;
 
+    public static final String PURCHASE_ACTION_BROKER = "Mua gói môi giới";
+    public static final String PURCHASE_ACTION_BROKER_VIP = "Mua gói môi giới VIP";
+    public static final String PURCHASE_ACTION_EXTEND_ROLE = "Gia hạn gói";
+    public static final String PURCHASE_ACTION_EXTEND_POST = "Gia bài đăng";
+
 }

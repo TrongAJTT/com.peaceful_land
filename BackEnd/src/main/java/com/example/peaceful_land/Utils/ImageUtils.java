@@ -14,7 +14,6 @@ import java.util.UUID;
 public class ImageUtils {
 
     public static String saveFileServer(MultipartFile file, int uploadType) throws IOException {
-        String contentType = file.getContentType();
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         // Kiểm tra tên file
         if (fileName.contains("..")) {

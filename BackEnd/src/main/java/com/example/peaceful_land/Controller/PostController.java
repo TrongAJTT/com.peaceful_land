@@ -1,10 +1,9 @@
 package com.example.peaceful_land.Controller;
 
 import com.example.peaceful_land.DTO.ChangePostThumbnailRequest;
+import com.example.peaceful_land.DTO.PostApproveRequest;
 import com.example.peaceful_land.DTO.PostRequest;
-import com.example.peaceful_land.DTO.PropertyRequest;
 import com.example.peaceful_land.Entity.Post;
-import com.example.peaceful_land.Entity.Property;
 import com.example.peaceful_land.Service.IPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -30,12 +29,22 @@ public class PostController {
         }
     }
 
-
     @PostMapping(value = "/change-thumbnail", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> changeThumbnail(@ModelAttribute ChangePostThumbnailRequest request) {
         try {
             String result = postService.changeThumbnail(request);
             return ResponseEntity.ok(result);
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/request-approve")
+    public ResponseEntity<?> requestApprove(@RequestBody PostApproveRequest request) {
+        try {
+            return ResponseEntity.ok("WORK");
+            // TODO: Implement this
         }
         catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

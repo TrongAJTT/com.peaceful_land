@@ -31,8 +31,8 @@ CREATE TABLE `accounts` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Tên tài khoản',
   `birth_date` date DEFAULT NULL COMMENT 'Ngày tháng năm sinh',
   `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Số điện thoại',
+  `avatar_url` text COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Đường dẫn ảnh đại diện',
   `status` bit(1) NOT NULL COMMENT 'Tình trạng tài khoản: 1 - hoạt động, 0 - đã khóa',
-  `avatar` bigint NOT NULL COMMENT 'Ảnh đại diện tài khoản',
   `role_expiration` date DEFAULT NULL COMMENT 'Ngày hết hạn vai trò',
   `meta` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `hide` bit(1) DEFAULT NULL,
@@ -40,10 +40,8 @@ CREATE TABLE `accounts` (
   `date_begin` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `account_unique_phone` (`phone`),
-  UNIQUE KEY `account_unique_email` (`email`),
-  KEY `account_files_FK` (`avatar`),
-  CONSTRAINT `account_files_FK` FOREIGN KEY (`avatar`) REFERENCES `files` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ thông tin tài khoản';
+  UNIQUE KEY `account_unique_email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ thông tin tài khoản';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -52,7 +50,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES (1,1,'dangvantrong2004@gmail.com','123123',1000,'Trọng Đặng','2004-10-04','0123123124',_binary '',1,'2025-02-03','',_binary '\0',0,'2024-12-05 14:09:45');
+INSERT INTO `accounts` VALUES (3,0,'dangvantrong2004@gmail.com','123123',0,'Trọng Đặng','2004-10-04','0123123124','avatars/0de6f4de-074e-408d-944b-3566d2489de5_CladdDiagram.jpg',_binary '','9999-12-31','',_binary '\0',0,'2024-12-05 18:35:50');
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -86,34 +84,6 @@ CREATE TABLE `discounts` (
 LOCK TABLES `discounts` WRITE;
 /*!40000 ALTER TABLE `discounts` DISABLE KEYS */;
 /*!40000 ALTER TABLE `discounts` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `files`
---
-
-DROP TABLE IF EXISTS `files`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `files` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id tập tin',
-  `file_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Đường dẫn lưu trữ',
-  `meta` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `hide` bit(1) DEFAULT NULL,
-  `order_index` int DEFAULT NULL,
-  `date_begin` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ tập tin và đường dẫn';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `files`
---
-
-LOCK TABLES `files` WRITE;
-/*!40000 ALTER TABLE `files` DISABLE KEYS */;
-INSERT INTO `files` VALUES (1,'avatars/25f47495-1aba-4184-ba92-85f5a3e87fdf_blank_avatar.jpg','',_binary '\0',0,'2024-12-04 22:24:58');
-/*!40000 ALTER TABLE `files` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -161,16 +131,14 @@ CREATE TABLE `post_logs` (
   `title` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Tiêu đề bài rao',
   `status` bit(1) NOT NULL DEFAULT b'1' COMMENT 'Trạng thái: 1 - còn hạn , 0 - hết hạn',
   `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Mô tả bài rao',
-  `thunbn` bigint NOT NULL COMMENT 'Ảnh bìa bài đăng (lưu riêng biệt), có thể chọn từ bất động sản hoặc tải ảnh mới',
   `expiration` datetime NOT NULL COMMENT 'Ngày hết hạn rao bài',
+  `thumbn_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `meta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `hide` bit(1) DEFAULT NULL,
   `order_index` int DEFAULT NULL,
   `date_begin` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `post_logs_posts_FK` (`post_id`),
-  KEY `post_logs_files_FK` (`thunbn`),
-  CONSTRAINT `post_logs_files_FK` FOREIGN KEY (`thunbn`) REFERENCES `files` (`id`),
   CONSTRAINT `post_logs_posts_FK` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ nhật ký cập nhật bài đăng. Bài đăng khi được chỉnh sửa thì phải thêm vào đây trước sau đó mới cập nhật bảng Posts.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -197,16 +165,14 @@ CREATE TABLE `posts` (
   `title` varchar(150) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Tiêu đề bài rao',
   `status` bit(1) NOT NULL DEFAULT b'1' COMMENT 'Trạng thái: 1 - còn hạn , 0 - hết hạn',
   `description` longtext COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Mô tả bài rao',
-  `thunbn` bigint NOT NULL COMMENT 'Ảnh bìa bài đăng (lưu riêng biệt), có thể chọn từ bất động sản hoặc tải ảnh mới',
+  `thumbn_url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `expiration` datetime NOT NULL COMMENT 'Ngày hết hạn rao bài',
   `meta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `hide` bit(1) DEFAULT NULL,
   `order_index` int DEFAULT NULL,
   `date_begin` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `posts_files_FK` (`thunbn`),
   KEY `posts_properties_FK` (`property_id`),
-  CONSTRAINT `posts_files_FK` FOREIGN KEY (`thunbn`) REFERENCES `files` (`id`),
   CONSTRAINT `posts_properties_FK` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ thông tin bài đăng mới nhất';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -253,7 +219,7 @@ CREATE TABLE `properties` (
   PRIMARY KEY (`id`),
   KEY `properties_account_FK` (`user_id`),
   CONSTRAINT `properties_account_FK` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng cập nhật thông tin mới nhất về bất động sản.';
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng cập nhật thông tin mới nhất về bất động sản.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -263,6 +229,30 @@ CREATE TABLE `properties` (
 LOCK TABLES `properties` WRITE;
 /*!40000 ALTER TABLE `properties` DISABLE KEYS */;
 /*!40000 ALTER TABLE `properties` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `property_images`
+--
+
+DROP TABLE IF EXISTS `property_images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `property_images` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id tập tin',
+  `property_id` bigint NOT NULL COMMENT 'Id bất động sản',
+  `file_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Đường dẫn lưu trữ',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ tập tin và đường dẫn';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `property_images`
+--
+
+LOCK TABLES `property_images` WRITE;
+/*!40000 ALTER TABLE `property_images` DISABLE KEYS */;
+/*!40000 ALTER TABLE `property_images` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -286,8 +276,8 @@ CREATE TABLE `property_logs` (
   `date_begin` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `property_logs_properties_FK` (`property_id`),
-  CONSTRAINT `property_logs_properties_FK` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng ghi lại nhật ký cập nhật bất động sản, khi cập nhật cần thêm dữ liệu vào bảng này trước.';
+  CONSTRAINT `property_logs_properties_FK` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng ghi lại nhật ký cập nhật bất động sản, khi cập nhật cần thêm dữ liệu vào bảng này trước.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -606,4 +596,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-05 23:19:12
+-- Dump completed on 2024-12-06  1:44:50

@@ -3,6 +3,7 @@ package com.example.peaceful_land.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity @Table(name = "accounts")
@@ -29,7 +30,7 @@ public class Account extends BaseEntity {
     private String name;
 
     @Column(name = "birth_date")
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
 
     @Column
     private String phone;

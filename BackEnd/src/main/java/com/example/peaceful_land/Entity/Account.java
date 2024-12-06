@@ -62,16 +62,7 @@ public class Account extends BaseEntity {
     }
 
     public String getRoleString(){
-        return Account.getRoleString(role);
-    }
-
-    public static String getRoleString(Byte role){
-        return switch (role) {
-            case 0 -> VariableUtils.ROLE_NORMAL_STR;
-            case 1 -> VariableUtils.ROLE_BROKER_STR;
-            case 2 -> VariableUtils.ROLE_BROKER_VIP_STR;
-            default -> VariableUtils.ROLE_ADMIN_STR;
-        };
+        return VariableUtils.getRoleString(role);
     }
 
 }

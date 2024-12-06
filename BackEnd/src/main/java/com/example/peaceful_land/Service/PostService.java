@@ -110,7 +110,7 @@ public class PostService implements IPostService {
             postRepository.save(post);
         }
         // Lấy số ngày duyệt bài tối đa
-        int noDayApprove = accountService.getApprovalRange(role);
+        int noDayApprove = VariableUtils.getApprovalDayRange(role);
         // Tạo yêu cầu duyệt bài
         RequestPost requestPost = RequestPost.builder()
                 .post(post)

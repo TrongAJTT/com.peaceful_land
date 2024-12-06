@@ -34,12 +34,6 @@ public interface IAccountService {
     // Mua vai trò
     Account purchaseRole(PurchaseRoleRequest id);
 
-    // Lấy thời gian rao bài tối đa (theo ngày)
-    int getExpirationRange(String userId);
-
-    // Lấy thời gian duyệt bài tối đa (theo ngày)
-    int getApprovalRange(Byte role);
-
     // Thay đổi avatar
     String changeAvatar(ChangeAvatarRequest request);
 
@@ -51,4 +45,7 @@ public interface IAccountService {
 
     // Xóa mềm phương thức thanh toán
     String deleteSoftPaymentMethod(Long userId, Long paymentMethodId);
+
+    // Kiểm tra khả năng đăng bài rao
+    PostPermissionResponse checkPostPermission(Long userId);
 }

@@ -6,9 +6,9 @@ import com.example.peaceful_land.Entity.PaymentMethod;
 import com.example.peaceful_land.Entity.Purchase;
 import com.example.peaceful_land.Repository.AccountRepository;
 import com.example.peaceful_land.Repository.PaymentMethodRepository;
+import com.example.peaceful_land.Repository.PropertyRepository;
 import com.example.peaceful_land.Repository.PurchaseRepository;
 import com.example.peaceful_land.Utils.ImageUtils;
-import com.example.peaceful_land.Utils.PriceUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +29,7 @@ public class AccountService implements IAccountService {
     private final PaymentMethodRepository paymentMethodRepository;
     private final EmailService emailService;
     private final RedisService redisService;
+    private final PropertyRepository propertyRepository;
 
     @Override
     public AccountInfoResponse getAccountInfo(Long userId) {
@@ -137,7 +138,7 @@ public class AccountService implements IAccountService {
     public Account purchaseRole(PurchaseRoleRequest request) {
         Account account = accountRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
-        Long requiredMoney = PriceUtils.getRolePriceFromDayRange(request.getRole(), request.getDay());
+        Long requiredMoney = VariableUtils.getRolePriceFromDayRange(request.getRole(), request.getDay());
         if (account.getAccountBalance() < requiredMoney) {
             throw new RuntimeException("Số dư không đủ. Yêu cầu tối thiểu " + requiredMoney);
         }
@@ -171,23 +172,6 @@ public class AccountService implements IAccountService {
         }
         account.setAccountBalance(account.getAccountBalance() - requiredMoney);
         return accountRepository.save(account);
-    }
-
-    @Override
-    public int getExpirationRange(String userId) {
-        Account account = accountRepository.findByEmail(userId)
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
-        if (account.getRole() == VariableUtils.ROLE_NORMAL) return 7;
-        else if (account.getRole() == VariableUtils.ROLE_BROKER) return 10;
-        else return 14;
-    }
-
-    @Override
-    public int getApprovalRange(Byte role) {
-        // Nếu role không phải từ 0 đến 2 thì trả về -1
-        if (role < 0 || role > 2) return -1;
-        else if (Objects.equals(role, VariableUtils.ROLE_NORMAL)) return 2;
-        else return 1;
     }
 
     @Override
@@ -266,5 +250,38 @@ public class AccountService implements IAccountService {
                     return "Xóa phương thức thanh toán thành công";
                 })
                 .orElseThrow(() -> new RuntimeException("Phương thức thanh toán không tồn tại"));
+    }
+
+    @Override
+    public PostPermissionResponse checkPostPermission(Long userId) {
+        // Kiểm tra tài khoản có tồn tại không
+        Account account = accountRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+        // Nếu là người dùng thông thường thì kiểm tra có vượt quá lượng bài đăng tối đa không
+        if (account.getRole() == VariableUtils.ROLE_NORMAL) {
+            long count = propertyRepository.countByUserEquals(account);
+            if (count >= VariableUtils.MAX_POST_NORMAL_TOTAL) {
+                throw new RuntimeException("Vượt quá số lượng bài đăng tối đa");
+            }
+        }
+        // Kiểm tra xem lượng bài đăng ngày hôm nay đã vượt quá giới hạn chưa?
+        int countToday = (int) propertyRepository.countByDateBeginBetweenAndUserEquals(
+                LocalDate.now().atStartOfDay(),
+                LocalDate.now().atTime(23, 59, 59),
+                account
+        );
+        int maxPostPerDay = VariableUtils.getPostLimitPerDay(account.getRole());
+        if (countToday >= maxPostPerDay) {
+            throw new RuntimeException("Đã đạt tối đa giới hạn bài đăng trong ngày: " + maxPostPerDay);
+        }
+        // Kiểm tra quyền chọn danh mục bất động sản
+        boolean fullCategory = account.getRole() != VariableUtils.ROLE_NORMAL;
+        // Lấy thời gian sống tối đa của bài rao
+        int maxLiveTime = VariableUtils.getPostLiveTimeDay(account.getRole());
+        // Trả về thông tin quyền đăng bài
+        return PostPermissionResponse.builder()
+                .maxLiveTime(maxLiveTime)
+                .fullCategory(fullCategory)
+                .build();
     }
 }

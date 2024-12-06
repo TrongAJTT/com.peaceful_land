@@ -201,7 +201,7 @@ CREATE TABLE `properties` (
   `location` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Vị trí (tỉnh, quận/huyện. phường/xã)',
   `location_detail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Vị trí (số nhà, đường)',
   `map_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Địa chỉ trên bản đồ số',
-  `category` enum('Nhà riêng','Nhà biệt thự, liền kề','Nhà mặt phố','Shophouse, nhà phố thương mại','Chung cư mini, căn hộ dịch vụ','Condotel','Đất nền dự án','Bán đất','Trang trại, khu nghỉ đưỡng','Kho, nhà xưởng','Bất động sản khác') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Nhà riêng' COMMENT 'Phân loại bất động sản',
+  `category` enum('Nhà riêng','Nhà biệt thự, liền kề','Nhà mặt phố','Shophouse, nhà phố thương mại','Chung cư mini, căn hộ dịch vụ','Condotel','Đất nền dự án','Bán đất','Trang trại, khu nghỉ dưỡng','Kho, nhà xưởng','Bất động sản khác') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Nhà riêng' COMMENT 'Phân loại bất động sản',
   `price` bigint NOT NULL COMMENT 'Giá tiền',
   `area` int NOT NULL COMMENT 'Diện tích bất động sản (mét vuông)',
   `legal` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Giấy tờ pháp lý',

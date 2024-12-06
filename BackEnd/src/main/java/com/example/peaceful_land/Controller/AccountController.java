@@ -90,4 +90,15 @@ public class AccountController {
         }
     }
 
+    // Dùng cho mục đích kiểm tra
+    @GetMapping("/test")
+    public ResponseEntity<?> test(@RequestBody IdRequest request) {
+        try{
+            return ResponseEntity.ok(accountService.checkPostPermission(request.getUserId()));
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

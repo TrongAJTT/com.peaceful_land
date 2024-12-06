@@ -8,13 +8,13 @@ import java.time.LocalDate;
 @Entity @Table(name = "requests_post")
 @Getter @Setter @Builder
 @NoArgsConstructor @AllArgsConstructor
-public class RequestPost {
+public class RequestPost extends BaseEntity {
 
     @Id @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne @JoinColumn(name = "post_id")
-    private Post postId;
+    private Post post;
 
     @Column
     private LocalDate expiration;
@@ -25,4 +25,14 @@ public class RequestPost {
     @Column(name = "deny_message")
     private String denyMessage;
 
+    @Override
+    public String toString() {
+        return "RequestPost{" +
+                "id=" + id +
+                ", post_id=" + post.getId() +
+                ", expiration=" + expiration +
+                ", approved=" + approved +
+                ", post_visibility=" + !post.getHide() +
+                '}';
+    }
 }

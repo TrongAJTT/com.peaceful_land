@@ -24,6 +24,9 @@ public class BaseEntity {
     @Column(name = "date_begin")
     private LocalDateTime dateBegin;
 
+    // Những thuộc tính này tự động tạo trước khi lưu vào CSDL.
+    // Muốn thay đổi thì phải thay đổi sau khi lưu vào CSDL, rồi sau đó lưu lần nữa.
+
     @PrePersist
     protected void onCreate(){
         meta = "";

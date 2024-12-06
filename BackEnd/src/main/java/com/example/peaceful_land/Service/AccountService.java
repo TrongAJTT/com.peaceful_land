@@ -160,10 +160,10 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public int getApprovalRange(String userId) {
-        Account account = accountRepository.findByEmail(userId)
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
-        if (account.getRole() == VariableUtils.ROLE_NORMAL) return 2;
+    public int getApprovalRange(Byte role) {
+        // Nếu role không phải từ 0 đến 2 thì trả về -1
+        if (role < 0 || role > 2) return -1;
+        else if (Objects.equals(role, VariableUtils.ROLE_NORMAL)) return 2;
         else return 1;
     }
 

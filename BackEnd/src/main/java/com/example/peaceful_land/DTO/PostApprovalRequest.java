@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data @Getter @Setter
-public class PostApproveRequest {
+public class PostApprovalRequest {
 
     @JsonProperty("post_id")
-    private Long topicId;
+    private Long postId;
 
 }

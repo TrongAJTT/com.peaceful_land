@@ -32,7 +32,7 @@ public interface IAccountService {
     int getExpirationRange(String userId);
 
     // Lấy thời gian duyệt bài tối đa (theo ngày)
-    int getApprovalRange(String userId);
+    int getApprovalRange(Byte role);
 
     // Thay đổi avatar
     String changeAvatar(ChangeAvatarRequest request);

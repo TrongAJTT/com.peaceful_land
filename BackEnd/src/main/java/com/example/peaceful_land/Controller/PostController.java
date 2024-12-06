@@ -3,6 +3,7 @@ package com.example.peaceful_land.Controller;
 import com.example.peaceful_land.DTO.ChangePostThumbnailRequest;
 import com.example.peaceful_land.DTO.PostApprovalRequest;
 import com.example.peaceful_land.DTO.PostRequest;
+import com.example.peaceful_land.DTO.PostResponse;
 import com.example.peaceful_land.Entity.Post;
 import com.example.peaceful_land.Entity.RequestPost;
 import com.example.peaceful_land.Service.IPostService;
@@ -46,6 +47,17 @@ public class PostController {
         try {
             RequestPost newRequest = postService.createUserPostRequestApproval(request);
             return ResponseEntity.ok("Yêu cầu duyệt bài rao thành công:\n" + newRequest.toString());
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPostInformation(@PathVariable Long id) {
+        try {
+            PostResponse post = postService.getPostInformation(id);
+            return ResponseEntity.ok(post);
         }
         catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

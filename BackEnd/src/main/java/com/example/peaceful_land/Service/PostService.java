@@ -3,6 +3,7 @@ package com.example.peaceful_land.Service;
 import com.example.peaceful_land.DTO.ChangePostThumbnailRequest;
 import com.example.peaceful_land.DTO.PostApprovalRequest;
 import com.example.peaceful_land.DTO.PostRequest;
+import com.example.peaceful_land.DTO.PostResponse;
 import com.example.peaceful_land.Entity.Post;
 import com.example.peaceful_land.Entity.PostLog;
 import com.example.peaceful_land.Entity.Property;
@@ -120,4 +121,23 @@ public class PostService implements IPostService {
         return requestPostRepository.save(requestPost);
     }
 
+    @Override
+    public PostResponse getPostInformation(Long id) {
+        // Kiểm tra nếu bài rao tồn tại
+        Post post = postRepository.findById(id).orElse(null);
+        if (post == null) {
+            throw new RuntimeException("Bài rao không tồn tại");
+        }
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao đã bị ẩn");
+        }
+        // Lấy bài duyệt của bài rao này
+        RequestPost requestPost = requestPostRepository.findByPostEquals(post);
+        // Trả về thông tin phản hồi
+        return PostResponse.builder()
+                .data(post)
+                .isPendingApproval(requestPost.getApproved())
+                .build();
+    }
 }

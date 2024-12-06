@@ -564,8 +564,9 @@ DROP TABLE IF EXISTS `user_interests`;
 CREATE TABLE `user_interests` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id',
   `user_id` bigint NOT NULL COMMENT 'Id người dùng',
-  `property_id` bigint DEFAULT NULL COMMENT 'Id bất động sản',
+  `property_id` bigint DEFAULT NOT NULL COMMENT 'Id bất động sản',
   `interested` bit(1) NOT NULL COMMENT '0 - Không thích, 1 - Thích',
+  `notification` bit(1) NOT NULL COMMENT 'Gửi thông báo về email khi có cập nhật (chỉ áp dụng với interested=1)',
   `meta` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `hide` bit(1) DEFAULT NULL,
   `order_index` int DEFAULT NULL,

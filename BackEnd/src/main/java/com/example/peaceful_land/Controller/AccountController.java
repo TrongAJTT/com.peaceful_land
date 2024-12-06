@@ -73,12 +73,17 @@ public class AccountController {
     @PostMapping("/payment-methods")
     public ResponseEntity<?> getPaymentMethods(@RequestBody IdRequest request) {
         try {
-            return ResponseEntity.ok(
-                    paymentMethodRepository.findAllByAccountEquals(
-                            accountRepository.findById(request.getUserId())
-                                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"))
-                    ).stream().map(PaymentMethodResponse::from).toList()
-            );
+            return ResponseEntity.ok(accountService.getPaymentMethod(request.getUserId()));
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/payment-method/delete")
+    public ResponseEntity<?> deletePaymentMethod(@RequestBody IdRequest request) {
+        try {
+            return ResponseEntity.ok(accountService.deleteSoftPaymentMethod(request.getUserId(), request.getPaymentMethodId()));
         }
         catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

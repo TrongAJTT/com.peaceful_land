@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, Long> {
     boolean existsByAccountEqualsAndNameEqualsAndAccountNumberEqualsAndHideEquals(Account account, String name, String accountNumber, boolean hide);
-    List<PaymentMethod> findAllByAccountEquals(Account account);
+    List<PaymentMethod> findAllByAccountEqualsAndHideEquals(Account account, boolean hide);
 }

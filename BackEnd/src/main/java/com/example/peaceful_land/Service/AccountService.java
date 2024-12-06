@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_AVATAR;
@@ -235,5 +236,35 @@ public class AccountService implements IAccountService {
                         .build()
         );
         return "Thêm phương thức thanh toán thành công";
+    }
+
+    @Override
+    public List<PaymentMethodResponse> getPaymentMethod(Long userId) {
+        return paymentMethodRepository.findAllByAccountEqualsAndHideEquals(
+                        accountRepository
+                                .findById(userId)
+                                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại")),
+                        false
+                )
+                .stream()
+                .map(PaymentMethodResponse::from)
+                .toList();
+    }
+
+    @Override
+    public String deleteSoftPaymentMethod(Long userId, Long paymentMethodId) {
+        return paymentMethodRepository.findById(paymentMethodId)
+                .map(paymentMethod -> {
+                    if (paymentMethod.getAccount().getId() != userId) {
+                        throw new RuntimeException("Tài khoản không tồn tại hoặc không có quyền xóa phương thức thanh toán này");
+                    }
+                    if (paymentMethod.getHide()) {
+                        throw new RuntimeException("Phương thức thanh toán đã bị xóa");
+                    }
+                    paymentMethod.setHide(true);
+                    paymentMethodRepository.save(paymentMethod);
+                    return "Xóa phương thức thanh toán thành công";
+                })
+                .orElseThrow(() -> new RuntimeException("Phương thức thanh toán không tồn tại"));
     }
 }

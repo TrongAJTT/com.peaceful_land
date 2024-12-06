@@ -3,6 +3,8 @@ package com.example.peaceful_land.Service;
 import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Account;
 
+import java.util.List;
+
 public interface IAccountService {
 
     // Lấy thông tin tài khoản
@@ -43,4 +45,10 @@ public interface IAccountService {
 
     // Thêm phương thức thanh toán
     String addPaymentMethod(AddPaymentMethodRequest request);
+
+    // Xem danh sách phương thức thanh toán
+    List<PaymentMethodResponse> getPaymentMethod(Long userId);
+
+    // Xóa mềm phương thức thanh toán
+    String deleteSoftPaymentMethod(Long userId, Long paymentMethodId);
 }

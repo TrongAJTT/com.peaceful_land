@@ -11,5 +11,5 @@ public interface IPostService {
     Post createPost(PostRequest request);
     String changeThumbnail(ChangePostThumbnailRequest request);
     RequestPost createUserPostRequestApproval(IdRequest postRequest);
-    PostResponse getPostInformation(Long id);
+    PostResponse getPostInformation(IdRequest request);
 }

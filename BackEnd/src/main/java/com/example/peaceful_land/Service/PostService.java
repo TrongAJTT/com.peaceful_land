@@ -4,15 +4,9 @@ import com.example.peaceful_land.DTO.ChangePostThumbnailRequest;
 import com.example.peaceful_land.DTO.IdRequest;
 import com.example.peaceful_land.DTO.PostRequest;
 import com.example.peaceful_land.DTO.PostResponse;
-import com.example.peaceful_land.Entity.Post;
-import com.example.peaceful_land.Entity.PostLog;
-import com.example.peaceful_land.Entity.Property;
-import com.example.peaceful_land.Entity.RequestPost;
+import com.example.peaceful_land.Entity.*;
 import com.example.peaceful_land.Exception.PropertyNotFoundException;
-import com.example.peaceful_land.Repository.PostLogRepository;
-import com.example.peaceful_land.Repository.PostRepository;
-import com.example.peaceful_land.Repository.PropertyRepository;
-import com.example.peaceful_land.Repository.RequestPostRepository;
+import com.example.peaceful_land.Repository.*;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +15,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_POST_THUMBNAIL;
 
 @Service @RequiredArgsConstructor
 public class PostService implements IPostService {
 
+    private final AccountRepository accountRepository;
     private final RequestPostRepository requestPostRepository;
     private final PostRepository postRepository;
     private final PostLogRepository postLogRepository;
-    private final IAccountService accountService;
+    private final UserInterestRepository userInterestRepository;
     private final PropertyRepository propertyRepository;
 
     @Override
@@ -121,9 +117,12 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public PostResponse getPostInformation(Long id) {
+    public PostResponse getPostInformation(IdRequest request) {
+        long userId = request.getUserId() == null ? -1 : request.getUserId();
+        // Kiểm tra nếu người dùng tồn tại
+        Optional<Account> account = accountRepository.findById(userId);
         // Kiểm tra nếu bài rao tồn tại
-        Post post = postRepository.findById(id).orElse(null);
+        Post post = postRepository.findById(request.getPostId()).orElse(null);
         if (post == null) {
             throw new RuntimeException("Bài rao không tồn tại");
         }
@@ -133,10 +132,29 @@ public class PostService implements IPostService {
         }
         // Lấy bài duyệt của bài rao này
         RequestPost requestPost = requestPostRepository.findByPostEquals(post);
+        // Trả kết quả nếu người dùng không tồn tại
+        if (account.isEmpty()) {
+            return PostResponse.builder()
+                    .data(post)
+                    .isPendingApproval(requestPost.getApproved())
+                    .build();
+        }
+        // Lấy thông tin quan tâm của người dùng
+        Optional<UserInterest> userInterest = userInterestRepository
+                .findByUserEqualsAndPropertyEquals(account.get(), post.getProperty());
         // Trả về thông tin phản hồi
-        return PostResponse.builder()
-                .data(post)
-                .isPendingApproval(requestPost.getApproved())
-                .build();
+        if (userInterest.isPresent()) {
+            return PostResponse.builder()
+                    .data(post)
+                    .isPendingApproval(requestPost.getApproved())
+                    .interested(userInterest.get().getInterested())
+                    .build();
+        }
+        else {
+            return PostResponse.builder()
+                    .data(post)
+                    .isPendingApproval(requestPost.getApproved())
+                    .build();
+        }
     }
 }

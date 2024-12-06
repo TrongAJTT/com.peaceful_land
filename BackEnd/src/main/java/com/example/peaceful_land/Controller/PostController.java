@@ -54,9 +54,10 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPostInformation(@PathVariable Long id) {
+    public ResponseEntity<?> getPostInformation(@PathVariable Long id, @RequestBody IdRequest request) {
         try {
-            PostResponse post = postService.getPostInformation(id);
+            request.setPostId(id);
+            PostResponse post = postService.getPostInformation(request);
             return ResponseEntity.ok(post);
         }
         catch (Exception e) {

@@ -12,6 +12,10 @@ public class PostResponse {
 
     private Post data;
 
+    // Người dùng có quan tâm đến bài rao không
+    // true: đã quan tâm, false: không quan tâm, null: không có dữ liệu
+    private Boolean interested;
+
     // Nếu bài rao được đăng bởi môi giới VIP thì vẫn hiện trong khi duyệt.
     // Trong lúc duyệt, bài rao vẫn hiện, nhưng sẽ có một số hạn chế:
     // + Người dùng sẽ không thể tạo yêu cầu liên hệ hoặc tham quan.

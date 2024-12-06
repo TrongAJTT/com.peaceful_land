@@ -1,7 +1,7 @@
 package com.example.peaceful_land.Controller;
 
 import com.example.peaceful_land.DTO.ChangePostThumbnailRequest;
-import com.example.peaceful_land.DTO.PostApprovalRequest;
+import com.example.peaceful_land.DTO.IdRequest;
 import com.example.peaceful_land.DTO.PostRequest;
 import com.example.peaceful_land.DTO.PostResponse;
 import com.example.peaceful_land.Entity.Post;
@@ -43,7 +43,7 @@ public class PostController {
     }
 
     @PostMapping("/request-approve")
-    public ResponseEntity<?> requestApprove(@RequestBody PostApprovalRequest request) {
+    public ResponseEntity<?> requestApprove(@RequestBody IdRequest request) {
         try {
             RequestPost newRequest = postService.createUserPostRequestApproval(request);
             return ResponseEntity.ok("Yêu cầu duyệt bài rao thành công:\n" + newRequest.toString());

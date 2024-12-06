@@ -1,7 +1,7 @@
 package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.ChangePostThumbnailRequest;
-import com.example.peaceful_land.DTO.PostApprovalRequest;
+import com.example.peaceful_land.DTO.IdRequest;
 import com.example.peaceful_land.DTO.PostRequest;
 import com.example.peaceful_land.DTO.PostResponse;
 import com.example.peaceful_land.Entity.Post;
@@ -94,7 +94,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public RequestPost createUserPostRequestApproval(PostApprovalRequest postRequest) {
+    public RequestPost createUserPostRequestApproval(IdRequest postRequest) {
         // Kiểm tra nếu bài rao tồn tại
         Post post = postRepository.findById(postRequest.getPostId()).orElse(null);
         if (post == null) {

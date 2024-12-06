@@ -1,17 +1,21 @@
 package com.example.peaceful_land.Service;
 
-import com.example.peaceful_land.DTO.ChangeAvatarRequest;
-import com.example.peaceful_land.DTO.PurchaseRoleRequest;
-import com.example.peaceful_land.DTO.RegisterRequest;
+import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Account;
 
 public interface IAccountService {
+
+    // Lấy thông tin tài khoản
+    AccountInfoResponse getAccountInfo(Long userId);
 
     // Đăng nhập
     String tryLogin(String userId, String password);
 
     // Đăng ký tài khoản mới
     Account register(RegisterRequest userInfo);
+
+    // Đổi mật khẩu tài khoản
+    String changePassword(ChangePasswordRequest request);
 
     // Quên mật khẩu giai đoạn 1: Gửi mã OTP
     void forgotPassword(String email);

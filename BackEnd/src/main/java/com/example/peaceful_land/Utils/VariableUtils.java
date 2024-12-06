@@ -7,6 +7,11 @@ public class VariableUtils {
     public static final Byte ROLE_BROKER_VIP    = 2;
     public static final Byte ROLE_ADMIN         = 3;
 
+    public static final String ROLE_NORMAL_STR      = "Người dùng thông thường";
+    public static final String ROLE_BROKER_STR      = "Môi giới";
+    public static final String ROLE_BROKER_VIP_STR  = "Môi giới VIP";
+    public static final String ROLE_ADMIN_STR       = "Quản trị viên";
+
     public static final String DEFAULT_AVATAR = "template/blank_avatar.webp";
     public static final String IMAGE_NA = "template/image_state_not_available.jpg";
 

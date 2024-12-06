@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data @Getter @Setter
-public class PostApprovalRequest {
+public class IdRequest {
+
+    @JsonProperty("user_id")
+    private Long userId;
 
     @JsonProperty("post_id")
     private Long postId;

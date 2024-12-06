@@ -1,8 +1,6 @@
 package com.example.peaceful_land.Service;
 
-import com.example.peaceful_land.DTO.ChangeAvatarRequest;
-import com.example.peaceful_land.DTO.PurchaseRoleRequest;
-import com.example.peaceful_land.DTO.RegisterRequest;
+import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Account;
 import com.example.peaceful_land.Entity.Purchase;
 import com.example.peaceful_land.Repository.AccountRepository;
@@ -27,6 +25,13 @@ public class AccountService implements IAccountService {
     private final PurchaseRepository purchaseRepository;
     private final EmailService emailService;
     private final RedisService redisService;
+
+    @Override
+    public AccountInfoResponse getAccountInfo(Long userId) {
+        return accountRepository.findById(userId)
+                .map(AccountInfoResponse::from)
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+    }
 
     @Override
     public String tryLogin(String userId, String password) {
@@ -61,6 +66,20 @@ public class AccountService implements IAccountService {
                         .roleExpiration(LocalDate.of(9999, 12, 31))
                         .build()
         );
+    }
+
+    @Override
+    public String changePassword(ChangePasswordRequest request) {
+        return accountRepository.findById(request.getUserId())
+                .map(account -> {
+                    if (!account.getPassword().equals(request.getOldPassword())) {
+                        throw new RuntimeException("Mật khẩu cũ không chính xác");
+                    }
+                    account.setPassword(request.getNewPassword()); // TODO: Mã hóa mật khẩu
+                    accountRepository.save(account);
+                    return "Đổi mật khẩu thành công";
+                })
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
     }
 
     @Override

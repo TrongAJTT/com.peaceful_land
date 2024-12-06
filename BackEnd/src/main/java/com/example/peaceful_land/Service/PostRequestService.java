@@ -29,7 +29,7 @@ public class PostRequestService implements IPostRequestService {
 
     @Override
     public List<PostApprovalResponse> getPendingPostRequests() {
-        List<RequestPost> postRequests = requestPostRepository.findAllByApprovedEquals(false);
+        List<RequestPost> postRequests = requestPostRepository.findAllByApprovedEquals(null);
         return postRequests.stream()
                 .map(RequestPost::parsePostApprovalResponse)
                 .toList();
@@ -38,6 +38,14 @@ public class PostRequestService implements IPostRequestService {
     @Override
     public List<PostApprovalResponse> getApprovedPostRequests() {
         List<RequestPost> postRequests = requestPostRepository.findAllByApprovedEquals(true);
+        return postRequests.stream()
+                .map(RequestPost::parsePostApprovalResponse)
+                .toList();
+    }
+
+    @Override
+    public List<PostApprovalResponse> getRejectedPostRequests() {
+        List<RequestPost> postRequests = requestPostRepository.findAllByApprovedEquals(false);
         return postRequests.stream()
                 .map(RequestPost::parsePostApprovalResponse)
                 .toList();

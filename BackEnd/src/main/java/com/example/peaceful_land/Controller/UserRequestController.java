@@ -33,4 +33,9 @@ public class UserRequestController {
         return ResponseEntity.ok(postRequestService.getApprovedPostRequests());
     }
 
+    @GetMapping("/posts-rejected")
+    public ResponseEntity<?> getAllRejectedPostRequests() {
+        return ResponseEntity.ok(postRequestService.getRejectedPostRequests());
+    }
+
 }

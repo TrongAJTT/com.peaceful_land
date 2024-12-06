@@ -115,7 +115,6 @@ public class PostService implements IPostService {
         RequestPost requestPost = RequestPost.builder()
                 .post(post)
                 .expiration(LocalDate.now().plusDays(noDayApprove))
-                .approved(false)
                 .build();
         // Lưu yêu cầu
         return requestPostRepository.save(requestPost);

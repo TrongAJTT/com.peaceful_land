@@ -1,5 +1,6 @@
 package com.example.peaceful_land.Entity;
 
+import com.example.peaceful_land.DTO.PostApprovalResponse;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,5 +35,19 @@ public class RequestPost extends BaseEntity {
                 ", approved=" + approved +
                 ", post_visibility=" + !post.getHide() +
                 '}';
+    }
+
+    public PostApprovalResponse parsePostApprovalResponse(){
+        return PostApprovalResponse.builder()
+                .id(getId())
+                .requestDate(getDateBegin())
+                .expiryDate(expiration)
+                .approved(approved)
+                .denyMessage(denyMessage)
+                .postId(post.getId())
+                .postTitle(post.getTitle())
+                .propertyAddress(post.getProperty().getLocationDetail() + ", " + post.getProperty().getLocation())
+                .postVisibility(!this.post.getHide())
+                .build();
     }
 }

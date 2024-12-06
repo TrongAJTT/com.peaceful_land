@@ -40,4 +40,7 @@ public interface IAccountService {
 
     // Thay đổi avatar
     String changeAvatar(ChangeAvatarRequest request);
+
+    // Thêm phương thức thanh toán
+    String addPaymentMethod(AddPaymentMethodRequest request);
 }

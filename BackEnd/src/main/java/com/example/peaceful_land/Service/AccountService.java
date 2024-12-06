@@ -2,8 +2,10 @@ package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Account;
+import com.example.peaceful_land.Entity.PaymentMethod;
 import com.example.peaceful_land.Entity.Purchase;
 import com.example.peaceful_land.Repository.AccountRepository;
+import com.example.peaceful_land.Repository.PaymentMethodRepository;
 import com.example.peaceful_land.Repository.PurchaseRepository;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.PriceUtils;
@@ -23,6 +25,7 @@ public class AccountService implements IAccountService {
 
     private final AccountRepository accountRepository;
     private final PurchaseRepository purchaseRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
     private final EmailService emailService;
     private final RedisService redisService;
 
@@ -210,5 +213,27 @@ public class AccountService implements IAccountService {
         } catch (IOException e) {
             throw new RuntimeException("Lỗi khi lưu tập tin: " + e.getMessage());
         }
+    }
+
+    @Override
+    public String addPaymentMethod(AddPaymentMethodRequest request) {
+        // TODO: Thực hiện chức năng thanh toán trước sau đó mới cấp quyền cho cái này
+        // Kiểm tra tài khoản có tồn tại không
+        Account account = accountRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+        // Kiểm tra phương thức thanh toán đã tồn tại chưa
+        if (paymentMethodRepository.existsByAccountEqualsAndNameEqualsAndAccountNumberEqualsAndHideEquals(account, request.getName(), request.getAccountNumber(), false)) {
+            throw new RuntimeException("Phương thức thanh toán đã tồn tại.");
+        }
+        // Lưu phương thức thanh toán
+        paymentMethodRepository.save(
+                PaymentMethod.builder()
+                        .account(account)
+                        .isWallet(request.getIsWallet())
+                        .name(request.getName())
+                        .accountNumber(request.getAccountNumber())
+                        .build()
+        );
+        return "Thêm phương thức thanh toán thành công";
     }
 }

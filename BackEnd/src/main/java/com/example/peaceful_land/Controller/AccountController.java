@@ -1,10 +1,8 @@
 package com.example.peaceful_land.Controller;
 
-import com.example.peaceful_land.DTO.ChangeAvatarRequest;
-import com.example.peaceful_land.DTO.ChangePasswordRequest;
-import com.example.peaceful_land.DTO.IdRequest;
-import com.example.peaceful_land.DTO.PurchaseRoleRequest;
+import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Repository.AccountRepository;
+import com.example.peaceful_land.Repository.PaymentMethodRepository;
 import com.example.peaceful_land.Service.IAccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -19,6 +17,7 @@ public class AccountController {
 
     private final IAccountService accountService;
     private final AccountRepository accountRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
 
     @PostMapping("/info")
     public ResponseEntity<?> getAccountInfo(@RequestBody IdRequest request) {
@@ -54,6 +53,32 @@ public class AccountController {
     public ResponseEntity<?> uploadAvatar(@ModelAttribute ChangeAvatarRequest request) {
         try {
             return ResponseEntity.ok(accountService.changeAvatar(request));
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/deposit")
+    public ResponseEntity<?> deposit(@RequestBody AddPaymentMethodRequest request) {
+        try {
+            // TODO: Thực hiện chức năng thanh toán trước
+            return ResponseEntity.ok(accountService.addPaymentMethod(request));
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/payment-methods")
+    public ResponseEntity<?> getPaymentMethods(@RequestBody IdRequest request) {
+        try {
+            return ResponseEntity.ok(
+                    paymentMethodRepository.findAllByAccountEquals(
+                            accountRepository.findById(request.getUserId())
+                                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"))
+                    ).stream().map(PaymentMethodResponse::from).toList()
+            );
         }
         catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

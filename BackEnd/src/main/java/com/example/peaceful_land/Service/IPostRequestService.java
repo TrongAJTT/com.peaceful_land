@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface IPostRequestService {
     List<PostApprovalResponse> getAllPostRequests();
+    List<PostApprovalResponse> getPendingPostRequests();
+    List<PostApprovalResponse> getApprovedPostRequests();
 }

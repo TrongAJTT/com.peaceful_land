@@ -4,7 +4,9 @@ import com.example.peaceful_land.Entity.Post;
 import com.example.peaceful_land.Entity.RequestPost;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RequestPostRepository extends JpaRepository<RequestPost, Long> {
+import java.util.List;
 
+public interface RequestPostRepository extends JpaRepository<RequestPost, Long> {
+    List<RequestPost> findAllByApprovedEquals(Boolean approved);
     RequestPost findByPostEquals(Post post);
 }

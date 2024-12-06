@@ -25,7 +25,12 @@ public class UserRequestController {
 
     @GetMapping("/posts-pending")
     public ResponseEntity<?> getAllPendingPostRequests() {
-        return ResponseEntity.ok(requestPostRepository.findAll());
+        return ResponseEntity.ok(postRequestService.getPendingPostRequests());
+    }
+
+    @GetMapping("/posts-approved")
+    public ResponseEntity<?> getAllApprovedPostRequests() {
+        return ResponseEntity.ok(postRequestService.getApprovedPostRequests());
     }
 
 }

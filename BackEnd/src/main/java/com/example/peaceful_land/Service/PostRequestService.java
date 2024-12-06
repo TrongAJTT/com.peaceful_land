@@ -26,4 +26,20 @@ public class PostRequestService implements IPostRequestService {
                 .map(RequestPost::parsePostApprovalResponse)
                 .toList();
     }
+
+    @Override
+    public List<PostApprovalResponse> getPendingPostRequests() {
+        List<RequestPost> postRequests = requestPostRepository.findAllByApprovedEquals(false);
+        return postRequests.stream()
+                .map(RequestPost::parsePostApprovalResponse)
+                .toList();
+    }
+
+    @Override
+    public List<PostApprovalResponse> getApprovedPostRequests() {
+        List<RequestPost> postRequests = requestPostRepository.findAllByApprovedEquals(true);
+        return postRequests.stream()
+                .map(RequestPost::parsePostApprovalResponse)
+                .toList();
+    }
 }

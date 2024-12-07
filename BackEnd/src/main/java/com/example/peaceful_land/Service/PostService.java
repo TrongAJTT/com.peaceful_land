@@ -132,7 +132,7 @@ public class PostService implements IPostService {
         // Trả kết quả nếu người dùng không tồn tại
         if (account.isEmpty()) {
             return ViewPostResponse.builder()
-                    .data(post)
+                    .data(ResponsePost.fromPost(post))
                     .isPendingApproval(requestPost.getApproved())
                     .build();
         }
@@ -142,14 +142,14 @@ public class PostService implements IPostService {
         // Trả về thông tin phản hồi
         if (userInterest.isPresent()) {
             return ViewPostResponse.builder()
-                    .data(post)
+                    .data(ResponsePost.fromPost(post))
                     .isPendingApproval(requestPost.getApproved())
                     .interested(userInterest.get().getInterested())
                     .build();
         }
         else {
             return ViewPostResponse.builder()
-                    .data(post)
+                    .data(ResponsePost.fromPost(post))
                     .isPendingApproval(requestPost.getApproved())
                     .build();
         }

@@ -1,9 +1,6 @@
 package com.example.peaceful_land.Service;
 
-import com.example.peaceful_land.DTO.ChangePostThumbnailRequest;
-import com.example.peaceful_land.DTO.IdRequest;
-import com.example.peaceful_land.DTO.PostRequest;
-import com.example.peaceful_land.DTO.PostResponse;
+import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.*;
 import com.example.peaceful_land.Exception.PropertyNotFoundException;
 import com.example.peaceful_land.Repository.*;
@@ -156,5 +153,32 @@ public class PostService implements IPostService {
                     .isPendingApproval(requestPost.getApproved())
                     .build();
         }
+    }
+
+    @Override
+    public String interestPost(InterestPostRequest request) {
+        Account account = accountRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+        Post post = postRepository.findById(request.getPostId())
+                .orElseThrow(() -> new RuntimeException("Bài rao không tồn tại"));
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao đã bị ẩn");
+        }
+        // Lưu thông tin quan tâm
+        UserInterest userInterest = userInterestRepository.findByUserEqualsAndPropertyEquals(account, post.getProperty())
+                .orElse(UserInterest.builder().build());
+        // Cập nhật thông tin quan tâm, nếu như đã quan tâm (hoặc không quan tâm), mà nhấn lần nữa là xóa đi
+        if (userInterest.getId() != null && userInterest.getInterested() == request.isInterested()) {
+            userInterestRepository.delete(userInterest);
+            return userInterest.getInterested() ? "Đã xóa dữ liệu quan tâm" : "Đã xóa dữ liệu không quan tâm";
+        }
+        // Cập nhật thông tin quan tâm mới (hoặc tạo mới nếu chưa có) và lưu vào database
+        userInterest.setUser(account);
+        userInterest.setProperty(post.getProperty());
+        userInterest.setInterested(request.isInterested());
+        userInterest.setNotification(request.isNotification());
+        userInterestRepository.save(userInterest);
+        return userInterest.getInterested() ? "Đã quan tâm bài đăng" : "Đã không quan tâm bài đăng";
     }
 }

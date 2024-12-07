@@ -20,4 +20,7 @@ public class UserInterest extends BaseEntity {
     @Column
     private Boolean interested;
 
+    @Column
+    private Boolean notification;
+
 }

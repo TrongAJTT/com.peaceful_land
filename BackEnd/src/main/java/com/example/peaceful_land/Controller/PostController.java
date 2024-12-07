@@ -1,9 +1,6 @@
 package com.example.peaceful_land.Controller;
 
-import com.example.peaceful_land.DTO.ChangePostThumbnailRequest;
-import com.example.peaceful_land.DTO.IdRequest;
-import com.example.peaceful_land.DTO.PostRequest;
-import com.example.peaceful_land.DTO.PostResponse;
+import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Post;
 import com.example.peaceful_land.Entity.RequestPost;
 import com.example.peaceful_land.Service.IPostService;
@@ -59,6 +56,18 @@ public class PostController {
             request.setPostId(id);
             PostResponse post = postService.getPostInformation(request);
             return ResponseEntity.ok(post);
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/interest")
+    public ResponseEntity<?> interestPost(@PathVariable Long id, @RequestBody InterestPostRequest request) {
+        try {
+            request.setPostId(id);
+            String msg = postService.interestPost(request);
+            return ResponseEntity.ok(msg);
         }
         catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -12,4 +12,5 @@ public interface IPostRequestService {
     List<PostApprovalResponse> getRejectedPostRequests();
     ResponseUserPostReqView getPostRequestById(Long id);
     void approvePostRequest(Long id);
+    void rejectPostRequest(Long id, String denyMessage);
 }

@@ -30,7 +30,7 @@ public class EmailService implements IEmailService {
     public void sendSimpleMail(EmailDetail details) {
         // Try block to check for exceptions
         try {
-            System.out.println("Sending Email...");
+            System.out.println("[Mail proxy] Sending Simple Email");
             // Creating a simple mail message
             SimpleMailMessage mailMessage = new SimpleMailMessage();
 
@@ -88,7 +88,7 @@ public class EmailService implements IEmailService {
     @Override
     public void sendForgotPassVerifyEmail(String emailTo, String VerificationCode) {
         try {
-            System.out.println("Sending Forgot Pass Verify Email to email: " + emailTo);
+            System.out.println("[Mail proxy] Sending Forgot Pass Verify Email to email: " + emailTo);
             // Creating a simple mail message
             SimpleMailMessage mailMessage = new SimpleMailMessage();
 
@@ -109,7 +109,7 @@ public class EmailService implements IEmailService {
     @Override
     public void sendPostApprovedEmailToOwner(String emailTo, Long postId, LocalDateTime createdAt) {
         try {
-            System.out.println("Sending Post Approved Email to owner: " + emailTo);
+            System.out.println("[Mail proxy] Sending Post Approved Email to owner: " + emailTo);
             // Creating a MimeMessage
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
@@ -136,7 +136,7 @@ public class EmailService implements IEmailService {
     @Override
     public void sendPostApprovedEmailToWhoInterested(String emailTo, Long postId, LocalDateTime createdAt) {
         try {
-            System.out.println("Sending Post Approved Email to interested user: " + emailTo);
+            System.out.println("[Mail proxy] Sending Post Approved Email to interested user: " + emailTo);
             // Creating a MimeMessage
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
@@ -151,6 +151,35 @@ public class EmailService implements IEmailService {
 
             helper.setTo(emailTo);
             helper.setSubject("Bài rao mà bạn quan tâm đã được duyệt");
+            helper.setText(htmlContent, true); // `true` để bật chế độ HTML
+
+            // Sending the mail
+            javaMailSender.send(mimeMessage);
+        }
+        catch (MailException | MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendPostRejectedEmailToOwner(String emailTo, Long postId, LocalDateTime createdAt, String reason) {
+        try {
+            System.out.println("[Mail proxy] Sending Post Rejected Email to interested user: " + emailTo);
+            // Creating a MimeMessage
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            String htmlContent = String.format(
+                    """
+                    <p>Chúng tôi xin chia buồn thông báo với bạn rằng một bài rao của bạn đã bị từ chối duyệt.</p>
+                    <p><b>Mã bài rao:</b> %s.</p>
+                    <p><b>Ngày tạo:</b> %s.</p>
+                    <p><b>Lý do:</b> %s.</p>
+                    <p>Hãy chú ý hơn trong bài rao sau bạn nhé!.</p>
+                    """, postId, createdAt.toString(), reason);
+
+            helper.setTo(emailTo);
+            helper.setSubject("Bài rao của bạn đã bị từ chối");
             helper.setText(htmlContent, true); // `true` để bật chế độ HTML
 
             // Sending the mail

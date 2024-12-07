@@ -104,4 +104,34 @@ public class PostRequestService implements IPostRequestService {
             }
         }
     }
+
+    @Override
+    public void rejectPostRequest(Long id, String denyMessage) {
+        // Lấy ra yêu cầu
+        RequestPost postRequest = requestPostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
+        // Thay đổi trạng thái yêu cầu và lưu vào database
+        postRequest.setApproved(false);
+        postRequest.setDenyMessage(denyMessage);
+        requestPostRepository.save(postRequest);
+        // Thay đổi trạng thái bài rao và lưu vào database nếu có
+        Post approvedPost = postRequest.getPost();
+        if (postRequest.getHide()){
+            approvedPost.setHide(false);
+            postRepository.save(approvedPost);
+            // Thay đổi trạng thái bất động sản và lưu vào database
+            Property property = approvedPost.getProperty();
+            property.setHide(false);
+            propertyRepository.save(property);
+        }
+        // Gửi email thông báo cho người đăng bài
+        new Thread(() ->
+                emailService.sendPostRejectedEmailToOwner(
+                        approvedPost.getProperty().getUser().getEmail(),
+                        approvedPost.getId(),
+                        approvedPost.getDateBegin(),
+                        denyMessage
+                )
+        ).start();
+    }
 }

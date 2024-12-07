@@ -181,4 +181,7 @@ public class PostService implements IPostService {
         userInterestRepository.save(userInterest);
         return userInterest.getInterested() ? "Đã quan tâm bài đăng" : "Đã không quan tâm bài đăng";
     }
+
+
+
 }

@@ -22,4 +22,7 @@ public interface IEmailService {
     // Gửi email thông báo cho người quan tâm
     void sendPostApprovedEmailToWhoInterested(String emailTo, Long postId, LocalDateTime createdAt);
 
+    // Gửi email với template xác nhận bài rao bị từ chối đến người rao bài
+    void sendPostRejectedEmailToOwner(String emailTo, Long postId, LocalDateTime createdAt, String reason);
+
 }

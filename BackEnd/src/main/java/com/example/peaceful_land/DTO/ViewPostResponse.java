@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data @Getter @Setter @Builder
-public class PostResponse {
+public class ViewPostResponse {
 
     private Post data;
 

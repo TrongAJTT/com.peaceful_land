@@ -1,6 +1,8 @@
 package com.example.peaceful_land.Entity;
 
 import com.example.peaceful_land.DTO.PostApprovalResponse;
+import com.example.peaceful_land.DTO.ResponsePost;
+import com.example.peaceful_land.DTO.ResponseUserPostReqView;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -48,6 +50,17 @@ public class RequestPost extends BaseEntity {
                 .postTitle(post.getTitle())
                 .propertyAddress(post.getProperty().getLocationDetail() + ", " + post.getProperty().getLocation())
                 .postVisibility(!this.post.getHide())
+                .build();
+    }
+
+    public ResponseUserPostReqView parseResponseUserPostReqView() {
+        return ResponseUserPostReqView.builder()
+                .id(getId())
+                .data(ResponsePost.fromPost(post))
+                .expiration(expiration)
+                .approved(approved)
+                .denyMessage(denyMessage)
+                .createdAt(getDateBegin())
                 .build();
     }
 }

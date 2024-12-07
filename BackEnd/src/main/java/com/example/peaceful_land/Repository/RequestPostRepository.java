@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface RequestPostRepository extends JpaRepository<RequestPost, Long> {
-    List<RequestPost> findAllByApprovedEquals(Boolean approved);
+    List<RequestPost> findAllByOrderByIdDesc();
+    List<RequestPost> findAllByApprovedEqualsOrderByExpirationDesc(Boolean approved);
     RequestPost findByPostEquals(Post post);
 }

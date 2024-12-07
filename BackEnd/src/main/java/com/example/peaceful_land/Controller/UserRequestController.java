@@ -4,10 +4,7 @@ import com.example.peaceful_land.Repository.RequestPostRepository;
 import com.example.peaceful_land.Service.IPostRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,23 +16,43 @@ public class UserRequestController {
     private final IPostRequestService postRequestService;
 
     @GetMapping("/posts")
-    public ResponseEntity<?> getAllPostRequests() {
-        return ResponseEntity.ok(postRequestService.getAllPostRequests());
+    public ResponseEntity<?> getAllPostRequests(@RequestParam(required = false) String type) {
+        if (type == null || type.equals("all")) {
+            return ResponseEntity.ok(postRequestService.getAllPostRequests());
+        } else if (type.equals("pending")) {
+            return ResponseEntity.ok(postRequestService.getPendingPostRequests());
+        } else if (type.equals("approved")) {
+            return ResponseEntity.ok(postRequestService.getApprovedPostRequests());
+        } else if (type.equals("rejected")) {
+            return ResponseEntity.ok(postRequestService.getRejectedPostRequests());
+        } else {
+            return ResponseEntity.badRequest().body("Không hợp lệ");
+        }
     }
 
-    @GetMapping("/posts-pending")
-    public ResponseEntity<?> getAllPendingPostRequests() {
-        return ResponseEntity.ok(postRequestService.getPendingPostRequests());
+    @GetMapping("/post/{id}")
+    public ResponseEntity<?> getPostRequestById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(postRequestService.getPostRequestById(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @GetMapping("/posts-approved")
-    public ResponseEntity<?> getAllApprovedPostRequests() {
-        return ResponseEntity.ok(postRequestService.getApprovedPostRequests());
-    }
-
-    @GetMapping("/posts-rejected")
-    public ResponseEntity<?> getAllRejectedPostRequests() {
-        return ResponseEntity.ok(postRequestService.getRejectedPostRequests());
+    @PostMapping("/post/{id}/action")
+    public ResponseEntity<?> getPostRequestById(@PathVariable Long id, @RequestParam String type) {
+        try {
+            if (type.equals("approve")) {
+                postRequestService.approvePostRequest(id);
+                return ResponseEntity.ok("Duyệt bài rao thành công");
+            } else if (type.equals("reject")) {
+                return ResponseEntity.ok("Từ chối bài rao thành công");
+            } else {
+                return ResponseEntity.badRequest().body("Không hợp lệ");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

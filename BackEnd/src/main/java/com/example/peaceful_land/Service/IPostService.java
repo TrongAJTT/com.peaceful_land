@@ -8,6 +8,6 @@ public interface IPostService {
     Post createPost(PostRequest request);
     String changeThumbnail(ChangePostThumbnailRequest request);
     RequestPost createUserPostRequestApproval(IdRequest postRequest);
-    PostResponse getPostInformation(IdRequest request);
+    ViewPostResponse getPostInformation(IdRequest request);
     String interestPost(InterestPostRequest request);
 }

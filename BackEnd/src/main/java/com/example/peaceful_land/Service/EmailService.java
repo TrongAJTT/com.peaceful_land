@@ -1,6 +1,6 @@
 package com.example.peaceful_land.Service;
 
-import com.example.peaceful_land.DTO.EmailDetails;
+import com.example.peaceful_land.DTO.EmailDetail;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +13,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class EmailService implements IEmailService {
     public static final String SUCCESS = "Mail Sent Successfully!";
 
     @Override
-    public String sendSimpleMail(EmailDetails details) {
+    public void sendSimpleMail(EmailDetail details) {
         // Try block to check for exceptions
         try {
             System.out.println("Sending Email...");
@@ -41,17 +42,16 @@ public class EmailService implements IEmailService {
 
             // Sending the mail
             javaMailSender.send(mailMessage);
-            return SUCCESS;
         }
 
         // Catch block to handle the exceptions
         catch (MailException e) {
-            return e.getMessage();
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public String sendMailWithAttachment(EmailDetails details) {
+    public String sendMailWithAttachment(EmailDetail details) {
         // Creating a mime message
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper;
@@ -86,9 +86,9 @@ public class EmailService implements IEmailService {
     }
 
     @Override
-    public String sendForgotPassVerifyEmail(String emailTo, String VerificationCode) {
+    public void sendForgotPassVerifyEmail(String emailTo, String VerificationCode) {
         try {
-            System.out.println("Sending Email...");
+            System.out.println("Sending Forgot Pass Verify Email to email: " + emailTo);
             // Creating a simple mail message
             SimpleMailMessage mailMessage = new SimpleMailMessage();
 
@@ -100,10 +100,64 @@ public class EmailService implements IEmailService {
 
             // Sending the mail
             javaMailSender.send(mailMessage);
-            return SUCCESS;
         }
         catch (MailException e) {
-            return e.getMessage();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendPostApprovedEmailToOwner(String emailTo, Long postId, LocalDateTime createdAt) {
+        try {
+            System.out.println("Sending Post Approved Email to owner: " + emailTo);
+            // Creating a MimeMessage
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            String htmlContent = String.format(
+                    """
+                    <p>Chúng tôi vui lòng thông báo với bạn rằng bài rao của bạn đã được duyệt.</p>
+                    <p><b>Mã bài rao:</b> %s.</p>
+                    <p><b>Ngày tạo:</b> %s.</p>
+                    """, postId, createdAt.toString());
+
+            helper.setTo(emailTo);
+            helper.setSubject("Bài rao của bạn đã được duyệt");
+            helper.setText(htmlContent, true); // `true` để bật chế độ HTML
+
+            // Sending the mail
+            javaMailSender.send(mimeMessage);
+        }
+        catch (MailException | MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendPostApprovedEmailToWhoInterested(String emailTo, Long postId, LocalDateTime createdAt) {
+        try {
+            System.out.println("Sending Post Approved Email to interested user: " + emailTo);
+            // Creating a MimeMessage
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            String htmlContent = String.format(
+                    """
+                    <p>Chúng tôi vui lòng thông báo với bạn rằng một bài rao mà bạn quan tâm đã được duyệt.</p>
+                    <p><b>Mã bài rao:</b> %s.</p>
+                    <p><b>Ngày tạo:</b> %s.</p>
+                    <p>Hãy kiểm tra ngay để biết thêm thông tin chi tiết về bất động sản bạn nhé!.</p>
+                    """, postId, createdAt.toString());
+
+            helper.setTo(emailTo);
+            helper.setSubject("Bài rao mà bạn quan tâm đã được duyệt");
+            helper.setText(htmlContent, true); // `true` để bật chế độ HTML
+
+            // Sending the mail
+            javaMailSender.send(mimeMessage);
+        }
+        catch (MailException | MessagingException e) {
+            throw new RuntimeException(e);
         }
     }
 }

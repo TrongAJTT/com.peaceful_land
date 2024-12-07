@@ -114,7 +114,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public PostResponse getPostInformation(IdRequest request) {
+    public ViewPostResponse getPostInformation(IdRequest request) {
         long userId = request.getUserId() == null ? -1 : request.getUserId();
         // Kiểm tra nếu người dùng tồn tại
         Optional<Account> account = accountRepository.findById(userId);
@@ -131,7 +131,7 @@ public class PostService implements IPostService {
         RequestPost requestPost = requestPostRepository.findByPostEquals(post);
         // Trả kết quả nếu người dùng không tồn tại
         if (account.isEmpty()) {
-            return PostResponse.builder()
+            return ViewPostResponse.builder()
                     .data(post)
                     .isPendingApproval(requestPost.getApproved())
                     .build();
@@ -141,14 +141,14 @@ public class PostService implements IPostService {
                 .findByUserEqualsAndPropertyEquals(account.get(), post.getProperty());
         // Trả về thông tin phản hồi
         if (userInterest.isPresent()) {
-            return PostResponse.builder()
+            return ViewPostResponse.builder()
                     .data(post)
                     .isPendingApproval(requestPost.getApproved())
                     .interested(userInterest.get().getInterested())
                     .build();
         }
         else {
-            return PostResponse.builder()
+            return ViewPostResponse.builder()
                     .data(post)
                     .isPendingApproval(requestPost.getApproved())
                     .build();

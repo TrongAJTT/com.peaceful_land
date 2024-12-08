@@ -38,7 +38,7 @@ public class PropertySpecification {
             if (category == null) {
                 return null; // không thêm điều kiện nếu category không có
             }
-            return criteriaBuilder.like(root.get("category"), "%" + category + "%");
+            return criteriaBuilder.equal(root.get("category"),  category);
         };
     }
 

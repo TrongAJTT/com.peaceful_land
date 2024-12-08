@@ -2,6 +2,7 @@ package com.example.peaceful_land.Security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -37,7 +38,12 @@ public class SecurityConfig  {
                                 //Loại request dùng jwt lấy đúng đường dẫn TODO: đây chỉ là mẫu vui lòng sửa lại
                                 "/colors",
                                 "/brands",
-                                "/categories").permitAll()
+                                "/categories"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,"/posts/**"
+                        ).permitAll()
 
                         // Secure the API endpoints that require JWT
                         .requestMatchers("/api/**").authenticated()  // Protect /api/** endpoints

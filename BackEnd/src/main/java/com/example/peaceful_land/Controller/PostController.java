@@ -75,6 +75,18 @@ public class PostController {
         }
     }
 
+    @PostMapping("/{id}/update-permission")
+    public ResponseEntity<?> getUpdatePostPermission(@PathVariable Long id, @RequestBody IdRequest request) {
+        try {
+            request.setPostId(id);
+            ResponsePostUpdatePermission permission = postService.getUpdatePostPermission(request);
+            return ResponseEntity.ok(permission);
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping(value = "/{id}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestParam String action, @ModelAttribute UpdatePropertyPostRequest request) {
         try {
@@ -87,33 +99,46 @@ public class PostController {
             // Cập nhật thông tin hành động cần thực hiện
             request.setAction(VariableUtils.getUpdateActionString(action));
             // Thực hiện cập nhật
-            if (action.equals(VariableUtils.UPDATE_TYPE_SOLD)){
-                // TODO: Xử lý trường hợp đã bán
-                postService.updatePost_Sold(updatePost, request);
-            }
-            else if (action.equals(VariableUtils.UPDATE_TYPE_RENTED)){
-                // TODO: Xử lý trường hợp đã cho thuê
-            }
-            else if (action.equals(VariableUtils.UPDATE_TYPE_RESALE)){
-                // TODO: Xử lý trường hợp mua bán lại
-            }
-            else if (action.equals(VariableUtils.UPDATE_TYPE_RERENT)){
-                // TODO: Xử lý trường hợp cho thuê lại
-            }
-            else if (action.equals(VariableUtils.UPDATE_TYPE_PRICE)){
-                // TODO: Xử lý trường hợp cập nhật giá
-            }
-            else if (action.equals(VariableUtils.UPDATE_TYPE_OFFER)){
-                // TODO: Xử lý trường hợp thay đổi hình thức
-            }
-            else if (action.equals(VariableUtils.UPDATE_TYPE_RENTAL_PERIOD)){
-                // TODO: Xử lý trường hợp thay đổi hạn cho thuê
-            }
-            else if (action.equals(VariableUtils.UPDATE_TYPE_DISCOUNT)){
-                // TODO: Xử lý trường hợp giảm giá
-            }
-            else {
-                // TODO: Xử lý trường hợp cập nhật thông tin bất động sản
+            switch (action) {
+                case VariableUtils.UPDATE_TYPE_SOLD -> {
+                    // Xử lý trường hợp đã bán
+                    postService.updatePost_SoldOrRented(updatePost, request, true);
+                    return ResponseEntity.ok("Cập nhật trạng thái đã bán bất động sản thành công");
+                }
+                case VariableUtils.UPDATE_TYPE_RENTED -> {
+                    // Xử lý trường hợp đã cho thuê
+                    postService.updatePost_SoldOrRented(updatePost, request, false);
+                    return ResponseEntity.ok("Cập nhật trạng thái đã cho thuê bất động sản thành công");
+                }
+                case VariableUtils.UPDATE_TYPE_RESALE -> {
+                    // Xử lý trường hợp mua bán lại
+                    postService.updatePost_ReSaleOrReRent(updatePost, request, true);
+                    return ResponseEntity.ok("Cập nhật trạng thái mua bán lại bất động sản thành công");
+                }
+                case VariableUtils.UPDATE_TYPE_RERENT -> {
+                    // Xử lý trường hợp cho thuê lại
+                    postService.updatePost_ReSaleOrReRent(updatePost, request, false);
+                    return ResponseEntity.ok("Cập nhật trạng thái cho thuê lại bất động sản thành công");
+                }
+                case VariableUtils.UPDATE_TYPE_PRICE -> {
+                    // Xử lý trường hợp cập nhật giá
+                    postService.updatePost_Price(updatePost, request);
+                    return ResponseEntity.ok("Cập nhật giá bất động sản thành công");
+                }
+                case VariableUtils.UPDATE_TYPE_OFFER -> {
+                    // Xử lý trường hợp thay đổi hình thức
+                    postService.updatePost_Offer(updatePost, request);
+                }
+                case VariableUtils.UPDATE_TYPE_RENTAL_PERIOD -> {
+                    // Xử lý trường hợp thay đổi hạn cho thuê
+                    postService.updatePost_RentalPeriod(updatePost, request);
+                }
+                case VariableUtils.UPDATE_TYPE_DISCOUNT -> {
+                    // TODO: Xử lý trường hợp giảm giá
+                }
+                default -> {
+                    // TODO: Xử lý trường hợp cập nhật thông tin bất động sản
+                }
             }
             // Gửi email thông báo cho người theo dõi
 

@@ -46,45 +46,28 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AccountPrimaryInfo userInfo) {
-        try {
-            return ResponseEntity.ok(accountService.register(userInfo));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(accountService.register(userInfo));
     }
 
     // Quên mật khẩu: Gửi mã xác thực về email TODO: Thay thế email thành JWT Token
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ResetPasswordRequest request) {
-        try {
-            accountService.forgotPassword(request.getEmail());
-            return ResponseEntity.ok("Đã gửi mã xác thực về email");
-        }
-        catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        accountService.forgotPassword(request.getEmail());
+        return ResponseEntity.ok("Đã gửi mã xác thực về email");
     }
 
     // Quên mật khẩu: Xác thực mã OTP TODO: Thay thế email thành JWT Token
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestBody ResetPasswordRequest request) {
-        try {
-            accountService.verifyOtp(request.getEmail(), request.getOtp());
-            return ResponseEntity.ok("Xác thực thành công");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        accountService.verifyOtp(request.getEmail(), request.getOtp());
+        return ResponseEntity.ok("Xác thực thành công");
     }
 
     // Quên mật khẩu: Đặt lại mật khẩu mới TODO: Thêm kiểm tra Token đã hết hạn trước khi cho phép đổi mật khẩu
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
-        try {
-            accountService.resetPassword(request.getEmail(), request.getNewPassword());
-            return ResponseEntity.ok("Đặt lại mật khẩu thành công");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        accountService.resetPassword(request.getEmail(), request.getNewPassword());
+        return ResponseEntity.ok("Đặt lại mật khẩu thành công");
     }
 
 

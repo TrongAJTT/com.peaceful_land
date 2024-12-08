@@ -424,7 +424,7 @@ public class PostService implements IPostService {
         return contentUpdate;
     }
 
-    public List<?> searchPost(SearchPostRequest request, int page, int size) {
+    public ViewPostListResponse searchPost(SearchPostRequest request, int page, int size) {
         Specification<Property> spec = Specification.where(PropertySpecification.hasHideFalse());
 
         // Lọc các điều kiện khác
@@ -494,7 +494,7 @@ public class PostService implements IPostService {
                 System.out.println(e.getMessage());
             }
         });
-        return postIds;
+        return ViewPostListResponse.builder().list_data(postIds).total_page(propertiesPage.getTotalPages()).build();
     }
 
 }

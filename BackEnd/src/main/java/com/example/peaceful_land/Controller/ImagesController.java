@@ -62,7 +62,7 @@ public class ImagesController {
                 // Trả về Base64 trong response
                 return ResponseEntity.ok()
                         .contentType(MediaType.TEXT_PLAIN) // Định dạng chuỗi text
-                        .body(base64Content);
+                        .body("data:image/png;base64," + base64Content);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("File not found or unreadable.");

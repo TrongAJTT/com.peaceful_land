@@ -52,7 +52,7 @@ public class AccountController {
         try {
             return ResponseEntity.ok(accountService.purchaseRole(request));
         }
-        catch (Exception e) {
+        catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
+import { User } from '../../../dto/user';
+import { AccountService } from '../../../core/services/account.service';
 
 @Component({
   selector: 'app-login-and-register',
@@ -12,9 +14,47 @@ import { SnackBarService } from '../../../core/services/snack-bar.service';
   templateUrl: './login-and-register.component.html',
   styleUrl: './login-and-register.component.css'
 })
-export class LoginAndRegisterComponent {
+export class LoginAndRegisterComponent implements OnInit{
   @ViewChild('container') container!: ElementRef;
-  user: any;
+  user!: User;
+  packages = {
+    'sale': [
+      { days: 30, price: 99000 , img: 'nor-package'},
+      { days: 90, price: 280000, img: 'nor-package' },
+      { days: 180, price: 475000, img: 'nor-package' },
+      { days: 360, price: 830000, img: 'nor-package' }
+    ],
+    'sale-pro': [
+      { days: 30, price: 154000 , img: 'vip-package'},
+      { days: 90, price: 440000 , img: 'vip-package'},
+      { days: 180, price: 740000 , img: 'vip-package'},
+      { days: 360, price: 1290000, img: 'vip-package' }
+    ]
+  };
+
+  accountDetails: any[] = [
+    {
+      regularUserPosts: 5,
+      agentPosts: 'Không giới hạn',
+      vipAgentPosts: 'Không giới hạn',
+      regularUserPostFrequency: '1 lần / ngày',
+      agentPostFrequency: '5 lần / ngày',
+      vipAgentPostFrequency: '10 lần / ngày',
+      regularUserCategories: 'Chỉ nhà riêng',
+      agentCategories: 'Tất cả',
+      vipAgentCategories: 'Tất cả',
+      regularUserApproval: 'Chờ duyệt',
+      agentApproval: 'Chờ duyệt',
+      vipAgentApproval: 'Xuất bản luôn, duyệt sau',
+      regularUserMaxApprovalTime: '2 ngày',
+      agentMaxApprovalTime: '1 ngày',
+      vipAgentMaxApprovalTime: '1 ngày',
+      regularUserMaxPostTime: '7 ngày',
+      agentMaxPostTime: '10 ngày',
+      vipAgentMaxPostTime: '14 ngày'
+    }
+  ];
+
   loginForm = new FormGroup({
     userId_login: new FormControl(''),
     password_login: new FormControl(''),
@@ -25,17 +65,21 @@ export class LoginAndRegisterComponent {
     phone: new FormControl(''),
     email: new FormControl(''),
     password: new FormControl(''),
-    gender: new FormControl(true)
+    birth_date: new FormControl(true)
   })
 
   constructor(
     private snackbarService:SnackBarService,
     public authService:AuthService,
+    private accountService:AccountService,
     private router:Router,
+    private cdr: ChangeDetectorRef,
   ){}
 
   ngOnInit(): void {
-    this.user = this.authService.getUserDetails();
+    if(this.authService.getAuthStatus()){
+      this.user = this.authService.getUserDetails();
+    }
   }
 
   handleLogin(event:Event){
@@ -66,7 +110,7 @@ export class LoginAndRegisterComponent {
     const password = this.registerForm.get("password")?.value?.trim() || ""; 
     const phone = this.registerForm.get("phone")?.value?.trim() || ""; 
     const name = this.registerForm.get("name")?.value?.trim() || ""; 
-    const gender = this.registerForm.get("gender")?.value; 
+    const birth_date = this.registerForm.get("birth_date")?.value; 
     
     if(name == ""){
       this.snackbarService.notifyWarningUser("Vui lòng nhập họ tên");
@@ -79,7 +123,7 @@ export class LoginAndRegisterComponent {
     }else if (password===""){
       this.snackbarService.notifyWarningUser("Vui lòng nhập mật khẩu");
     }else{
-      this.authService.register(email,password,phone,name,gender!)
+      this.authService.register(email,password,phone,name,birth_date!)
         .subscribe({
           next: (response:any) => {
             this.snackbarService.notifySuccessUser("Đăng kí thành công");
@@ -109,4 +153,23 @@ export class LoginAndRegisterComponent {
     this.authService.logout();
     this.snackbarService.notifySuccessUser("Đăng xuất thành công");
   }
+
+  purchaseRole(role: number,day:number){
+    this.accountService.purchaseRole(this.user.id,role,day)
+      .subscribe({
+        next: (response:any) => {
+          this.snackbarService.notifySuccessUser("Cập nhật gói thành công")
+          this.authService.reloadUserAfterBuyRole(response)
+          this.user = this.authService.getUserDetails();
+          this.cdr.detectChanges()
+        },
+        error: (response:any) => {
+          this.snackbarService.notifyErrorUser(response.error.message)
+          console.log(response)
+        }
+      })
+    
+  }
+
+
 }

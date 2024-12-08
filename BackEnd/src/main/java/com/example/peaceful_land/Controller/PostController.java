@@ -33,7 +33,7 @@ public class PostController {
     @PostMapping("/request-approve")
     public ResponseEntity<?> requestApprove(@RequestBody IdRequest request) {
         RequestPost newRequest = postService.createUserPostRequestApproval(request);
-        return ResponseEntity.ok("Yêu cầu duyệt bài rao thành công:\n" + newRequest.toString());
+        return ResponseEntity.ok(newRequest);
     }
 
     @GetMapping("/{id}")

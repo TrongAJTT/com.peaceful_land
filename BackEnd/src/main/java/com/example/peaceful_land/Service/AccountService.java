@@ -23,7 +23,7 @@ import java.util.Objects;
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_AVATAR;
 
 @Service @RequiredArgsConstructor
-public class AccountService implements IAccountService {
+public class AccountService implements IAccountService{
 
     private final AccountRepository accountRepository;
     private final PurchaseRepository purchaseRepository;

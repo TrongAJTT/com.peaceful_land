@@ -6,10 +6,6 @@ export interface User {
     phone: string;
     birthDate: string;
     role: number;
-    date_begin: string;
-    gender: boolean;
-    img: string;
-    enable: boolean;
     meta: string;
     hide: boolean;
     order: number;

@@ -1,5 +1,6 @@
 package com.example.peaceful_land.Entity;
 
+import com.example.peaceful_land.DTO.ResponsePropertyLog;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,5 +31,13 @@ public class PropertyLog extends BaseEntity {
 
     @Column
     private Long price;
+
+    public ResponsePropertyLog toResponsePropertyLog() {
+        return ResponsePropertyLog.builder()
+                .action(getAction())
+                .date(getDateBegin())
+                .price(getPrice())
+                .build();
+    }
 
 }

@@ -33,4 +33,8 @@ public interface IPostService {
     Object searchPost(SearchPostRequest request, int page, int size);
     // Tìm các bài rao gần nhất
     Object findNearestPosts(NearestPostsRequest request);
+    // Lịch sử cập nhật bất động sản
+    Object getPropertyUpdateHistory(IdRequest request);
+    // Lịch sử cập nhật bài rao
+    Object getPostUpdateHistory(IdRequest request);
 }

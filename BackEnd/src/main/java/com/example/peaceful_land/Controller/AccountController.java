@@ -57,8 +57,8 @@ public class AccountController {
     }
 
     // Dùng cho mục đích kiểm tra
-    @GetMapping("/test")
-    public ResponseEntity<?> test(@RequestBody IdRequest request) {
+    @GetMapping("/check-post-permission")
+    public ResponseEntity<?> checkPostPermission(@RequestBody IdRequest request) {
         return ResponseEntity.ok(accountService.checkPostPermission(request.getUserId()));
     }
 

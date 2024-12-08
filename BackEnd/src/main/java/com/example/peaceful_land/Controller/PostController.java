@@ -6,6 +6,7 @@ import com.example.peaceful_land.Entity.RequestPost;
 import com.example.peaceful_land.Service.IPostService;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +64,7 @@ public class PostController {
         Post updatePost = postService.checkPostExists(id);
         // Kiểm tra quyền cập nhật
         if (updatePost.getProperty().getUser().getId() != request.getUser_id()) {
-            return ResponseEntity.badRequest().body("Bạn không có quyền cập nhật bài rao này");
+            throw new DataIntegrityViolationException("Bạn không có quyền cập nhật bài rao này");
         }
         // Cập nhật thông tin hành động cần thực hiện
         request.setAction(VariableUtils.getUpdateActionString(action));
@@ -129,6 +130,16 @@ public class PostController {
     public ResponseEntity<?> searchNearestTopK (@PathVariable int number, @RequestBody NearestPostsRequest request) {
         request.setNumber(number);
         return ResponseEntity.ok(postService.findNearestPosts(request));
+    }
+
+    @GetMapping("/{id}/property-logs")
+    public ResponseEntity<?> getPropertyUpdateHistory(@PathVariable Long id) {
+        return ResponseEntity.ok(postService.getPropertyUpdateHistory(IdRequest.builder().postId(id).build()));
+    }
+
+    @GetMapping("/{id}/post-logs")
+    public ResponseEntity<?> getPostUpdateHistory(@PathVariable Long id) {
+        return ResponseEntity.ok(postService.getPostUpdateHistory(IdRequest.builder().postId(id).build()));
     }
 
 }

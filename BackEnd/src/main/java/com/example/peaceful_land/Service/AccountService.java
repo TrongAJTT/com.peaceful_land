@@ -288,12 +288,12 @@ public class AccountService implements IAccountService{
     public PostPermissionResponse checkPostPermission(Long userId) {
         // Kiểm tra tài khoản có tồn tại không
         Account account = accountRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+                .orElseThrow(() -> new IllegalArgumentException("Tài khoản không tồn tại"));
         // Nếu là người dùng thông thường thì kiểm tra có vượt quá lượng bài đăng tối đa không
         if (account.getRole() == VariableUtils.ROLE_NORMAL) {
             long count = propertyRepository.countByUserEquals(account);
             if (count >= VariableUtils.MAX_POST_NORMAL_TOTAL) {
-                throw new RuntimeException("Vượt quá số lượng bài đăng tối đa");
+                throw new IllegalStateException("Vượt quá số lượng bài đăng tối đa");
             }
         }
         // Kiểm tra xem lượng bài đăng ngày hôm nay đã vượt quá giới hạn chưa?
@@ -304,7 +304,7 @@ public class AccountService implements IAccountService{
         );
         int maxPostPerDay = VariableUtils.getPostLimitPerDay(account.getRole());
         if (countToday >= maxPostPerDay) {
-            throw new RuntimeException("Đã đạt tối đa giới hạn bài đăng trong ngày: " + maxPostPerDay);
+            throw new IllegalStateException("Đã đạt tối đa giới hạn bài đăng trong ngày: " + maxPostPerDay);
         }
         // Kiểm tra quyền chọn danh mục bất động sản
         boolean fullCategory = account.getRole() != VariableUtils.ROLE_NORMAL;

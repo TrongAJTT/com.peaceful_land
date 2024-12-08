@@ -17,6 +17,9 @@ public class IdRequest {
     @JsonProperty("post_id")
     private Long postId;
 
+    @JsonProperty("property_id")
+    private Long propertyId;
+
     @JsonProperty("payment_method_id")
     private Long paymentMethodId;
 

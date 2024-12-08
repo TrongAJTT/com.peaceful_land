@@ -2,6 +2,7 @@ package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.*;
+import com.example.peaceful_land.Exception.PostNotFoundException;
 import com.example.peaceful_land.Exception.PropertyNotFoundException;
 import com.example.peaceful_land.Query.PropertySpecification;
 import com.example.peaceful_land.Repository.*;
@@ -36,7 +37,7 @@ public class PostService implements IPostService {
 
     @Override
     public Post createPost(PostRequest request) {
-        try{
+        try {
             // Lấy ra bất động sản từ request
             Property property = propertyRepository.findById(request.getPropertyId()).orElse(null);
             if (property == null) throw new PropertyNotFoundException();
@@ -87,7 +88,7 @@ public class PostService implements IPostService {
             postLog.setThumbnUrl(fileName);
             postLogRepository.save(postLog);
             // Xóa file cũ nếu không có postLog nào sử dụng
-            if (!oldThumbnail.equals(VariableUtils.IMAGE_NA)){
+            if (!oldThumbnail.equals(VariableUtils.IMAGE_NA)) {
                 if (!postLogRepository.existsByThumbnUrl(oldThumbnail)) {
                     ImageUtils.deleteFileServer(oldThumbnail);
                 }
@@ -109,7 +110,7 @@ public class PostService implements IPostService {
         // Lấy vai trò người dùng
         Byte role = post.getProperty().getUser().getRole();
         // Nếu role là môi giới VIP thì hiện bài đăng và bất động sản ngay (nhưng vẫn chờ duyệt)
-        if (role.equals(VariableUtils.ROLE_BROKER_VIP)){
+        if (role.equals(VariableUtils.ROLE_BROKER_VIP)) {
             post.getProperty().setHide(false);
             propertyRepository.save(post.getProperty());
             post.setHide(false);
@@ -172,10 +173,10 @@ public class PostService implements IPostService {
         return createViewPostResponseFromInformation(account, post, requestPost);
     }
 
-    private ViewPostResponse createViewPostResponseFromInformation(Optional<Account> account, Post post, RequestPost requestPost){
+    private ViewPostResponse createViewPostResponseFromInformation(Optional<Account> account, Post post, RequestPost requestPost) {
         ResponsePost responsePost = ResponsePost.fromPost(post);
         boolean isApproved = false;
-        if (requestPost.getApproved() == null){
+        if (requestPost.getApproved() == null) {
             isApproved = true;
             responsePost.setTitle("Bài rao chờ duyệt #" + post.getId());
             responsePost.setDescription("Hãy nhấn vào nút quan tâm nếu bạn quan tâm đến bất động sản này. Nhớ bật thông báo, chúng tôi sẽ gửi thông báo về email của bạn khi bài rao được duyệt hoặc được cập nhật.");
@@ -201,8 +202,7 @@ public class PostService implements IPostService {
                     .isPendingApproval(isApproved)
                     .interested(userInterest.get().getInterested())
                     .build();
-        }
-        else {
+        } else {
             return ViewPostResponse.builder()
                     .data(responsePost)
                     .isPendingApproval(isApproved)
@@ -240,9 +240,9 @@ public class PostService implements IPostService {
     @Override
     public void sendNotificationToInterestedUsers(Property property, String contentUpdate) {
         List<UserInterest> listUserInterested = userInterestRepository.findByPropertyEqualsAndNotificationEquals(property, true);
-        if (!listUserInterested.isEmpty()){
+        if (!listUserInterested.isEmpty()) {
             new Thread(() -> {
-                for(UserInterest userInterest : listUserInterested) {
+                for (UserInterest userInterest : listUserInterested) {
                     emailService.sendPostUpdatedEmailToWhoInterested(
                             userInterest.getUser().getEmail(),
                             property.getId(),
@@ -277,11 +277,10 @@ public class PostService implements IPostService {
         List<String> listAction = new ArrayList<>();
         // Kiểm tra nếu bài rao còn sẵn sàng
         if (post.getProperty().getStatus()) {
-            if (post.getProperty().getOffer()){
+            if (post.getProperty().getOffer()) {
                 listAction.add(VariableUtils.UPDATE_TYPE_RENTED);
                 listAction.add(VariableUtils.UPDATE_TYPE_RENTAL_PERIOD);
-            }
-            else {
+            } else {
                 listAction.add(VariableUtils.UPDATE_TYPE_SOLD);
             }
             listAction.add(VariableUtils.UPDATE_TYPE_PRICE);
@@ -289,13 +288,11 @@ public class PostService implements IPostService {
             listAction.add(VariableUtils.UPDATE_TYPE_DISCOUNT);
             listAction.add(VariableUtils.UPDATE_TYPE_POST);
 
-        }
-        else {
-            if (post.getProperty().getOffer()){
+        } else {
+            if (post.getProperty().getOffer()) {
                 listAction.add(VariableUtils.UPDATE_TYPE_RERENT);
                 listAction.add(VariableUtils.UPDATE_TYPE_RENTAL_PERIOD);
-            }
-            else {
+            } else {
                 listAction.add(VariableUtils.UPDATE_TYPE_RESALE);
             }
         }
@@ -502,8 +499,8 @@ public class PostService implements IPostService {
             try {
                 postIds.add(
                         getPostInformationFromProperty(IdRequest.builder()
-                        .property(property)
-                        .userId(request.getUserId()).build())
+                                .property(property)
+                                .userId(request.getUserId()).build())
                 );
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -514,11 +511,24 @@ public class PostService implements IPostService {
 
     @Override
     public Object findNearestPosts(NearestPostsRequest request) {
-        Page<Post> page = postRepository.findAllByHideEquals (
+        Page<Post> page = postRepository.findAllByHideEquals(
                 false, PageRequest.of(0, request.getNumber(), Sort.by("dateBegin").descending())
         );
-        return page.getContent().stream().toList().stream().map( post ->
-            getPostInformationFromPost(IdRequest.builder().post(post).userId(request.getUserId()).build())
+        return page.getContent().stream().toList().stream().map(post ->
+                getPostInformationFromPost(IdRequest.builder().post(post).userId(request.getUserId()).build())
         ).toList();
+    }
+
+    @Override
+    public Object getPropertyUpdateHistory(IdRequest request) {
+        Post post = postRepository.findById(request.getPostId())
+                .orElseThrow(PostNotFoundException::new);
+        return propertyLogRepository.findAllByPropertyEqualsOrderByDateBeginDesc(post.getProperty())
+                .stream().map(PropertyLog::toResponsePropertyLog).toList();
+    }
+
+    @Override
+    public Object getPostUpdateHistory(IdRequest request) {
+        return null;
     }
 }

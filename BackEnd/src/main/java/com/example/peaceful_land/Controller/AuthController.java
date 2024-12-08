@@ -36,13 +36,17 @@ public class AuthController {
             // Trả về lỗi nếu có lỗi xác thực
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
+        try {
+            // Generate JWT token
+            Account account = accountService.tryLogin(loginRequest.getUserId(),loginRequest.getPassword());
+            String jwtToken = jwtTokenProvider.generateToken(account.getEmail());
 
-        // Generate JWT token
-        Account account = accountService.tryLogin(loginRequest.getUserId(),loginRequest.getPassword());
-        String jwtToken = jwtTokenProvider.generateToken(account.getEmail());
-
-        // Return the JWT token along with user details (or just the token if preferred)
-        return ResponseEntity.ok(new JwtResponse(jwtToken,account));
+            // Return the JWT token along with user details (or just the token if preferred)
+            return ResponseEntity.ok(new JwtResponse(jwtToken,account));
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/register")

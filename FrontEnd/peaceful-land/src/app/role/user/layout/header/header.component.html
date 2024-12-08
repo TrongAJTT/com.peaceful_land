@@ -18,7 +18,7 @@
                 <a (click)="toggleNavbarCollapse()" routerLink="ticket" class="nav-item nav-link">Tra cứu vé</a>
                 <a (click)="toggleNavbarCollapse()" routerLink="about-us" class="nav-item nav-link">Về chúng tôi</a>
                 <a (click)="toggleNavbarCollapse()" routerLink="blog" class="nav-link nav-item ">Tin tức</a>
-                <a (click)="toggleNavbarCollapse()" routerLink="contact-us" class="nav-item nav-link">Liên hệ</a>
+                <a *ngIf="isSaleOrUser" (click)="toggleNavbarCollapse()" routerLink="post_property" class="nav-item nav-link">Đăng bài</a>
                 <a (click)="toggleNavbarCollapse()" routerLink="login_and_register" class="nav-item nav-link">
                     <span *ngIf="isLoggedIn">Tài khoản</span>
                     <span *ngIf="!isLoggedIn">Đăng nhập</span>

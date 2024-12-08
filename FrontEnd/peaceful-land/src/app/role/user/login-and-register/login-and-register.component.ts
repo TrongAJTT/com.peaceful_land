@@ -16,6 +16,7 @@ import { AccountService } from '../../../core/services/account.service';
 })
 export class LoginAndRegisterComponent implements OnInit{
   @ViewChild('container') container!: ElementRef;
+  today!: string;
   user!: User;
   packages = {
     'sale': [
@@ -65,7 +66,7 @@ export class LoginAndRegisterComponent implements OnInit{
     phone: new FormControl(''),
     email: new FormControl(''),
     password: new FormControl(''),
-    birth_date: new FormControl(true)
+    birth_date: new FormControl('')
   })
 
   constructor(
@@ -80,6 +81,12 @@ export class LoginAndRegisterComponent implements OnInit{
     if(this.authService.getAuthStatus()){
       this.user = this.authService.getUserDetails();
     }
+
+    // Today
+    const now = new Date(); 
+    const month = ('0' + (now.getMonth() + 1)).slice(-2); 
+    const day = ('0' + now.getDate()).slice(-2); 
+    this.today = `${now.getFullYear()}-${month}-${day}`;
   }
 
   handleLogin(event:Event){
@@ -122,6 +129,8 @@ export class LoginAndRegisterComponent implements OnInit{
       this.snackbarService.notifyWarningUser("Email không hợp lệ");
     }else if (password===""){
       this.snackbarService.notifyWarningUser("Vui lòng nhập mật khẩu");
+    }else if (birth_date=="") {
+      this.snackbarService.notifyWarningUser("Vui lòng chọn ngày sinh")
     }else{
       this.authService.register(email,password,phone,name,birth_date!)
         .subscribe({
@@ -131,10 +140,10 @@ export class LoginAndRegisterComponent implements OnInit{
             this.registerForm.get("password")?.setValue("");
             this.registerForm.get("phone")?.setValue("");
             this.registerForm.get("name")?.setValue("");
+            this.registerForm.get("birth_date")?.setValue("");
             this.container.nativeElement.classList.remove("right-panel-active");
           },
           error: (response:any) => {
-            console.log(response);
             this.snackbarService.notifyErrorUser(response.error.message)
           }
         })
@@ -151,7 +160,7 @@ export class LoginAndRegisterComponent implements OnInit{
 
   logout(){
     this.authService.logout();
-    this.snackbarService.notifySuccessUser("Đăng xuất thành công");
+    window.location.reload();
   }
 
   purchaseRole(role: number,day:number){

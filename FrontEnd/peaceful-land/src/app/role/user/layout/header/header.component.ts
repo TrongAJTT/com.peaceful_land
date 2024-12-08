@@ -8,6 +8,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 })
 export class HeaderComponent implements AfterViewInit{
   isLoggedIn: boolean = false;
+  isSaleOrUser: boolean = false;
   @ViewChild('nav_header') navBarElement!: ElementRef;
   @ViewChild('navbar_collapse') navbarCollapse!: ElementRef;
 
@@ -17,6 +18,7 @@ export class HeaderComponent implements AfterViewInit{
 
   ngAfterViewInit(): void {
     this.isLoggedIn = this.authService.getAuthStatus();
+    this.isSaleOrUser = this.authService.getSaleOrUserStatus();
   }
   
   @HostListener('window:scroll', ['$event'])

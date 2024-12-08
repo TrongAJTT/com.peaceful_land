@@ -1,0 +1,201 @@
+<!-- Contact Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <!-- Modal Overlay for loading spinner -->
+        <div *ngIf="isLoading" class="modal-overlay">
+            <div class="spinner-container text-center">
+                <mat-spinner diameter="50"></mat-spinner>
+                <p>Đang xử lý...</p>
+            </div>
+      </div>
+        <div *ngIf="!isLoading">
+            <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
+                <h1 class="mb-3">Đăng bài mới</h1>
+                <p>Đăng bất động sản hấp dẫn và lôi cuốn nào</p>
+            </div>
+            <form [formGroup]="propertyForm" (ngSubmit)="handleSubmitProperty()">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="row gy-4">
+                            <h5 class="mb-3">Chọn địa chỉ chỉ tổng quan</h5>
+                            <div class="col-md-6 col-lg-4 wow fadeIn" data-wow-delay="0.1s">
+                                <div class="bg-light rounded p-3">
+                                    <mat-form-field appearance="fill" class="w-100">
+                                        <mat-label>Chọn tỉnh thành</mat-label>
+                                        <mat-select formControlName="selectedCity" (selectionChange)="onCityChange()" aria-label=".form-select-sm" required>
+                                            <mat-option value="" disabled>Chọn tỉnh thành</mat-option>
+                                            <mat-option *ngFor="let city of cities" [value]="city.Id">{{ city.Name }}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-5 wow fadeIn" data-wow-delay="0.3s">
+                                <div class="bg-light rounded p-3">
+                                    <mat-form-field appearance="fill" class="w-100">
+                                        <mat-label>Chọn quận huyện</mat-label>
+                                        <mat-select formControlName="selectedDistrict" (selectionChange)="onDistrictChange()" aria-label=".form-select-sm" required>
+                                            <mat-option value="" disabled>Chọn quận huyện</mat-option>
+                                            <mat-option *ngFor="let district of districts" [value]="district.Id">{{ district.Name }}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.5s">
+                                <div class="bg-light rounded p-3">
+                                    <mat-form-field appearance="fill" class="w-100">
+                                        <mat-label>Chọn phường xã</mat-label>
+                                        <mat-select formControlName="selectedWard" aria-label=".form-select-sm" required>
+                                            <mat-option value="" disabled>Chọn phường xã</mat-option>
+                                            <mat-option *ngFor="let ward of wards" [value]="ward.Id">{{ ward.Name }}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="row gy-4">
+                            <!-- Address Details -->
+                            <div class="col-12 col-md-4">
+                                <label for="location_detail">Địa chỉ chi tiết</label>
+                                <input type="text" id="location_detail" formControlName="locationDetail" class="form-control" placeholder="12, Huỳnh Tấn Phát">
+                            </div>
+                            
+                            <!-- Google Map URL -->
+                            <div class="col-12 col-md-4">
+                                <label for="map_url">Địa chỉ Google Map</label>
+                                <input type="text" id="map_url" formControlName="mapUrl" class="form-control" placeholder="Google Map Url Example">
+                            </div>
+                    
+                            <!-- Area -->
+                            <div class="col-12 col-md-4">
+                                <label for="area">Diện tích (mét vuông)</label>
+                                <input type="text" id="area" formControlName="area" class="form-control" value="1">
+                            </div>
+                    
+                            <!-- Category -->
+                            <div class="col-12 col-md-4">
+                                <mat-form-field appearance="fill" class="w-100">
+                                    <mat-label>Loại nhà</mat-label>
+                                    <mat-select formControlName="selectedCategory" aria-label=".form-select-sm" required>
+                                        <mat-option value="" disabled>Chọn loại nhà</mat-option>
+                                        <mat-option *ngFor="let category of categories" [value]="category">{{ category }}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                    
+                            <!-- Price -->
+                            <div class="col-12 col-md-4">
+                                <label for="price">Giá </label>
+                                <input type="text" id="price" formControlName="price" class="form-control" min="1" value="1000000">
+                            </div>
+                    
+                            <!-- Number of Bedrooms -->
+                            <div class="col-12 col-md-4">
+                                <label for="bedrooms">Số lượng phòng ngủ</label>
+                                <input type="number" id="bedrooms" formControlName="bedrooms" class="form-control" min="1" value="1">
+                            </div>
+                    
+                            <!-- Number of Toilets -->
+                            <div class="col-12 col-md-4">
+                                <label for="toilets">Số lượng nhà vệ sinh</label>
+                                <input type="number" id="toilets" formControlName="toilets" class="form-control" min="1" value="1">
+                            </div>
+                    
+                            <!-- Entrance -->
+                            <div class="col-12 col-md-4">
+                                <label for="entrance">Số lượng lối vào</label>
+                                <input type="number" id="entrance" formControlName="entrance" class="form-control" min="1" value="1">
+                            </div>
+                    
+                            <!-- Frontage -->
+                            <div class="col-12 col-md-4">
+                                <label for="frontage">Số lượng mặt tiền</label>
+                                <input type="number" id="frontage" formControlName="frontage" class="form-control" min="1" value="1">
+                            </div>
+                    
+                            <!-- House Orientation -->
+                            <div class="col-12 col-md-4">
+                                <mat-form-field appearance="fill" class="w-100">
+                                    <mat-label>Hướng nhà</mat-label>
+                                    <mat-select formControlName="selectedHouseOrientation" aria-label=".form-select-sm" required>
+                                        <mat-option value="" disabled>Chọn hướng nhà</mat-option>
+                                        <mat-option *ngFor="let orientation of houseOrientations" [value]="orientation">{{ orientation }}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                    
+                            <!-- Balcony Orientation -->
+                            <div class="col-12 col-md-4">
+                                <mat-form-field appearance="fill" class="w-100">
+                                    <mat-label>Hướng ban công</mat-label>
+                                    <mat-select formControlName="selectedBalconyOrientation" aria-label=".form-select-sm" required>
+                                        <mat-option value="" disabled>Chọn hướng ban công</mat-option>
+                                        <mat-option *ngFor="let orientation of balconyOrientations" [value]="orientation">{{ orientation }}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                    
+                            <!-- Legal Papers -->
+                            <div class="col-12 col-md-4">
+                                <label for="legal">Giấy tờ pháp lý</label>
+                                <input type="text" id="legal" formControlName="legal" class="form-control" placeholder="Sổ hồng">
+                            </div>
+                    
+                            <!-- Add Image -->
+                            <div class="col-12 col-md-4">
+                                <label for="image">Hình ảnh đại diện</label>
+                                <input type="file" id="image" (change)="onImageSelected($event)" class="form-control">
+                                <div *ngIf="imagePreview" class="mt-2">
+                                    <img [src]="imagePreview" alt="Image Preview" class="img-fluid" style="max-height: 200px; object-fit: cover; width: 100%;">
+                                </div>
+                            </div>
+                    
+                            <!-- Description -->
+                            <div class="col-12 col-md-4">
+                                <label for="description">Mô tả</label>
+                                <textarea id="description" formControlName="description" class="form-control" rows="4" placeholder="Mô tả về bất động sản"></textarea>
+                            </div>
+                    
+                            <!-- Topic -->
+                            <div class="col-12 col-md-4">
+                                <label for="topic">Chủ đề</label>
+                                <input type="text" id="topic" formControlName="topic" class="form-control" placeholder="Chủ đề bài đăng">
+                            </div>
+                    
+                            <!-- Expiration Date -->
+                            <div class="col-12 col-md-4">
+                                <label for="expiration">Hạn rao bài tối đa</label>
+                                <input type="number" id="expiration" formControlName="expiration" min="1" value="1" [max]="maxExpByRole" class="form-control">
+                            </div>
+    
+                            <div class="col-12 col-md-4">
+                                <!-- Chọn hình thức cho thuê hoặc mua bán -->
+                                <label for="offer">Hình thức</label>
+                                <div>
+                                  <label>
+                                    <input type="radio"  formControlName="selectedOffer" [value]="0"> Mua bán
+                                  </label>
+                                  <label>
+                                    <input type="radio"  formControlName="selectedOffer" [value]="1"> Cho thuê
+                                  </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Phần nhập Hạn cho thuê -->
+                            <div class="col-12 col-md-4">
+                                <label for="rental_period">Hạn cho thuê</label>
+                                <input type="date" id="rental_period" formControlName="rentalPeriod" class="form-control" [min]="today" [disabled]="propertyForm.controls['selectedOffer'].value === 0">
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="col-12 text-center">
+                        <button class="btn btn-success btn-lg" type="submit">Tạo bài đăng</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Contact End -->

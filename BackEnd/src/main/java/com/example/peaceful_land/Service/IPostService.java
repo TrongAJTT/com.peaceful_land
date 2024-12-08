@@ -29,4 +29,6 @@ public interface IPostService {
     void updatePost_Discount(Post post, UpdatePropertyPostRequest request);
     // Cập nhật thông tin bài rao
     String updatePost_Information(Post post, UpdatePropertyPostRequest request);
+
+    Object searchPost(SearchPostRequest request, int page, int size);
 }

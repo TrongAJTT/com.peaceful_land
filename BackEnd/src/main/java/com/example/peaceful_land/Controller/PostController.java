@@ -150,4 +150,15 @@ public class PostController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchPost(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestBody SearchPostRequest request) {
+        try {
+            return ResponseEntity.ok(postService.searchPost(request, page, size));
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

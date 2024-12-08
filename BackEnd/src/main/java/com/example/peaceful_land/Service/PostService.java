@@ -3,19 +3,20 @@ package com.example.peaceful_land.Service;
 import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.*;
 import com.example.peaceful_land.Exception.PropertyNotFoundException;
+import com.example.peaceful_land.Query.PropertySpecification;
 import com.example.peaceful_land.Repository.*;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_POST_THUMBNAIL;
 
@@ -394,4 +395,71 @@ public class PostService implements IPostService {
         sendNotificationToInterestedUsers(post.getProperty(), "Bất động sản đã được cập nhật thông tin bài rao");
         return contentUpdate;
     }
+
+    public List<?> searchPost(SearchPostRequest request, int page, int size) {
+        Specification<Property> spec = Specification.where(PropertySpecification.hasHideFalse());
+
+        // Lọc các điều kiện khác
+        Boolean offer = request.getOffer();
+        Boolean status = request.getStatus();
+        String location = request.getLocation();
+        String category = request.getCategory();
+        Long price = request.getPrice();
+        List<ViewPostResponse> postIds = new LinkedList<>();
+        Integer area = request.getArea();
+        Integer bedrooms = request.getBedrooms();
+        Integer toilets = request.getToilets();
+        Byte entrance = request.getEntrance();
+        Byte frontage = request.getFrontage();
+        String houseOrientation = request.getHouseOrientation();
+        String balconyOrientation = request.getBalconyOrientation();
+
+        if (offer != null) {
+            spec = spec.and(PropertySpecification.hasOffer(offer));
+        }
+        if (status != null) {
+            spec = spec.and(PropertySpecification.hasStatus(status));
+        }
+        if (location != null) {
+            spec = spec.and(PropertySpecification.hasLocation(location));
+        }
+        if (category != null) {
+            spec = spec.and(PropertySpecification.hasCategory(category));
+        }
+        if (price != null) {
+            spec = spec.and(PropertySpecification.hasPriceGreaterThan(price));
+        }
+        if (area != null) {
+            spec = spec.and(PropertySpecification.hasAreaGreaterThan(area));
+        }
+        if (bedrooms != null) {
+            spec = spec.and(PropertySpecification.hasBedroomsGreaterThan(bedrooms));
+        }
+        if (toilets != null) {
+            spec = spec.and(PropertySpecification.hasToiletsGreaterThan(toilets));
+        }
+        if (entrance != null) {
+            spec = spec.and(PropertySpecification.hasEntrance(entrance));
+        }
+        if (frontage != null) {
+            spec = spec.and(PropertySpecification.hasFrontage(frontage));
+        }
+        if (houseOrientation != null) {
+            spec = spec.and(PropertySpecification.hasHouseOrientation(houseOrientation));
+        }
+        if (balconyOrientation != null) {
+            spec = spec.and(PropertySpecification.hasBalconyOrientation(balconyOrientation));
+        }
+
+        // Tìm kiếm và lấy các Property thỏa mãn
+        Page<Property> propertiesPage = propertyRepository.findAll(spec, PageRequest.of(page, size));
+
+        // Chuyển đổi Page<Property> thành Page<Long> (chỉ lấy id)
+        propertiesPage.forEach(property ->
+                postIds.add(getPostInformation(IdRequest.builder().propertyId(property.getId()).build()))
+        );
+
+        return postIds;
+    }
+
 }

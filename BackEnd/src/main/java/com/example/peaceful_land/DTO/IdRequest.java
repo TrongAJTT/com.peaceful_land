@@ -1,11 +1,12 @@
 package com.example.peaceful_land.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Data @Getter @Setter
+@Data @Getter @Setter @Builder
 public class IdRequest {
 
     @JsonProperty("user_id")
@@ -17,4 +18,6 @@ public class IdRequest {
     @JsonProperty("payment_method_id")
     private Long paymentMethodId;
 
+    @JsonProperty("property_id")
+    private Long propertyId;
 }

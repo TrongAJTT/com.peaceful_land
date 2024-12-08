@@ -3,7 +3,7 @@ package com.example.peaceful_land.Controller;
 
 import com.example.peaceful_land.DTO.LoginRequest;
 import com.example.peaceful_land.DTO.ResetPasswordRequest;
-import com.example.peaceful_land.DTO.RegisterRequest;
+import com.example.peaceful_land.DTO.AccountPrimaryInfo;
 import com.example.peaceful_land.Entity.Account;
 import com.example.peaceful_land.Security.JwtResponse;
 import com.example.peaceful_land.Security.JwtTokenProvider;
@@ -36,21 +36,16 @@ public class AuthController {
             // Trả về lỗi nếu có lỗi xác thực
             return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
         }
-        try {
             // Generate JWT token
-            Account account = accountService.tryLogin(loginRequest.getUserId(),loginRequest.getPassword());
-            String jwtToken = jwtTokenProvider.generateToken(account.getEmail());
+        Account account = accountService.tryLogin(loginRequest.getUserId(),loginRequest.getPassword());
+        String jwtToken = jwtTokenProvider.generateToken(account.getEmail());
 
-            // Return the JWT token along with user details (or just the token if preferred)
-            return ResponseEntity.ok(new JwtResponse(jwtToken,account));
-        }
-        catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        // Return the JWT token along with user details (or just the token if preferred)
+        return ResponseEntity.ok(new JwtResponse(jwtToken,account));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest userInfo) {
+    public ResponseEntity<?> register(@RequestBody AccountPrimaryInfo userInfo) {
         try {
             return ResponseEntity.ok(accountService.register(userInfo));
         } catch (Exception e) {

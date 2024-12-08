@@ -17,7 +17,7 @@
 	<div class="form-container sign-in-container">
 		<form [formGroup]="loginForm" (ngSubmit)="handleLogin($event)">
 			<h1>Đăng nhập</h1>
-			<input formControlName="email_login" type="email" placeholder="Email" />
+			<input formControlName="userId_login" type="text" placeholder="Email hoặc mật khẩu" />
 			<input formControlName="password_login" type="password" placeholder="Mật khẩu" />
 			<button type="submit">Đăng nhập</button>
 		</form>

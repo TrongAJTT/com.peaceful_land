@@ -16,7 +16,7 @@ export class LoginAndRegisterComponent {
   @ViewChild('container') container!: ElementRef;
   user: any;
   loginForm = new FormGroup({
-    email_login: new FormControl(''),
+    userId_login: new FormControl(''),
     password_login: new FormControl(''),
   })
 
@@ -40,17 +40,14 @@ export class LoginAndRegisterComponent {
 
   handleLogin(event:Event){
     event.preventDefault();
-    const emailPattern= /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    const email_login = this.loginForm.get("email_login")?.value?.trim() || ""; 
+    const userId_login = this.loginForm.get("userId_login")?.value?.trim() || ""; 
     const password_login = this.loginForm.get("password_login")?.value?.trim() || ""; 
-    if (email_login==="") {
-      this.snackbarService.notifyWarningUser("Vui lòng nhập email");
-    }else if(!emailPattern.test(email_login)){
-      this.snackbarService.notifyWarningUser("Email không hợp lệ");
+    if (userId_login==="") {
+      this.snackbarService.notifyWarningUser("Vui lòng nhập email hoặc mật khẩu");
     }else if (password_login===""){
       this.snackbarService.notifyWarningUser("Vui lòng nhập mật khẩu");
     }else{
-      this.authService.login(email_login,password_login)
+      this.authService.login(userId_login,password_login)
         .subscribe({
           next: (response:any) => {
             window.location.reload();

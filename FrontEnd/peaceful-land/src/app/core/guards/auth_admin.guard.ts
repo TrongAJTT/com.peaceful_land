@@ -12,9 +12,6 @@ export class AuthAdminGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot): boolean {
     if (this.authService.getAuthStatus() && this.authService.getAdminStatus()) {
       sessionStorage.setItem('currentUrl', location.hash);
-
-      // this.router.navigate(route.url);
-      // this.router.navigate(['admin', 'trip']);
       return true;
     } else {
       this.router.navigate(['/']);

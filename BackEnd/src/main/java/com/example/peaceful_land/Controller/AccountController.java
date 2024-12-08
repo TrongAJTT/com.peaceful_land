@@ -30,7 +30,7 @@ public class AccountController {
         try {
             return ResponseEntity.ok(accountService.getAccountInfo(request.getUserId()));
         }
-        catch (Exception e) {
+        catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

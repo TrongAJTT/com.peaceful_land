@@ -21,7 +21,7 @@ public class PostController {
     @PostMapping("/create-post")
     public ResponseEntity<?> createPost(@RequestBody PostRequest request) {
         Post newPost = postService.createPost(request);
-        return ResponseEntity.ok("Thêm bất động sản thành công:\n" + newPost.toString());
+        return ResponseEntity.ok(newPost);
     }
 
     @PostMapping(value = "/change-thumbnail", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -20,7 +20,7 @@ public class PropertyController {
     @PostMapping("/create-property")
     public ResponseEntity<?> createProperty(@RequestBody PropertyRequest request) {
         Property newProperty = propertyService.createProperty(request);
-        return ResponseEntity.ok("Property created successfully:\n" + newProperty);
+        return ResponseEntity.ok(newProperty);
     }
 
     @PostMapping(value = "/upload-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

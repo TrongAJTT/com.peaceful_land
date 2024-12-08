@@ -88,20 +88,17 @@ public class PostRequestService implements IPostRequestService {
             )
         ).start();
         // Gửi email đến người quan tâm
-        List<Account> listUserInterested = userInterestRepository.findByPropertyEqualsAndNotificationEquals(approvedPost.getProperty(), true)
-                .stream()
-                .map(UserInterest::getUser)
-                .toList();
+        List<UserInterest> listUserInterested = userInterestRepository.findByPropertyEqualsAndNotificationEquals(approvedPost.getProperty(), true);
         if (!listUserInterested.isEmpty()){
-            for(Account account : listUserInterested) {
-                new Thread(() ->
+            new Thread(() -> {
+                for(UserInterest userInterest : listUserInterested) {
                     emailService.sendPostApprovedEmailToWhoInterested(
-                            account.getEmail(),
+                            userInterest.getUser().getEmail(),
                             approvedPost.getId(),
-                            approvedPost.getDateBegin()
-                    )
-                ).start();
-            }
+                            userInterest.getDateBegin()
+                    );
+                }
+            }).start();
         }
     }
 
@@ -126,12 +123,12 @@ public class PostRequestService implements IPostRequestService {
         }
         // Gửi email thông báo cho người đăng bài
         new Thread(() ->
-                emailService.sendPostRejectedEmailToOwner(
-                        approvedPost.getProperty().getUser().getEmail(),
-                        approvedPost.getId(),
-                        approvedPost.getDateBegin(),
-                        denyMessage
-                )
+            emailService.sendPostRejectedEmailToOwner(
+                    approvedPost.getProperty().getUser().getEmail(),
+                    approvedPost.getId(),
+                    approvedPost.getDateBegin(),
+                    denyMessage
+            )
         ).start();
     }
 }

@@ -31,6 +31,17 @@ public class VariableUtils {
     public static final int MAX_POST_BROKER_PER_DAY = 5;
     public static final int MAX_POST_BROKER_VIP_PER_DAY = 10;
 
+    public static final String
+            UPDATE_TYPE_SOLD = "sold",
+            UPDATE_TYPE_RENTED = "rented",
+            UPDATE_TYPE_RESALE = "re-sale",
+            UPDATE_TYPE_RERENT = "re-rent",
+            UPDATE_TYPE_PRICE = "price",
+            UPDATE_TYPE_OFFER = "offer",
+            UPDATE_TYPE_RENTAL_PERIOD = "rental-period",
+            UPDATE_TYPE_DISCOUNT = "discount",
+            UPDATE_TYPE_POST = "post";
+
     public static Long getRolePriceFromDayRange(Byte roleId, Integer day) {
         if (Objects.equals(roleId, ROLE_BROKER)) {
             if (day == 30) {
@@ -87,6 +98,20 @@ public class VariableUtils {
             case 0 -> MAX_POST_NORMAL_PER_DAY;
             case 1 -> MAX_POST_BROKER_PER_DAY;
             default -> MAX_POST_BROKER_VIP_PER_DAY;
+        };
+    }
+
+    public static String getUpdateActionString(String actionUpdateId){
+        return switch (actionUpdateId) {
+            case UPDATE_TYPE_SOLD -> "Đã bán";
+            case UPDATE_TYPE_RENTED -> "Đã bán', 'N";
+            case UPDATE_TYPE_RESALE -> "Người mua bán lại";
+            case UPDATE_TYPE_RERENT -> "Hết hợp đồng, cho thuê lại";
+            case UPDATE_TYPE_PRICE -> "Cập nhật giá";
+            case UPDATE_TYPE_OFFER -> "Thay đổi hình thức";
+            case UPDATE_TYPE_RENTAL_PERIOD -> "Thay đổi hạn cho thuê";
+            case UPDATE_TYPE_DISCOUNT -> "Giảm giá";
+            default -> "Cập nhật tin rao";
         };
     }
 

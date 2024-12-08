@@ -145,7 +145,7 @@ public class EmailService implements IEmailService {
                     """
                     <p>Chúng tôi vui lòng thông báo với bạn rằng một bài rao mà bạn quan tâm đã được duyệt.</p>
                     <p><b>Mã bài rao:</b> %s.</p>
-                    <p><b>Ngày tạo:</b> %s.</p>
+                    <p><b>Ngày bắt đầu quan tâm:</b> %s.</p>
                     <p>Hãy kiểm tra ngay để biết thêm thông tin chi tiết về bất động sản bạn nhé!.</p>
                     """, postId, createdAt.toString());
 
@@ -181,6 +181,34 @@ public class EmailService implements IEmailService {
             helper.setTo(emailTo);
             helper.setSubject("Bài rao của bạn đã bị từ chối");
             helper.setText(htmlContent, true); // `true` để bật chế độ HTML
+
+            // Sending the mail
+            javaMailSender.send(mimeMessage);
+        }
+        catch (MailException | MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendPostUpdatedEmailToWhoInterested(String emailTo, Long postId, LocalDateTime createdAt, String contentUpdate) {
+        try {
+            System.out.println("[Mail proxy] Sending Notify Update Email to interested user: " + emailTo);
+            // Creating a MimeMessage
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            String htmlContent = String.format(
+                    """
+                    <p>Chúng tôi vui lòng thông báo với bạn rằng một bài rao mà bạn quan tâm đã được cập nhật.</p>
+                    <p><b>Mã bài rao:</b> %s.</p>
+                    <p><b>Thời gian bắt đầu quan tâm:</b> %s.</p>
+                    <p><b>Nội dung cập nhật:</b> %s.</p>
+                    """, postId, createdAt.toString(), contentUpdate);
+
+            helper.setTo(emailTo);
+            helper.setSubject("Bài rao của bạn đã bị từ chối");
+            helper.setText(htmlContent, true);
 
             // Sending the mail
             javaMailSender.send(mimeMessage);

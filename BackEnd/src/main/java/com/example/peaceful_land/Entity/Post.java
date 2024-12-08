@@ -44,7 +44,7 @@ public class Post extends BaseEntity {
                 '}';
     }
 
-    public PostLog parsePostLog() {
+    public PostLog toPostLog() {
         return PostLog.builder()
                 .post(this)
                 .title(this.title)

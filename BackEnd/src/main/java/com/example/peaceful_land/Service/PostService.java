@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_POST_THUMBNAIL;
@@ -21,10 +22,12 @@ public class PostService implements IPostService {
 
     private final AccountRepository accountRepository;
     private final RequestPostRepository requestPostRepository;
+    private final PropertyLogRepository propertyLogRepository;
     private final PostRepository postRepository;
     private final PostLogRepository postLogRepository;
     private final UserInterestRepository userInterestRepository;
     private final PropertyRepository propertyRepository;
+    private final IEmailService emailService;
 
     @Override
     public Post createPost(PostRequest request) {
@@ -44,12 +47,17 @@ public class PostService implements IPostService {
             newPost.setHide(true);
             postRepository.save(newPost);
             // Lưu vào nhật ký thay đổi
-            postLogRepository.save(newPost.parsePostLog());
+            postLogRepository.save(newPost.toPostLog());
             // Trả về post mới
             return newPost;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Post checkPostExists(Long id) {
+        return postRepository.findById(id).orElseThrow(() -> new RuntimeException("Bài rao không tồn tại"));
     }
 
     @Override
@@ -182,6 +190,34 @@ public class PostService implements IPostService {
         return userInterest.getInterested() ? "Đã quan tâm bài đăng" : "Đã không quan tâm bài đăng";
     }
 
+    @Override
+    public void sendNotificationToInterestedUsers(Property property, String contentUpdate) {
+        List<UserInterest> listUserInterested = userInterestRepository.findByPropertyEqualsAndNotificationEquals(property, true);
+        if (!listUserInterested.isEmpty()){
+            new Thread(() -> {
+                for(UserInterest userInterest : listUserInterested) {
+                    emailService.sendPostUpdatedEmailToWhoInterested(
+                            userInterest.getUser().getEmail(),
+                            property.getId(),
+                            userInterest.getDateBegin(),
+                            contentUpdate
+                    );
+                }
+            }).start();
+        }
+    }
 
+    @Override
+    public void updatePost_Sold(Post post, UpdatePropertyPostRequest request) {
+        // Cập nhật thông tin tình trạng bất động sản
+        post.getProperty().setStatus(false);
+        propertyRepository.save(post.getProperty());
+        // Cập nhật vào bản ghi nhật ký mới nhất của bất động sản
+        PropertyLog propertyLog = post.getProperty().toPropertyLog();
+        propertyLog.setAction(request.getAction());
+        propertyLogRepository.save(propertyLog);
+        // Thông báo cho người quan tâm
+        sendNotificationToInterestedUsers(post.getProperty(), "Bất động sản đã được bán");
+    }
 
 }

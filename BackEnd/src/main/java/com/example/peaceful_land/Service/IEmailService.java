@@ -25,4 +25,7 @@ public interface IEmailService {
     // Gửi email với template xác nhận bài rao bị từ chối đến người rao bài
     void sendPostRejectedEmailToOwner(String emailTo, Long postId, LocalDateTime createdAt, String reason);
 
+    // Gửi email thông báo cho người quan tâm răng bài rao được cập nhật
+    void sendPostUpdatedEmailToWhoInterested(String emailTo, Long postId, LocalDateTime createdAt, String contentUpdate);
+
 }

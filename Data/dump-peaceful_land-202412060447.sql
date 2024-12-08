@@ -139,7 +139,7 @@ CREATE TABLE `post_logs` (
   PRIMARY KEY (`id`),
   KEY `post_logs_posts_FK` (`post_id`),
   CONSTRAINT `post_logs_posts_FK` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ nhật ký cập nhật bài đăng. Bài đăng khi được chỉnh sửa thì phải thêm vào đây trước sau đó mới cập nhật bảng Posts.';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng lưu trữ nhật ký cập nhật bài đăng.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -265,7 +265,7 @@ DROP TABLE IF EXISTS `property_logs`;
 CREATE TABLE `property_logs` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id nhật ký',
   `property_id` bigint NOT NULL COMMENT 'Id bất động sản',
-  `action` enum('Đã bán','Đã cho thuê','Người mua bán lại','Hết hợp đồng cho thuê','Cập nhật giá','Thay đổi hình thức','Thay đổi hạn cho thuê','Giảm giá') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Hành động thay đổi',
+  `action` enum('Đã bán','Đã cho thuê','Người mua bán lại','Hết hợp đồng, cho thuê lại','Cập nhật giá','Thay đổi hình thức','Thay đổi hạn cho thuê','Giảm giá','Cập nhật tin rao') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'Hành động thay đổi',
   `offer` bit(1) NOT NULL DEFAULT b'0' COMMENT 'Hình thức: 0 - Mua bán, 1 - Cho thuê',
   `status` bit(1) NOT NULL DEFAULT b'1' COMMENT 'Trạng thái: 0 - Đã bán hoặc cho thuê, 1 - sẵn sàng',
   `rental_period` date DEFAULT NULL COMMENT 'Hạn cho thuê (bắt buộc nếu type=1)',
@@ -277,7 +277,7 @@ CREATE TABLE `property_logs` (
   PRIMARY KEY (`id`),
   KEY `property_logs_properties_FK` (`property_id`),
   CONSTRAINT `property_logs_properties_FK` FOREIGN KEY (`property_id`) REFERENCES `properties` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng ghi lại nhật ký cập nhật bất động sản, khi cập nhật cần thêm dữ liệu vào bảng này trước.';
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng ghi lại nhật ký cập nhật bất động sản.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

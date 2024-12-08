@@ -4,10 +4,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Data @Getter @Setter @Builder
-public class ChangePostThumbnailRequest {
-    private Long post_id;
-    private MultipartFile image;
+public class ResponsePostUpdatePermission {
+    private boolean can_update;
+    private List<String> actions;
 }

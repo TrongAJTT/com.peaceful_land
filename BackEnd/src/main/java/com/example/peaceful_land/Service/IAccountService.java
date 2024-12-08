@@ -14,10 +14,13 @@ public interface IAccountService {
     Account tryLogin(String userId, String password);
 
     // Đăng ký tài khoản mới
-    Account register(RegisterRequest userInfo);
+    Account register(AccountPrimaryInfo userInfo);
 
     // Đổi mật khẩu tài khoản
     String changePassword(ChangePasswordRequest request);
+
+    // Đổi thông tin tài khoản
+    String changeAccountInfo(AccountPrimaryInfo request);
 
     // Quên mật khẩu giai đoạn 1: Gửi mã OTP
     void forgotPassword(String email);

@@ -1,5 +1,9 @@
 package com.example.peaceful_land.Utils;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class VariableUtils {
@@ -104,7 +108,7 @@ public class VariableUtils {
     public static String getUpdateActionString(String actionUpdateId){
         return switch (actionUpdateId) {
             case UPDATE_TYPE_SOLD -> "Đã bán";
-            case UPDATE_TYPE_RENTED -> "Đã bán', 'N";
+            case UPDATE_TYPE_RENTED -> "Đã cho thuê";
             case UPDATE_TYPE_RESALE -> "Người mua bán lại";
             case UPDATE_TYPE_RERENT -> "Hết hợp đồng, cho thuê lại";
             case UPDATE_TYPE_PRICE -> "Cập nhật giá";
@@ -113,6 +117,14 @@ public class VariableUtils {
             case UPDATE_TYPE_DISCOUNT -> "Giảm giá";
             default -> "Cập nhật tin rao";
         };
+    }
+
+    public static String convertToVnTimeZoneString(LocalDateTime localDateTime) {
+        // Chuyển LocalDateTime sang ZonedDateTime với múi giờ cụ thể
+        ZonedDateTime zonedCreatedAt = localDateTime.atZone(ZoneId.of("Asia/Ho_Chi_Minh"));
+        // Định dạng thời gian thành chuỗi mong muốn
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return zonedCreatedAt.format(formatter);
     }
 
 }

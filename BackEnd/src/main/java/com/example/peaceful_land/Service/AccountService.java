@@ -59,7 +59,7 @@ public class AccountService implements IAccountService {
     }
 
     @Override
-    public Account register(RegisterRequest userInfo) {
+    public Account register(AccountPrimaryInfo userInfo) {
         if (accountRepository.existsByEmail(userInfo.getEmail())) {
             throw new RuntimeException("Email đã tồn tại");
         }
@@ -112,6 +112,11 @@ public class AccountService implements IAccountService {
                     return "Đổi mật khẩu thành công";
                 })
                 .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+    }
+
+    @Override
+    public String changeAccountInfo(AccountPrimaryInfo request) {
+        return "";
     }
 
     @Override

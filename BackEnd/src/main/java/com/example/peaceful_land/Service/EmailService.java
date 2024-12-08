@@ -1,6 +1,7 @@
 package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.EmailDetail;
+import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -119,7 +120,7 @@ public class EmailService implements IEmailService {
                     <p>Chúng tôi vui lòng thông báo với bạn rằng bài rao của bạn đã được duyệt.</p>
                     <p><b>Mã bài rao:</b> %s.</p>
                     <p><b>Ngày tạo:</b> %s.</p>
-                    """, postId, createdAt.toString());
+                    """, postId, VariableUtils.convertToVnTimeZoneString(createdAt));
 
             helper.setTo(emailTo);
             helper.setSubject("Bài rao của bạn đã được duyệt");
@@ -147,7 +148,7 @@ public class EmailService implements IEmailService {
                     <p><b>Mã bài rao:</b> %s.</p>
                     <p><b>Ngày bắt đầu quan tâm:</b> %s.</p>
                     <p>Hãy kiểm tra ngay để biết thêm thông tin chi tiết về bất động sản bạn nhé!.</p>
-                    """, postId, createdAt.toString());
+                    """, postId, VariableUtils.convertToVnTimeZoneString(createdAt));
 
             helper.setTo(emailTo);
             helper.setSubject("Bài rao mà bạn quan tâm đã được duyệt");
@@ -176,7 +177,7 @@ public class EmailService implements IEmailService {
                     <p><b>Ngày tạo:</b> %s.</p>
                     <p><b>Lý do:</b> %s.</p>
                     <p>Hãy chú ý hơn trong bài rao sau bạn nhé!.</p>
-                    """, postId, createdAt.toString(), reason);
+                    """, postId, VariableUtils.convertToVnTimeZoneString(createdAt), reason);
 
             helper.setTo(emailTo);
             helper.setSubject("Bài rao của bạn đã bị từ chối");
@@ -204,10 +205,10 @@ public class EmailService implements IEmailService {
                     <p><b>Mã bài rao:</b> %s.</p>
                     <p><b>Thời gian bắt đầu quan tâm:</b> %s.</p>
                     <p><b>Nội dung cập nhật:</b> %s.</p>
-                    """, postId, createdAt.toString(), contentUpdate);
+                    """, postId, VariableUtils.convertToVnTimeZoneString(createdAt), contentUpdate);
 
             helper.setTo(emailTo);
-            helper.setSubject("Bài rao của bạn đã bị từ chối");
+            helper.setSubject("Bài rao mà bạn theo dõi đã được cập nhật");
             helper.setText(htmlContent, true);
 
             // Sending the mail

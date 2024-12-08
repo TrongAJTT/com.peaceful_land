@@ -3,7 +3,7 @@ package com.example.peaceful_land.Controller;
 
 import com.example.peaceful_land.DTO.LoginRequest;
 import com.example.peaceful_land.DTO.ResetPasswordRequest;
-import com.example.peaceful_land.DTO.RegisterRequest;
+import com.example.peaceful_land.DTO.AccountPrimaryInfo;
 import com.example.peaceful_land.Entity.Account;
 import com.example.peaceful_land.Security.JwtResponse;
 import com.example.peaceful_land.Security.JwtTokenProvider;
@@ -45,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest userInfo) {
+    public ResponseEntity<?> register(@RequestBody AccountPrimaryInfo userInfo) {
         try {
             return ResponseEntity.ok(accountService.register(userInfo));
         } catch (Exception e) {

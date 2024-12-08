@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data @Getter @Setter
 public class UpdatePropertyPostRequest {
@@ -26,12 +27,14 @@ public class UpdatePropertyPostRequest {
 
     // Cập nhật liên quan đến bất động sản
 
-    private Boolean offer;
-
-    private Boolean property_status;
-
     private LocalDate rental_period;
 
     private Long price;
+
+    // Cập nhật liên quan đến giảm giá bất động sản
+
+    private Long discount_price;
+
+    private LocalDateTime discount_expiration;
 
 }

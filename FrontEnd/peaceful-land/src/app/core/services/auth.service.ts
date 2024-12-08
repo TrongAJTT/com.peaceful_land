@@ -8,6 +8,8 @@ import { Observable, tap } from 'rxjs';
 export class AuthService {
   private userRole: 'none' |'user' | 'sale' | 'admin' = 'none';
   authStatusChanged: EventEmitter<'none' |'user' | 'sale' | 'admin'> = new EventEmitter();
+
+
   private apiUrl = 'http://localhost:8080/api/auth';
 
   constructor(private http: HttpClient) { 

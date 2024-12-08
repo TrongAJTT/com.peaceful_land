@@ -12,7 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_POST_THUMBNAIL;
@@ -23,6 +25,7 @@ public class PostService implements IPostService {
     private final AccountRepository accountRepository;
     private final RequestPostRepository requestPostRepository;
     private final PropertyLogRepository propertyLogRepository;
+    private final DiscountRepository discountRepository;
     private final PostRepository postRepository;
     private final PostLogRepository postLogRepository;
     private final UserInterestRepository userInterestRepository;
@@ -208,7 +211,58 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public void updatePost_Sold(Post post, UpdatePropertyPostRequest request) {
+    public ResponsePostUpdatePermission getUpdatePostPermission(IdRequest request) {
+        Post post = postRepository.findById(request.getPostId()).orElse(null);
+        if (post == null) {
+            throw new RuntimeException("Bài rao không tồn tại");
+        }
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao đã bị xóa");
+        }
+        // Nếu người dùng không phải là chủ sở hữu
+        if (post.getProperty().getUser().getId() != request.getUserId()) {
+            throw new RuntimeException("Bạn không có quyền cập nhật bài rao này");
+        }
+        // Nếu bài rao đã hết hạn
+        if (post.getExpiration().isBefore(LocalDate.now())) {
+            return ResponsePostUpdatePermission.builder()
+                    .can_update(false)
+                    .build();
+        }
+        List<String> listAction = new ArrayList<>();
+        // Kiểm tra nếu bài rao còn sẵn sàng
+        if (post.getProperty().getStatus()) {
+            if (post.getProperty().getOffer()){
+                listAction.add(VariableUtils.UPDATE_TYPE_RENTED);
+                listAction.add(VariableUtils.UPDATE_TYPE_RENTAL_PERIOD);
+            }
+            else {
+                listAction.add(VariableUtils.UPDATE_TYPE_SOLD);
+            }
+            listAction.add(VariableUtils.UPDATE_TYPE_PRICE);
+            listAction.add(VariableUtils.UPDATE_TYPE_OFFER);
+            listAction.add(VariableUtils.UPDATE_TYPE_DISCOUNT);
+            listAction.add(VariableUtils.UPDATE_TYPE_POST);
+
+        }
+        else {
+            if (post.getProperty().getOffer()){
+                listAction.add(VariableUtils.UPDATE_TYPE_RERENT);
+                listAction.add(VariableUtils.UPDATE_TYPE_RENTAL_PERIOD);
+            }
+            else {
+                listAction.add(VariableUtils.UPDATE_TYPE_RESALE);
+            }
+        }
+        return ResponsePostUpdatePermission.builder()
+                .can_update(true)
+                .actions(listAction)
+                .build();
+    }
+
+    @Override
+    public void updatePost_SoldOrRented(Post post, UpdatePropertyPostRequest request, boolean isSold) {
         // Cập nhật thông tin tình trạng bất động sản
         post.getProperty().setStatus(false);
         propertyRepository.save(post.getProperty());
@@ -217,7 +271,127 @@ public class PostService implements IPostService {
         propertyLog.setAction(request.getAction());
         propertyLogRepository.save(propertyLog);
         // Thông báo cho người quan tâm
-        sendNotificationToInterestedUsers(post.getProperty(), "Bất động sản đã được bán");
+        sendNotificationToInterestedUsers(
+                post.getProperty(),
+                "Bất động sản đã được " + (isSold ? "bán" : "cho thuê")
+        );
     }
 
+    @Override
+    public void updatePost_ReSaleOrReRent(Post post, UpdatePropertyPostRequest request, boolean isReSale) {
+        // Cập nhật thông tin tình trạng bất động sản
+        post.getProperty().setStatus(true);
+        if (request.getPrice() != null) {
+            post.getProperty().setPrice(request.getPrice());
+        }
+        propertyRepository.save(post.getProperty());
+        // Cập nhật vào bản ghi nhật ký mới nhất của bất động sản
+        PropertyLog propertyLog = post.getProperty().toPropertyLog();
+        propertyLog.setAction(request.getAction());
+        propertyLogRepository.save(propertyLog);
+        // Thông báo cho người quan tâm
+        sendNotificationToInterestedUsers(
+                post.getProperty(),
+                "Bất động sản đã được " + (isReSale ? "mua bán lại" : "cho thuê lại") + " với giá " + propertyLog.getPrice()
+        );
+    }
+
+    @Override
+    public void updatePost_Price(Post post, UpdatePropertyPostRequest request) {
+        // Cập nhật thông tin giá bất động sản
+        Long oldPrice = post.getProperty().getPrice();
+        if (Objects.equals(request.getPrice(), oldPrice)) {
+            throw new RuntimeException("Giá mới không được trùng với giá cũ");
+        }
+        post.getProperty().setPrice(request.getPrice());
+        propertyRepository.save(post.getProperty());
+        // Cập nhật vào bản ghi nhật ký mới nhất của bất động sản
+        PropertyLog propertyLog = post.getProperty().toPropertyLog();
+        propertyLog.setAction(request.getAction());
+        propertyLogRepository.save(propertyLog);
+        // Thông báo cho người quan tâm
+        sendNotificationToInterestedUsers(
+                post.getProperty(),
+                "Bất động sản đã được cập nhật giá từ " + oldPrice + " sang giá mới " + propertyLog.getPrice()
+        );
+    }
+
+    @Override
+    public void updatePost_Offer(Post post, UpdatePropertyPostRequest request) {
+        // Cập nhật thông tin hình thức bất động sản
+        post.getProperty().setOffer(!post.getProperty().getOffer());
+        propertyRepository.save(post.getProperty());
+        // Cập nhật vào bản ghi nhật ký mới nhất của bất động sản
+        PropertyLog propertyLog = post.getProperty().toPropertyLog();
+        propertyLog.setAction(request.getAction());
+        propertyLogRepository.save(propertyLog);
+        // Thông báo cho người quan tâm
+        sendNotificationToInterestedUsers(
+                post.getProperty(),
+                "Bất động sản đã được " + (post.getProperty().getOffer() ? "đổi sang hình thức cho thuê" : "đổi sang hình thức bán")
+        );
+    }
+
+    @Override
+    public void updatePost_RentalPeriod(Post post, UpdatePropertyPostRequest request) {
+        if (request.getRental_period().isBefore(LocalDate.now().plusMonths(6))) {
+            throw new RuntimeException("Hạn cho thuê không được nhỏ hơn 6 tháng");
+        }
+        // Xử lý trường hợp thay đổi hạn cho thuê
+        post.getProperty().setRentalPeriod(request.getRental_period());
+        propertyRepository.save(post.getProperty());
+        // Cập nhật vào bản ghi nhật ký mới nhất của bất động sản
+        PropertyLog propertyLog = post.getProperty().toPropertyLog();
+        propertyLog.setAction(request.getAction());
+        propertyLogRepository.save(propertyLog);
+        // Thông báo cho người quan tâm
+        sendNotificationToInterestedUsers(
+                post.getProperty(),
+                "Bất động sản đã được cập nhật hạn cho thuê từ " + LocalDate.now() + " sang " + propertyLog.getRentalPeriod()
+        );
+    }
+
+    @Override
+    public void updatePost_Discount(Post post, UpdatePropertyPostRequest request) {
+        throw new RuntimeException("Chức năng chưa được hỗ trợ");
+//        if (request.getDiscount_expiration().isBefore(LocalDateTime.now())) {
+//            throw new RuntimeException("Hạn giảm giá không được nhỏ hơn 6 giờ");
+//        // Cập nhật thông tin giảm giá bất động sản
+//        post.getProperty().setDiscount(request.getDiscount());
+//        propertyRepository.save(post.getProperty());
+//        // Cập nhật vào bản ghi nhật ký mới nhất của bất động sản
+//        PropertyLog propertyLog = post.getProperty().toPropertyLog();
+//        propertyLog.setAction(request.getAction());
+//        propertyLogRepository.save(propertyLog);
+//        // Thông báo cho ng
+    }
+
+    @Override
+    public String updatePost_Information(Post post, UpdatePropertyPostRequest request) {
+        // Cập nhật thông tin bất động sản
+        post.setTitle(request.getTitle());
+        post.setDescription(request.getDescription());
+        postRepository.save(post);
+        propertyRepository.save(post.getProperty());
+        String contentUpdate = "Cập nhật thông tin thành công.";
+        // Cập nhật ảnh bìa nếu có
+        if (request.getThumbnail() != null) {
+            try {
+                changeThumbnail(ChangePostThumbnailRequest.builder()
+                        .post_id(post.getId())
+                        .image(request.getThumbnail())
+                        .build());
+                contentUpdate += " Cập nhật ảnh bìa mới thành công";
+            } catch (Exception e) {
+                contentUpdate += " Lỗi khi cập nhật ảnh bìa: " + e.getMessage();
+            }
+        }
+        // Cập nhật vào bản ghi nhật ký mới nhất của bất động sản
+        Post newPost = postRepository.findById(post.getId())
+                .orElseThrow(() -> new RuntimeException("Bài rao không tồn tại"));
+        postLogRepository.save(newPost.toPostLog());
+        // Thông báo cho người quan tâm
+        sendNotificationToInterestedUsers(post.getProperty(), "Bất động sản đã được cập nhật thông tin bài rao");
+        return contentUpdate;
+    }
 }

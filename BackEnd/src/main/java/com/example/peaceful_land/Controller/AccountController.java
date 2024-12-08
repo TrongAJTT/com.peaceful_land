@@ -1,10 +1,8 @@
 package com.example.peaceful_land.Controller;
 
 import com.example.peaceful_land.DTO.*;
-import com.example.peaceful_land.Repository.AccountRepository;
-import com.example.peaceful_land.Repository.PaymentMethodRepository;
 import com.example.peaceful_land.Service.IAccountService;
-import jakarta.validation.Valid;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
     private final IAccountService accountService;
-    private final AccountRepository accountRepository;
-    private final PaymentMethodRepository paymentMethodRepository;
+    private final Gson gson;
 
     @PostMapping("/info")
     public ResponseEntity<?> getAccountInfo(@RequestBody IdRequest request) {
@@ -27,7 +24,7 @@ public class AccountController {
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
-        return ResponseEntity.ok(accountService.changePassword(request));
+        return ResponseEntity.ok(gson.toJson(accountService.changePassword(request)));
     }
 
     @PostMapping("/purchase-role")
@@ -60,6 +57,12 @@ public class AccountController {
     @GetMapping("/check-post-permission")
     public ResponseEntity<?> checkPostPermission(@RequestBody IdRequest request) {
         return ResponseEntity.ok(accountService.checkPostPermission(request.getUserId()));
+    }
+
+    @PostMapping("/update-info")
+    public ResponseEntity<?> updateInfo(@RequestBody UpdateAccountInfoRequest request) {
+//        return ResponseEntity.ok(accountService.updateInfo(request));
+        return null;
     }
 
 }

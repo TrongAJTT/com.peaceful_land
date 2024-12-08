@@ -32,7 +32,7 @@ public class AccountService implements IAccountService{
     private final RedisService redisService;
     private final PropertyRepository propertyRepository;
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
     @Override
     public AccountInfoResponse getAccountInfo(Long userId) {
@@ -48,7 +48,6 @@ public class AccountService implements IAccountService{
     @Override
     public Account tryLogin(String userId, String password) {
         // userId có thể là email hoặc số điện thoại
-        // Xử lý ngoại lệ
         for(Account account:getAccounts()){
             if((account.getEmail().equals(userId) || account.getPhone().equals(userId)) &&
                     passwordEncoder.matches(password,account.getPassword())){
@@ -104,14 +103,14 @@ public class AccountService implements IAccountService{
     public String changePassword(ChangePasswordRequest request) {
         return accountRepository.findById(request.getUserId())
                 .map(account -> {
-                    if (!account.getPassword().equals(request.getOldPassword())) {
+                    if (!passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
                         throw new RuntimeException("Mật khẩu cũ không chính xác");
                     }
-                    account.setPassword(request.getNewPassword()); // TODO: Mã hóa mật khẩu
+                    account.setPassword(passwordEncoder.encode(request.getNewPassword()));
                     accountRepository.save(account);
                     return "Đổi mật khẩu thành công";
                 })
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+                .orElseThrow(() -> new IllegalStateException("Tài khoản không tồn tại"));
     }
 
     @Override
@@ -148,7 +147,7 @@ public class AccountService implements IAccountService{
             throw new RuntimeException("Email không hợp lệ");
         }
         accountRepository.findByEmail(email).ifPresent(account -> {
-            account.setPassword(newPassword); // TODO: Mã hóa mật khẩu
+            account.setPassword(passwordEncoder.encode(newPassword));
             accountRepository.save(account);
         });
     }

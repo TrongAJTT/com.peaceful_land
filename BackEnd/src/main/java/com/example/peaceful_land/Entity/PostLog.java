@@ -1,5 +1,6 @@
 package com.example.peaceful_land.Entity;
 
+import com.example.peaceful_land.DTO.ResponsePostLog;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,5 +31,14 @@ public class PostLog extends BaseEntity {
 
     @Column
     private LocalDate expiration;
+
+    public ResponsePostLog toResponsePostLog() {
+        return ResponsePostLog.builder()
+                .createdAt(this.getDateBegin())
+                .title(this.title)
+                .description(this.description)
+                .thumbnail_url(this.thumbnUrl)
+                .build();
+    }
 
 }

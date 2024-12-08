@@ -529,6 +529,9 @@ public class PostService implements IPostService {
 
     @Override
     public Object getPostUpdateHistory(IdRequest request) {
-        return null;
+        Post post = postRepository.findById(request.getPostId())
+                .orElseThrow(PostNotFoundException::new);
+        return postLogRepository.findAllByPostEqualsOrderByDateBeginDesc(post)
+                .stream().map(PostLog::toResponsePostLog).toList();
     }
 }

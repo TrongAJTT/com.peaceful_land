@@ -125,4 +125,10 @@ public class PostController {
         return ResponseEntity.ok(postService.searchPost(request, page, size));
     }
 
+    @GetMapping("/find-nearest-{number}")
+    public ResponseEntity<?> searchNearestTopK (@PathVariable int number, @RequestBody NearestPostsRequest request) {
+        request.setNumber(number);
+        return ResponseEntity.ok(postService.findNearestPosts(request));
+    }
+
 }

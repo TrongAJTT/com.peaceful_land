@@ -10,6 +10,7 @@ import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -144,6 +145,20 @@ public class PostService implements IPostService {
         return createViewPostResponseFromInformation(account, post, requestPost);
     }
 
+    public ViewPostResponse getPostInformationFromPost(IdRequest request) {
+        long userId = request.getUserId() == null ? -1 : request.getUserId();
+        // Kiểm tra nếu người dùng tồn tại
+        Optional<Account> account = accountRepository.findById(userId);
+        // Kiểm tra nếu bài rao đã bị ẩn
+        Post post = request.getPost();
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao đã bị ẩn");
+        }
+        // Lấy bài duyệt của bài rao này
+        RequestPost requestPost = requestPostRepository.findByPostEquals(post);
+        return createViewPostResponseFromInformation(account, post, requestPost);
+    }
+
     private ViewPostResponse getPostInformationFromProperty(IdRequest request) {
         Optional<Account> account = accountRepository.findById(request.getUserId());
         // Kiểm tra nếu bài rao tồn tại
@@ -159,9 +174,9 @@ public class PostService implements IPostService {
 
     private ViewPostResponse createViewPostResponseFromInformation(Optional<Account> account, Post post, RequestPost requestPost){
         ResponsePost responsePost = ResponsePost.fromPost(post);
-        boolean isApproved = true;
-        if (!requestPost.getApproved()){
-            isApproved = false;
+        boolean isApproved = false;
+        if (requestPost.getApproved() == null){
+            isApproved = true;
             responsePost.setTitle("Bài rao chờ duyệt #" + post.getId());
             responsePost.setDescription("Hãy nhấn vào nút quan tâm nếu bạn quan tâm đến bất động sản này. Nhớ bật thông báo, chúng tôi sẽ gửi thông báo về email của bạn khi bài rao được duyệt hoặc được cập nhật.");
             responsePost.getProperty().setLocation("Thông tin bị ẩn");
@@ -480,7 +495,7 @@ public class PostService implements IPostService {
         }
 
         // Tìm kiếm và lấy các Property thỏa mãn
-        Page<Property> propertiesPage = propertyRepository.findAll(spec, PageRequest.of(page, size));
+        Page<Property> propertiesPage = propertyRepository.findAll(spec, PageRequest.of(page, size, Sort.by("dateBegin").descending()));
 
         // Chuyển đổi Page<Property> thành Page<Long> (chỉ lấy id)
         propertiesPage.forEach(property -> {
@@ -497,4 +512,13 @@ public class PostService implements IPostService {
         return ViewPostListResponse.builder().list_data(postIds).total_page(propertiesPage.getTotalPages()).build();
     }
 
+    @Override
+    public Object findNearestPosts(NearestPostsRequest request) {
+        Page<Post> page = postRepository.findAllByHideEquals (
+                false, PageRequest.of(0, request.getNumber(), Sort.by("dateBegin").descending())
+        );
+        return page.getContent().stream().toList().stream().map( post ->
+            getPostInformationFromPost(IdRequest.builder().post(post).userId(request.getUserId()).build())
+        ).toList();
+    }
 }

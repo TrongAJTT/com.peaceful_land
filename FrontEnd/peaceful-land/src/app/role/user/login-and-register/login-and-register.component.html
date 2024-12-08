@@ -1,0 +1,61 @@
+<!-- <div *ngIf="!authService.getUserDetails()" #container class="container mt-24" id="container"> -->
+<div  #container class="container mt-24" id="container">
+	<div class="form-container sign-up-container">
+		<form [formGroup]="registerForm" (ngSubmit)="handleRegister($event)">
+			<h1>Tạo mới tài khoản</h1>
+			<input formControlName="name" type="text" placeholder="Họ tên" />
+			<input formControlName="phone" type="text" placeholder="Số điện thoại" />
+			<input formControlName="email" type="email" placeholder="Email" />
+			<input formControlName="password" type="password" placeholder="Mật khẩu" />
+			<div class="w-100 gender-selection"> 
+				<input class="w-fit mx-2" type="radio" name="gender" formControlName="gender" [value]="true" checked> Nam
+				<input class="w-fit mx-2" type="radio" name="gender" formControlName="gender" [value]="false" /> Nữ 
+			</div>
+			<button class="mt-3" type="submit">Đăng kí</button>
+		</form>
+	</div>
+	<div class="form-container sign-in-container">
+		<form [formGroup]="loginForm" (ngSubmit)="handleLogin($event)">
+			<h1>Đăng nhập</h1>
+			<input formControlName="email_login" type="email" placeholder="Email" />
+			<input formControlName="password_login" type="password" placeholder="Mật khẩu" />
+			<button type="submit">Đăng nhập</button>
+		</form>
+	</div>
+	<div class="overlay-container">
+		<div class="overlay">
+			<div class="overlay-panel overlay-left">
+				<h1>Chào mừng bạn!</h1>
+				<p>Đăng kí giúp bạn có trải nghiệm tuyệt vời nhất</p>
+				<button class="ghost" id="signIn" (click)="toLogin()">Đăng nhập</button>
+			</div>
+			<div class="overlay-panel overlay-right">
+				<h1>Chào bạn!</h1>
+				<p>Nhập thông tin cá nhân để có trải nghiệm tốt nhất nhé!</p>
+				<button (click)="toRegister()" class="ghost" id="signUp">Đăng kí</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Thông tin người dùng -->
+
+<!-- <div *ngIf="authService.getUserDetails()" class="user-info">
+	<div class="user-details">
+		<div class="user-avatar">
+			<img src="/assets/img/testimonial-1.jpg" alt="User Avatar">
+			</div>
+			<div class="user-data">
+			<h3>{{user.name}}</h3>
+			<p><strong>{{user.phone}}</strong>1</p>
+			<p><strong>Email:</strong> {{user.email}}</p>
+			<p><strong>Giới tính:</strong> 
+				<span *ngIf="user.gender">Nam</span>
+				<span *ngIf="!user.gender">Nữ</span>
+			  </p>
+			  
+		</div>
+	</div>
+
+	<button class="logout-btn" (click)="logout()">Đăng xuất</button>
+</div> -->

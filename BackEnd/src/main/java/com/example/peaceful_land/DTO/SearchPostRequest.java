@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SearchPostRequest {
+    private Long userId;
     private Boolean offer;
     private Boolean status;
     private String location;

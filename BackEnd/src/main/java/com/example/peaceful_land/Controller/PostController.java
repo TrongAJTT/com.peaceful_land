@@ -55,7 +55,7 @@ public class PostController {
     public ResponseEntity<?> getPostInformation(@PathVariable Long id, @RequestBody IdRequest request) {
         try {
             request.setPostId(id);
-            ViewPostResponse post = postService.getPostInformation(request);
+            ViewPostResponse post = postService.getPostInformationFromPostId(request);
             return ResponseEntity.ok(post);
         }
         catch (Exception e) {

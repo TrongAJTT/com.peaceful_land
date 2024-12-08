@@ -126,7 +126,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public ViewPostResponse getPostInformation(IdRequest request) {
+    public ViewPostResponse getPostInformationFromPostId(IdRequest request) {
         long userId = request.getUserId() == null ? -1 : request.getUserId();
         // Kiểm tra nếu người dùng tồn tại
         Optional<Account> account = accountRepository.findById(userId);
@@ -141,11 +141,39 @@ public class PostService implements IPostService {
         }
         // Lấy bài duyệt của bài rao này
         RequestPost requestPost = requestPostRepository.findByPostEquals(post);
+        return createViewPostResponseFromInformation(account, post, requestPost);
+    }
+
+    private ViewPostResponse getPostInformationFromProperty(IdRequest request) {
+        Optional<Account> account = accountRepository.findById(request.getUserId());
+        // Kiểm tra nếu bài rao tồn tại
+        Post post = postRepository.findByProperty(request.getProperty());
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao đã bị ẩn");
+        }
+        // Lấy bài duyệt của bài rao này
+        RequestPost requestPost = requestPostRepository.findByPostEquals(post);
+        return createViewPostResponseFromInformation(account, post, requestPost);
+    }
+
+    private ViewPostResponse createViewPostResponseFromInformation(Optional<Account> account, Post post, RequestPost requestPost){
+        ResponsePost responsePost = ResponsePost.fromPost(post);
+        boolean isApproved = true;
+        if (!requestPost.getApproved()){
+            isApproved = false;
+            responsePost.setTitle("Bài rao chờ duyệt #" + post.getId());
+            responsePost.setDescription("Hãy nhấn vào nút quan tâm nếu bạn quan tâm đến bất động sản này. Nhớ bật thông báo, chúng tôi sẽ gửi thông báo về email của bạn khi bài rao được duyệt hoặc được cập nhật.");
+            responsePost.getProperty().setLocation("Thông tin bị ẩn");
+            responsePost.getProperty().setLocationDetail("Thông tin bị ẩn");
+            responsePost.getProperty().setMapUrl("Thông tin bị ẩn");
+            responsePost.getProperty().setUserId((long) -1);
+        }
         // Trả kết quả nếu người dùng không tồn tại
         if (account.isEmpty()) {
             return ViewPostResponse.builder()
-                    .data(ResponsePost.fromPost(post))
-                    .isPendingApproval(requestPost.getApproved())
+                    .data(responsePost)
+                    .isPendingApproval(isApproved)
                     .build();
         }
         // Lấy thông tin quan tâm của người dùng
@@ -154,15 +182,15 @@ public class PostService implements IPostService {
         // Trả về thông tin phản hồi
         if (userInterest.isPresent()) {
             return ViewPostResponse.builder()
-                    .data(ResponsePost.fromPost(post))
-                    .isPendingApproval(requestPost.getApproved())
+                    .data(responsePost)
+                    .isPendingApproval(isApproved)
                     .interested(userInterest.get().getInterested())
                     .build();
         }
         else {
             return ViewPostResponse.builder()
-                    .data(ResponsePost.fromPost(post))
-                    .isPendingApproval(requestPost.getApproved())
+                    .data(responsePost)
+                    .isPendingApproval(isApproved)
                     .build();
         }
     }
@@ -405,7 +433,7 @@ public class PostService implements IPostService {
         String location = request.getLocation();
         String category = request.getCategory();
         Long price = request.getPrice();
-        List<Post> postIds = new LinkedList<>();
+        List<ViewPostResponse> postIds = new LinkedList<>();
         Integer area = request.getArea();
         Integer bedrooms = request.getBedrooms();
         Integer toilets = request.getToilets();
@@ -455,9 +483,17 @@ public class PostService implements IPostService {
         Page<Property> propertiesPage = propertyRepository.findAll(spec, PageRequest.of(page, size));
 
         // Chuyển đổi Page<Property> thành Page<Long> (chỉ lấy id)
-        propertiesPage.forEach(property ->
-                postIds.add(postRepository.findByProperty(property))
-        );
+        propertiesPage.forEach(property -> {
+            try {
+                postIds.add(
+                        getPostInformationFromProperty(IdRequest.builder()
+                        .property(property)
+                        .userId(request.getUserId()).build())
+                );
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        });
         return postIds;
     }
 

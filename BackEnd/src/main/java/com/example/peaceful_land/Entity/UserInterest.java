@@ -12,12 +12,15 @@ public class UserInterest extends BaseEntity {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "user_id")
-    private Account userId;
+    private Account user;
 
     @ManyToOne @JoinColumn(name = "property_id")
-    private Property propertyId;
+    private Property property;
 
     @Column
     private Boolean interested;
+
+    @Column
+    private Boolean notification;
 
 }

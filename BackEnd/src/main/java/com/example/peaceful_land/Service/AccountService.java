@@ -1,14 +1,14 @@
 package com.example.peaceful_land.Service;
 
-import com.example.peaceful_land.DTO.ChangeAvatarRequest;
-import com.example.peaceful_land.DTO.PurchaseRoleRequest;
-import com.example.peaceful_land.DTO.RegisterRequest;
+import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Account;
+import com.example.peaceful_land.Entity.PaymentMethod;
 import com.example.peaceful_land.Entity.Purchase;
 import com.example.peaceful_land.Repository.AccountRepository;
+import com.example.peaceful_land.Repository.PaymentMethodRepository;
+import com.example.peaceful_land.Repository.PropertyRepository;
 import com.example.peaceful_land.Repository.PurchaseRepository;
 import com.example.peaceful_land.Utils.ImageUtils;
-import com.example.peaceful_land.Utils.PriceUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_AVATAR;
@@ -28,8 +29,17 @@ public class AccountService implements IAccountService{
 
     private final AccountRepository accountRepository;
     private final PurchaseRepository purchaseRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
     private final EmailService emailService;
     private final RedisService redisService;
+    private final PropertyRepository propertyRepository;
+
+    @Override
+    public AccountInfoResponse getAccountInfo(Long userId) {
+        return accountRepository.findById(userId)
+                .map(AccountInfoResponse::from)
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+    }
 
     @Override
     public String tryLogin(String userId, String password) {
@@ -64,6 +74,20 @@ public class AccountService implements IAccountService{
                         .roleExpiration(LocalDate.of(9999, 12, 31))
                         .build()
         );
+    }
+
+    @Override
+    public String changePassword(ChangePasswordRequest request) {
+        return accountRepository.findById(request.getUserId())
+                .map(account -> {
+                    if (!account.getPassword().equals(request.getOldPassword())) {
+                        throw new RuntimeException("Mật khẩu cũ không chính xác");
+                    }
+                    account.setPassword(request.getNewPassword()); // TODO: Mã hóa mật khẩu
+                    accountRepository.save(account);
+                    return "Đổi mật khẩu thành công";
+                })
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
     }
 
     @Override
@@ -117,7 +141,7 @@ public class AccountService implements IAccountService{
     public Account purchaseRole(PurchaseRoleRequest request) {
         Account account = accountRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
-        Long requiredMoney = PriceUtils.getRolePriceFromDayRange(request.getRole(), request.getDay());
+        Long requiredMoney = VariableUtils.getRolePriceFromDayRange(request.getRole(), request.getDay());
         if (account.getAccountBalance() < requiredMoney) {
             throw new RuntimeException("Số dư không đủ. Yêu cầu tối thiểu " + requiredMoney);
         }
@@ -154,23 +178,6 @@ public class AccountService implements IAccountService{
     }
 
     @Override
-    public int getExpirationRange(String userId) {
-        Account account = accountRepository.findByEmail(userId)
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
-        if (account.getRole() == VariableUtils.ROLE_NORMAL) return 7;
-        else if (account.getRole() == VariableUtils.ROLE_BROKER) return 10;
-        else return 14;
-    }
-
-    @Override
-    public int getApprovalRange(Byte role) {
-        // Nếu role không phải từ 0 đến 2 thì trả về -1
-        if (role < 0 || role > 2) return -1;
-        else if (Objects.equals(role, VariableUtils.ROLE_NORMAL)) return 2;
-        else return 1;
-    }
-
-    @Override
     public String changeAvatar(ChangeAvatarRequest request) {
         // Kiểm tra tài khoản tồn tại
         Account account = accountRepository.findById(request.getUserId()).orElse(null);
@@ -194,5 +201,90 @@ public class AccountService implements IAccountService{
         } catch (IOException e) {
             throw new RuntimeException("Lỗi khi lưu tập tin: " + e.getMessage());
         }
+    }
+
+    @Override
+    public String addPaymentMethod(AddPaymentMethodRequest request) {
+        // TODO: Thực hiện chức năng thanh toán trước sau đó mới cấp quyền cho cái này
+        // Kiểm tra tài khoản có tồn tại không
+        Account account = accountRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+        // Kiểm tra phương thức thanh toán đã tồn tại chưa
+        if (paymentMethodRepository.existsByAccountEqualsAndNameEqualsAndAccountNumberEqualsAndHideEquals(account, request.getName(), request.getAccountNumber(), false)) {
+            throw new RuntimeException("Phương thức thanh toán đã tồn tại.");
+        }
+        // Lưu phương thức thanh toán
+        paymentMethodRepository.save(
+                PaymentMethod.builder()
+                        .account(account)
+                        .isWallet(request.getIsWallet())
+                        .name(request.getName())
+                        .accountNumber(request.getAccountNumber())
+                        .build()
+        );
+        return "Thêm phương thức thanh toán thành công";
+    }
+
+    @Override
+    public List<PaymentMethodResponse> getPaymentMethod(Long userId) {
+        return paymentMethodRepository.findAllByAccountEqualsAndHideEquals(
+                        accountRepository
+                                .findById(userId)
+                                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại")),
+                        false
+                )
+                .stream()
+                .map(PaymentMethodResponse::from)
+                .toList();
+    }
+
+    @Override
+    public String deleteSoftPaymentMethod(Long userId, Long paymentMethodId) {
+        return paymentMethodRepository.findById(paymentMethodId)
+                .map(paymentMethod -> {
+                    if (paymentMethod.getAccount().getId() != userId) {
+                        throw new RuntimeException("Tài khoản không tồn tại hoặc không có quyền xóa phương thức thanh toán này");
+                    }
+                    if (paymentMethod.getHide()) {
+                        throw new RuntimeException("Phương thức thanh toán đã bị xóa");
+                    }
+                    paymentMethod.setHide(true);
+                    paymentMethodRepository.save(paymentMethod);
+                    return "Xóa phương thức thanh toán thành công";
+                })
+                .orElseThrow(() -> new RuntimeException("Phương thức thanh toán không tồn tại"));
+    }
+
+    @Override
+    public PostPermissionResponse checkPostPermission(Long userId) {
+        // Kiểm tra tài khoản có tồn tại không
+        Account account = accountRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+        // Nếu là người dùng thông thường thì kiểm tra có vượt quá lượng bài đăng tối đa không
+        if (account.getRole() == VariableUtils.ROLE_NORMAL) {
+            long count = propertyRepository.countByUserEquals(account);
+            if (count >= VariableUtils.MAX_POST_NORMAL_TOTAL) {
+                throw new RuntimeException("Vượt quá số lượng bài đăng tối đa");
+            }
+        }
+        // Kiểm tra xem lượng bài đăng ngày hôm nay đã vượt quá giới hạn chưa?
+        int countToday = (int) propertyRepository.countByDateBeginBetweenAndUserEquals(
+                LocalDate.now().atStartOfDay(),
+                LocalDate.now().atTime(23, 59, 59),
+                account
+        );
+        int maxPostPerDay = VariableUtils.getPostLimitPerDay(account.getRole());
+        if (countToday >= maxPostPerDay) {
+            throw new RuntimeException("Đã đạt tối đa giới hạn bài đăng trong ngày: " + maxPostPerDay);
+        }
+        // Kiểm tra quyền chọn danh mục bất động sản
+        boolean fullCategory = account.getRole() != VariableUtils.ROLE_NORMAL;
+        // Lấy thời gian sống tối đa của bài rao
+        int maxLiveTime = VariableUtils.getPostLiveTimeDay(account.getRole());
+        // Trả về thông tin quyền đăng bài
+        return PostPermissionResponse.builder()
+                .maxLiveTime(maxLiveTime)
+                .fullCategory(fullCategory)
+                .build();
     }
 }

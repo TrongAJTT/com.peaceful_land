@@ -13,12 +13,9 @@ import com.example.peaceful_land.Repository.PropertyRepository;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service @RequiredArgsConstructor
@@ -44,7 +41,7 @@ public class PropertyService implements IPropertyService {
             newProperty.setHide(true);
             propertyRepository.save(newProperty);
             // Lưu vào nhật ký thay đổi
-            propertyLogRepository.save(newProperty.parsePropertyLog());
+            propertyLogRepository.save(newProperty.toPropertyLog());
            // Trả về bất động sản mới
             return newProperty;
         } catch (Exception e) {

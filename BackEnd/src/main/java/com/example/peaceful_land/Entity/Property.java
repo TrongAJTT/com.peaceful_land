@@ -88,7 +88,7 @@ public class Property extends BaseEntity {
                 '}';
     }
 
-    public PropertyLog parsePropertyLog(){
+    public PropertyLog toPropertyLog(){
         return PropertyLog.builder()
                 .property(this)
                 .action("Cập nhật giá")

@@ -1,5 +1,6 @@
 package com.example.peaceful_land.Entity;
 
+import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -58,6 +59,10 @@ public class Account extends BaseEntity {
                 ", status=" + status +
                 ", roleExpiration=" + roleExpiration +
                 '}';
+    }
+
+    public String getRoleString(){
+        return VariableUtils.getRoleString(role);
     }
 
 }

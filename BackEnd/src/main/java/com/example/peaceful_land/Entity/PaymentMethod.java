@@ -12,7 +12,7 @@ public class PaymentMethod extends BaseEntity {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "user_id")
-    private Account userId;
+    private Account account;
 
     @Column(name = "is_wallet")
     private Boolean isWallet;
@@ -27,7 +27,7 @@ public class PaymentMethod extends BaseEntity {
     public String toString() {
         return "PaymentMethod{" +
                 "id=" + id +
-                ", userId=" + userId +
+                ", userId=" + account.getId() +
                 ", isWallet=" + isWallet +
                 ", name='" + name + '\'' +
                 ", accountNumber='" + accountNumber + '\'' +

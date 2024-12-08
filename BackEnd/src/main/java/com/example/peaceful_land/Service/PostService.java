@@ -1,18 +1,9 @@
 package com.example.peaceful_land.Service;
 
-import com.example.peaceful_land.DTO.ChangePostThumbnailRequest;
-import com.example.peaceful_land.DTO.PostApprovalRequest;
-import com.example.peaceful_land.DTO.PostRequest;
-import com.example.peaceful_land.DTO.PostResponse;
-import com.example.peaceful_land.Entity.Post;
-import com.example.peaceful_land.Entity.PostLog;
-import com.example.peaceful_land.Entity.Property;
-import com.example.peaceful_land.Entity.RequestPost;
+import com.example.peaceful_land.DTO.*;
+import com.example.peaceful_land.Entity.*;
 import com.example.peaceful_land.Exception.PropertyNotFoundException;
-import com.example.peaceful_land.Repository.PostLogRepository;
-import com.example.peaceful_land.Repository.PostRepository;
-import com.example.peaceful_land.Repository.PropertyRepository;
-import com.example.peaceful_land.Repository.RequestPostRepository;
+import com.example.peaceful_land.Repository.*;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +12,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_POST_THUMBNAIL;
 
 @Service @RequiredArgsConstructor
 public class PostService implements IPostService {
 
+    private final AccountRepository accountRepository;
     private final RequestPostRepository requestPostRepository;
+    private final PropertyLogRepository propertyLogRepository;
     private final PostRepository postRepository;
     private final PostLogRepository postLogRepository;
-    private final IAccountService accountService;
+    private final UserInterestRepository userInterestRepository;
     private final PropertyRepository propertyRepository;
+    private final IEmailService emailService;
 
     @Override
     public Post createPost(PostRequest request) {
@@ -51,12 +47,17 @@ public class PostService implements IPostService {
             newPost.setHide(true);
             postRepository.save(newPost);
             // Lưu vào nhật ký thay đổi
-            postLogRepository.save(newPost.parsePostLog());
+            postLogRepository.save(newPost.toPostLog());
             // Trả về post mới
             return newPost;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Post checkPostExists(Long id) {
+        return postRepository.findById(id).orElseThrow(() -> new RuntimeException("Bài rao không tồn tại"));
     }
 
     @Override
@@ -94,7 +95,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public RequestPost createUserPostRequestApproval(PostApprovalRequest postRequest) {
+    public RequestPost createUserPostRequestApproval(IdRequest postRequest) {
         // Kiểm tra nếu bài rao tồn tại
         Post post = postRepository.findById(postRequest.getPostId()).orElse(null);
         if (post == null) {
@@ -110,7 +111,7 @@ public class PostService implements IPostService {
             postRepository.save(post);
         }
         // Lấy số ngày duyệt bài tối đa
-        int noDayApprove = accountService.getApprovalRange(role);
+        int noDayApprove = VariableUtils.getApprovalDayRange(role);
         // Tạo yêu cầu duyệt bài
         RequestPost requestPost = RequestPost.builder()
                 .post(post)
@@ -121,9 +122,12 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public PostResponse getPostInformation(Long id) {
+    public ViewPostResponse getPostInformation(IdRequest request) {
+        long userId = request.getUserId() == null ? -1 : request.getUserId();
+        // Kiểm tra nếu người dùng tồn tại
+        Optional<Account> account = accountRepository.findById(userId);
         // Kiểm tra nếu bài rao tồn tại
-        Post post = postRepository.findById(id).orElse(null);
+        Post post = postRepository.findById(request.getPostId()).orElse(null);
         if (post == null) {
             throw new RuntimeException("Bài rao không tồn tại");
         }
@@ -133,10 +137,87 @@ public class PostService implements IPostService {
         }
         // Lấy bài duyệt của bài rao này
         RequestPost requestPost = requestPostRepository.findByPostEquals(post);
+        // Trả kết quả nếu người dùng không tồn tại
+        if (account.isEmpty()) {
+            return ViewPostResponse.builder()
+                    .data(ResponsePost.fromPost(post))
+                    .isPendingApproval(requestPost.getApproved())
+                    .build();
+        }
+        // Lấy thông tin quan tâm của người dùng
+        Optional<UserInterest> userInterest = userInterestRepository
+                .findByUserEqualsAndPropertyEquals(account.get(), post.getProperty());
         // Trả về thông tin phản hồi
-        return PostResponse.builder()
-                .data(post)
-                .isPendingApproval(requestPost.getApproved())
-                .build();
+        if (userInterest.isPresent()) {
+            return ViewPostResponse.builder()
+                    .data(ResponsePost.fromPost(post))
+                    .isPendingApproval(requestPost.getApproved())
+                    .interested(userInterest.get().getInterested())
+                    .build();
+        }
+        else {
+            return ViewPostResponse.builder()
+                    .data(ResponsePost.fromPost(post))
+                    .isPendingApproval(requestPost.getApproved())
+                    .build();
+        }
     }
+
+    @Override
+    public String interestPost(InterestPostRequest request) {
+        Account account = accountRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+        Post post = postRepository.findById(request.getPostId())
+                .orElseThrow(() -> new RuntimeException("Bài rao không tồn tại"));
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao đã bị ẩn");
+        }
+        // Lưu thông tin quan tâm
+        UserInterest userInterest = userInterestRepository.findByUserEqualsAndPropertyEquals(account, post.getProperty())
+                .orElse(UserInterest.builder().build());
+        // Cập nhật thông tin quan tâm, nếu như đã quan tâm (hoặc không quan tâm), mà nhấn lần nữa là xóa đi
+        if (userInterest.getId() != null && userInterest.getInterested() == request.isInterested()) {
+            userInterestRepository.delete(userInterest);
+            return userInterest.getInterested() ? "Đã xóa dữ liệu quan tâm" : "Đã xóa dữ liệu không quan tâm";
+        }
+        // Cập nhật thông tin quan tâm mới (hoặc tạo mới nếu chưa có) và lưu vào database
+        userInterest.setUser(account);
+        userInterest.setProperty(post.getProperty());
+        userInterest.setInterested(request.isInterested());
+        userInterest.setNotification(request.isNotification());
+        userInterestRepository.save(userInterest);
+        return userInterest.getInterested() ? "Đã quan tâm bài đăng" : "Đã không quan tâm bài đăng";
+    }
+
+    @Override
+    public void sendNotificationToInterestedUsers(Property property, String contentUpdate) {
+        List<UserInterest> listUserInterested = userInterestRepository.findByPropertyEqualsAndNotificationEquals(property, true);
+        if (!listUserInterested.isEmpty()){
+            new Thread(() -> {
+                for(UserInterest userInterest : listUserInterested) {
+                    emailService.sendPostUpdatedEmailToWhoInterested(
+                            userInterest.getUser().getEmail(),
+                            property.getId(),
+                            userInterest.getDateBegin(),
+                            contentUpdate
+                    );
+                }
+            }).start();
+        }
+    }
+
+    @Override
+    public void updatePost_Sold(Post post, UpdatePropertyPostRequest request) {
+        // Cập nhật thông tin tình trạng bất động sản
+        post.getProperty().setStatus(false);
+        propertyRepository.save(post.getProperty());
+        // Cập nhật vào bản ghi nhật ký mới nhất của bất động sản
+        PropertyLog propertyLog = post.getProperty().toPropertyLog();
+        propertyLog.setAction(request.getAction());
+        propertyLogRepository.save(propertyLog);
+        // Thông báo cho người quan tâm
+        sendNotificationToInterestedUsers(post.getProperty(), "Bất động sản đã được bán");
+    }
+
 }

@@ -1,6 +1,5 @@
 package com.example.peaceful_land.DTO;
 
-import com.example.peaceful_land.Entity.Post;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -8,9 +7,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data @Getter @Setter @Builder
-public class PostResponse {
+public class ViewPostResponse {
 
-    private Post data;
+    private ResponsePost data;
+
+    // Người dùng có quan tâm đến bài rao không
+    // true: đã quan tâm, false: không quan tâm, null: không có dữ liệu
+    private Boolean interested;
 
     // Nếu bài rao được đăng bởi môi giới VIP thì vẫn hiện trong khi duyệt.
     // Trong lúc duyệt, bài rao vẫn hiện, nhưng sẽ có một số hạn chế:

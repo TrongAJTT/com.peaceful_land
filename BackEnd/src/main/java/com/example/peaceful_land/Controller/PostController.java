@@ -135,19 +135,19 @@ public class PostController {
                 }
                 case VariableUtils.UPDATE_TYPE_DISCOUNT -> {
                     // TODO: Xử lý trường hợp giảm giá
+                    postService.updatePost_Discount(updatePost, request);
+                    return ResponseEntity.ok("Cập nhật giảm gía bài đăng thành công");
                 }
                 default -> {
-                    // TODO: Xử lý trường hợp cập nhật thông tin bất động sản
+                    // Xử lý trường hợp cập nhật thông tin bất động sản
+                    String result = postService.updatePost_Information(updatePost, request);
+                    return ResponseEntity.ok("Cập nhật thông tin bài rao bất động sản: " + result);
                 }
             }
-            // Gửi email thông báo cho người theo dõi
-
-            // Xóa cái này
-            return ResponseEntity.ok("Cập nhật bất động sản thành công:\n");
+            return null;
         }
         catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 }

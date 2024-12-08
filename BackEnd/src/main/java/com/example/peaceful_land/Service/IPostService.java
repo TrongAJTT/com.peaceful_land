@@ -25,4 +25,8 @@ public interface IPostService {
     void updatePost_Offer(Post post, UpdatePropertyPostRequest request);
     // Cập nhật hạn cho thuê một bài rao
     void updatePost_RentalPeriod(Post post, UpdatePropertyPostRequest request);
+    // Cập nhật giảm giá một bài rao
+    void updatePost_Discount(Post post, UpdatePropertyPostRequest request);
+    // Cập nhật thông tin bài rao
+    String updatePost_Information(Post post, UpdatePropertyPostRequest request);
 }

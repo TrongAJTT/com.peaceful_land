@@ -1,12 +1,18 @@
 package com.example.peaceful_land.Controller;
 
 import com.example.peaceful_land.DTO.*;
+import com.example.peaceful_land.Entity.Account;
 import com.example.peaceful_land.Repository.AccountRepository;
 import com.example.peaceful_land.Repository.PaymentMethodRepository;
+import com.example.peaceful_land.Security.JwtResponse;
+import com.example.peaceful_land.Security.JwtTokenProvider;
 import com.example.peaceful_land.Service.IAccountService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,6 +34,8 @@ public class AccountController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {

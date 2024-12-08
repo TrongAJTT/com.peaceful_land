@@ -11,7 +11,7 @@ public interface IAccountService {
     AccountInfoResponse getAccountInfo(Long userId);
 
     // Đăng nhập
-    String tryLogin(String userId, String password);
+    Account tryLogin(String userId, String password);
 
     // Đăng ký tài khoản mới
     Account register(RegisterRequest userInfo);

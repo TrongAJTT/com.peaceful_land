@@ -11,6 +11,7 @@ import com.example.peaceful_land.Repository.PurchaseRepository;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +32,8 @@ public class AccountService implements IAccountService {
     private final RedisService redisService;
     private final PropertyRepository propertyRepository;
 
+    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+
     @Override
     public AccountInfoResponse getAccountInfo(Long userId) {
         return accountRepository.findById(userId)
@@ -38,13 +41,21 @@ public class AccountService implements IAccountService {
                 .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
     }
 
+    public List<Account> getAccounts(){
+        return accountRepository.findAll();
+    }
+
     @Override
-    public String tryLogin(String userId, String password) {
+    public Account tryLogin(String userId, String password) {
         // userId có thể là email hoặc số điện thoại
         // Xử lý ngoại lệ
-
-        // Xử lý và trả về Token nếu hợp lệ
-        return "token";
+        for(Account account:getAccounts()){
+            if((account.getEmail().equals(userId) || account.getPhone().equals(userId)) &&
+                    passwordEncoder.matches(password,account.getPassword())){
+                return account;
+            }
+        }
+        throw new RuntimeException("Thông tin đăng nhập không chính xác");
     }
 
     @Override
@@ -61,7 +72,7 @@ public class AccountService implements IAccountService {
                 Account.builder()
                         .role((byte) 0)
                         .email(userInfo.getEmail())
-                        .password(userInfo.getPassword())   // TODO: Mã hóa mật khẩu
+                        .password(passwordEncoder.encode(userInfo.getPassword()))
                         .accountBalance(0)
                         .name(userInfo.getName())
                         .birthDate(userInfo.getBirthDate())
@@ -71,6 +82,22 @@ public class AccountService implements IAccountService {
                         .roleExpiration(LocalDate.of(9999, 12, 31))
                         .build()
         );
+    }
+
+    public void encodePassword(Account account){
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
+        accountRepository.save(account);
+    }
+
+    public void encodeOldPassword(){
+        List<Account> accountList = getAccounts();
+        for(Account account:accountList){
+            if (!account.getPassword().startsWith("$2a$") &&
+                    !account.getPassword().startsWith("$2b$") &&
+                    !account.getPassword().startsWith("$2y$")){
+                encodePassword(account);
+            }
+        }
     }
 
     @Override

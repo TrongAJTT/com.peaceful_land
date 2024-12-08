@@ -152,7 +152,10 @@ public class PostController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchPost(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestBody SearchPostRequest request) {
+    public ResponseEntity<?> searchPost (
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestBody SearchPostRequest request ){
         try {
             return ResponseEntity.ok(postService.searchPost(request, page, size));
         }

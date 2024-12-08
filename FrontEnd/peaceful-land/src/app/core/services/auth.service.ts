@@ -17,10 +17,12 @@ export class AuthService {
   }
 
   private loadAuthStatus() {
-    const savedUserRole = localStorage.getItem('userRole') as 'none' |'user' | 'sale' | 'admin';
-    if (savedUserRole) {
-      this.userRole = savedUserRole;
-      this.authStatusChanged.emit(this.userRole);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const savedUserRole = localStorage.getItem('userRole') as 'none' |'user' | 'sale' | 'admin' ;
+      if (savedUserRole) {
+        this.userRole = savedUserRole;
+        this.authStatusChanged.emit(this.userRole);
+      } 
     }
   }
 
@@ -34,8 +36,9 @@ export class AuthService {
       tap(response => {
         if (response.token) {
           this.saveToken(response.token); // Save token after successful login
-          this.setUserDetails(response.user)
+          this.setUserDetails(response.account)
           this.loadRole(response.account.role)
+          this.saveAuthStatus();
           this.authStatusChanged.emit(this.userRole);
         }
       })
@@ -56,8 +59,9 @@ export class AuthService {
       case 3:
         this.userRole = 'admin';
         break;
+      default:
+        this.userRole = 'none';
     }
-    this.saveAuthStatus();
   }
 
   private saveAuthStatus() {
@@ -106,6 +110,13 @@ export class AuthService {
 
   getAdminStatus() {
     return this.userRole === 'admin';
+  }
+
+  reloadUserAfterBuyRole(response: any){
+    this.setUserDetails(response)
+    this.loadRole(response.role)
+    this.saveAuthStatus();
+    this.authStatusChanged.emit(this.userRole);
   }
 
 

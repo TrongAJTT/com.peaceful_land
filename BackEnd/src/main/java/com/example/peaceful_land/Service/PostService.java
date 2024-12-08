@@ -405,7 +405,7 @@ public class PostService implements IPostService {
         String location = request.getLocation();
         String category = request.getCategory();
         Long price = request.getPrice();
-        List<ViewPostResponse> postIds = new LinkedList<>();
+        List<Post> postIds = new LinkedList<>();
         Integer area = request.getArea();
         Integer bedrooms = request.getBedrooms();
         Integer toilets = request.getToilets();
@@ -456,9 +456,8 @@ public class PostService implements IPostService {
 
         // Chuyển đổi Page<Property> thành Page<Long> (chỉ lấy id)
         propertiesPage.forEach(property ->
-                postIds.add(getPostInformation(IdRequest.builder().propertyId(property.getId()).build()))
+                postIds.add(postRepository.findByProperty(property))
         );
-
         return postIds;
     }
 

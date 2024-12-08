@@ -10,7 +10,7 @@ public interface IPostService {
     Post checkPostExists(Long id);
     String changeThumbnail(ChangePostThumbnailRequest request);
     RequestPost createUserPostRequestApproval(IdRequest postRequest);
-    ViewPostResponse getPostInformation(IdRequest request);
+    ViewPostResponse getPostInformationFromPostId(IdRequest request);
     String interestPost(InterestPostRequest request);
     void sendNotificationToInterestedUsers(Property property, String contentUpdate);
     // Xem trạng thái cập nhật bài rao
@@ -29,4 +29,6 @@ public interface IPostService {
     void updatePost_Discount(Post post, UpdatePropertyPostRequest request);
     // Cập nhật thông tin bài rao
     String updatePost_Information(Post post, UpdatePropertyPostRequest request);
+
+    Object searchPost(SearchPostRequest request, int page, int size);
 }

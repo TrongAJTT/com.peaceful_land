@@ -91,8 +91,7 @@ public class VariableUtils {
     public static Integer getApprovalDayRange(Byte roleId) {
         return switch (roleId){
             case 0 -> 2;
-            case 1 -> 1;
-            case 2 -> 1;
+            case 1, 2 -> 1;
             default -> -1;
         };
     }

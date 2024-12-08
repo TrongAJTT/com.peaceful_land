@@ -3,19 +3,20 @@ package com.example.peaceful_land.Service;
 import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.*;
 import com.example.peaceful_land.Exception.PropertyNotFoundException;
+import com.example.peaceful_land.Query.PropertySpecification;
 import com.example.peaceful_land.Repository.*;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_POST_THUMBNAIL;
 
@@ -125,7 +126,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public ViewPostResponse getPostInformation(IdRequest request) {
+    public ViewPostResponse getPostInformationFromPostId(IdRequest request) {
         long userId = request.getUserId() == null ? -1 : request.getUserId();
         // Kiểm tra nếu người dùng tồn tại
         Optional<Account> account = accountRepository.findById(userId);
@@ -140,11 +141,39 @@ public class PostService implements IPostService {
         }
         // Lấy bài duyệt của bài rao này
         RequestPost requestPost = requestPostRepository.findByPostEquals(post);
+        return createViewPostResponseFromInformation(account, post, requestPost);
+    }
+
+    private ViewPostResponse getPostInformationFromProperty(IdRequest request) {
+        Optional<Account> account = accountRepository.findById(request.getUserId());
+        // Kiểm tra nếu bài rao tồn tại
+        Post post = postRepository.findByProperty(request.getProperty());
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao đã bị ẩn");
+        }
+        // Lấy bài duyệt của bài rao này
+        RequestPost requestPost = requestPostRepository.findByPostEquals(post);
+        return createViewPostResponseFromInformation(account, post, requestPost);
+    }
+
+    private ViewPostResponse createViewPostResponseFromInformation(Optional<Account> account, Post post, RequestPost requestPost){
+        ResponsePost responsePost = ResponsePost.fromPost(post);
+        boolean isApproved = true;
+        if (!requestPost.getApproved()){
+            isApproved = false;
+            responsePost.setTitle("Bài rao chờ duyệt #" + post.getId());
+            responsePost.setDescription("Hãy nhấn vào nút quan tâm nếu bạn quan tâm đến bất động sản này. Nhớ bật thông báo, chúng tôi sẽ gửi thông báo về email của bạn khi bài rao được duyệt hoặc được cập nhật.");
+            responsePost.getProperty().setLocation("Thông tin bị ẩn");
+            responsePost.getProperty().setLocationDetail("Thông tin bị ẩn");
+            responsePost.getProperty().setMapUrl("Thông tin bị ẩn");
+            responsePost.getProperty().setUserId((long) -1);
+        }
         // Trả kết quả nếu người dùng không tồn tại
         if (account.isEmpty()) {
             return ViewPostResponse.builder()
-                    .data(ResponsePost.fromPost(post))
-                    .isPendingApproval(requestPost.getApproved())
+                    .data(responsePost)
+                    .isPendingApproval(isApproved)
                     .build();
         }
         // Lấy thông tin quan tâm của người dùng
@@ -153,15 +182,15 @@ public class PostService implements IPostService {
         // Trả về thông tin phản hồi
         if (userInterest.isPresent()) {
             return ViewPostResponse.builder()
-                    .data(ResponsePost.fromPost(post))
-                    .isPendingApproval(requestPost.getApproved())
+                    .data(responsePost)
+                    .isPendingApproval(isApproved)
                     .interested(userInterest.get().getInterested())
                     .build();
         }
         else {
             return ViewPostResponse.builder()
-                    .data(ResponsePost.fromPost(post))
-                    .isPendingApproval(requestPost.getApproved())
+                    .data(responsePost)
+                    .isPendingApproval(isApproved)
                     .build();
         }
     }
@@ -394,4 +423,78 @@ public class PostService implements IPostService {
         sendNotificationToInterestedUsers(post.getProperty(), "Bất động sản đã được cập nhật thông tin bài rao");
         return contentUpdate;
     }
+
+    public ViewPostListResponse searchPost(SearchPostRequest request, int page, int size) {
+        Specification<Property> spec = Specification.where(PropertySpecification.hasHideFalse());
+
+        // Lọc các điều kiện khác
+        Boolean offer = request.getOffer();
+        Boolean status = request.getStatus();
+        String location = request.getLocation();
+        String category = request.getCategory();
+        Long price = request.getPrice();
+        List<ViewPostResponse> postIds = new LinkedList<>();
+        Integer area = request.getArea();
+        Integer bedrooms = request.getBedrooms();
+        Integer toilets = request.getToilets();
+        Byte entrance = request.getEntrance();
+        Byte frontage = request.getFrontage();
+        String houseOrientation = request.getHouseOrientation();
+        String balconyOrientation = request.getBalconyOrientation();
+
+        if (offer != null) {
+            spec = spec.and(PropertySpecification.hasOffer(offer));
+        }
+        if (status != null) {
+            spec = spec.and(PropertySpecification.hasStatus(status));
+        }
+        if (location != null) {
+            spec = spec.and(PropertySpecification.hasLocation(location));
+        }
+        if (category != null) {
+            spec = spec.and(PropertySpecification.hasCategory(category));
+        }
+        if (price != null) {
+            spec = spec.and(PropertySpecification.hasPriceGreaterThan(price));
+        }
+        if (area != null) {
+            spec = spec.and(PropertySpecification.hasAreaGreaterThan(area));
+        }
+        if (bedrooms != null) {
+            spec = spec.and(PropertySpecification.hasBedroomsGreaterThan(bedrooms));
+        }
+        if (toilets != null) {
+            spec = spec.and(PropertySpecification.hasToiletsGreaterThan(toilets));
+        }
+        if (entrance != null) {
+            spec = spec.and(PropertySpecification.hasEntrance(entrance));
+        }
+        if (frontage != null) {
+            spec = spec.and(PropertySpecification.hasFrontage(frontage));
+        }
+        if (houseOrientation != null) {
+            spec = spec.and(PropertySpecification.hasHouseOrientation(houseOrientation));
+        }
+        if (balconyOrientation != null) {
+            spec = spec.and(PropertySpecification.hasBalconyOrientation(balconyOrientation));
+        }
+
+        // Tìm kiếm và lấy các Property thỏa mãn
+        Page<Property> propertiesPage = propertyRepository.findAll(spec, PageRequest.of(page, size));
+
+        // Chuyển đổi Page<Property> thành Page<Long> (chỉ lấy id)
+        propertiesPage.forEach(property -> {
+            try {
+                postIds.add(
+                        getPostInformationFromProperty(IdRequest.builder()
+                        .property(property)
+                        .userId(request.getUserId()).build())
+                );
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        });
+        return ViewPostListResponse.builder().list_data(postIds).total_page(propertiesPage.getTotalPages()).build();
+    }
+
 }

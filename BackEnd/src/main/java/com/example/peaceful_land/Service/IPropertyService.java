@@ -7,4 +7,5 @@ import com.example.peaceful_land.Entity.Property;
 public interface IPropertyService {
     Property createProperty(PropertyRequest property);
     String uploadImages(PropertyImagesRequest request);
+
 }

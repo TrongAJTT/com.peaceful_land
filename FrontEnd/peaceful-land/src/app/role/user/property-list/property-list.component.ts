@@ -1,26 +1,29 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { PostService } from '../../../core/services/post.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { User } from '../../../dto/user';
-import { CommonModule } from '@angular/common';
-import { SnackBarService } from '../../../core/services/snack-bar.service';
-import { error } from 'console';
-import { firstValueFrom } from 'rxjs';
 import { ImageService } from '../../../core/services/image.service';
-import { response } from 'express';
+import { SnackBarService } from '../../../core/services/snack-bar.service';
+import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
+import { User } from '../../../dto/user';
 
 @Component({
-  selector: 'app-home',
+  selector: 'app-property-list',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  templateUrl: './property-list.component.html',
+  styleUrl: './property-list.component.css'
 })
-export class HomeComponent implements OnInit, AfterViewInit, OnChanges{
-  new6Post: any[] = [];
-  userId = -1;
-  topK = 6;
+export class PropertyListComponent implements OnInit,AfterViewInit {
+  currentPage: number = 1;  // Trang mặc định là trang 1
+  postList: any[] = [1];
   user!: User;
+  userId: number = -1;
+  postsImages: { [key: number]: string } = {};
+
+  topK = 6;
+  new6Post: any[] = [];
+
 
   constructor(
     private postService: PostService,
@@ -47,13 +50,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnChanges{
     }
   }
 
-  async ngAfterViewInit(): Promise<void> {
-    await this.ngOnInit()
-    this.cdr.detectChanges();
-  }
-
-  postsImages: { [key: number]: string } = {};  // Lưu trữ ảnh cho từng post
-
   async changeToImg(thumbnUrl: string, postId: number): Promise<void> {
     try {
       const response = await firstValueFrom(this.imgService.changeToImgBase64(thumbnUrl));
@@ -62,9 +58,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnChanges{
       this.postsImages[postId] = '/assets/img/house/house-demo.jpg';  // Đặt ảnh mặc định
     }
   }
-  
-  
-  ngOnChanges(changes: SimpleChanges): void {
-    this.cdr.detectChanges()
+
+  async ngAfterViewInit(): Promise<void> {
+      await this.ngOnInit()
+      this.cdr.detectChanges()
   }
+
+  loadPage(page: number): void {
+    this.currentPage = page;  // Cập nhật trang hiện tại
+  }
+
+
 }

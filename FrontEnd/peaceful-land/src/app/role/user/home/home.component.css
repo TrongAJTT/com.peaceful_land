@@ -1,0 +1,25 @@
+@import url("../../../../../public/assets/css/style.css");
+
+.fw-500{
+    font-weight: 500 !important;
+}
+
+.w-100{
+    width: 100%;
+}
+
+.bg-cate{
+    background-color: #f2e9ff;
+}
+
+.c-p{
+    cursor: pointer;
+}
+
+.h-72{
+    height: 72px;
+}
+
+.h-48{
+    height: 48px;
+}

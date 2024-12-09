@@ -12,6 +12,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
 import { PropertyService } from '../../../core/services/property.service';
 import { firstValueFrom } from 'rxjs';
+import { PostService } from '../../../core/services/post.service';
+import { Router } from '@angular/router';
+import { AccountService } from '../../../core/services/account.service';
+import { response } from 'express';
 
 interface Ward {
   Id: string;
@@ -44,6 +48,7 @@ interface City {
   styleUrls: ['./post-property.component.css']
 })
 export class PostPropertyComponent implements OnInit, OnChanges {
+  isPermitted = true;
   cities: City[] = [];
   districts: District[] = [];
   user!: User;
@@ -77,10 +82,31 @@ export class PostPropertyComponent implements OnInit, OnChanges {
     private cdr: ChangeDetectorRef,
     private authService:AuthService,
     private snackBarService:SnackBarService,
-    private propertyService:PropertyService
+    private propertyService:PropertyService,
+    private accountService:AccountService,
+    private postService: PostService,
+    private router: Router
   ) {}
 
   ngOnInit() {
+    this.user = this.authService.getUserDetails();
+    this.accountService.checkPost(this.user.id)
+      .subscribe({
+        next: (response:any) =>{},
+        error: (response:any) => {
+          this.snackBarService.notifyErrorUser(response.error.message)
+          this.isPermitted = false
+          this.isLoading = false
+          this.cdr.detectChanges()
+          console.log(response)
+        }
+      })
+
+    if(this.isPermitted){
+      return
+    }
+
+
     this.loadData();
 
     // Today
@@ -89,7 +115,6 @@ export class PostPropertyComponent implements OnInit, OnChanges {
     const day = ('0' + now.getDate()).slice(-2); 
     this.today = `${now.getFullYear()}-${month}-${day}`;
     this.loadCities();
-    this.user = this.authService.getUserDetails();
 
 
     switch(this.user.role){
@@ -264,6 +289,8 @@ export class PostPropertyComponent implements OnInit, OnChanges {
     const selectedOffer = this.propertyForm.get("selectedOffer")?.value!;
     const rentalPeriod = this.propertyForm.get("rentalPeriod")?.value?.trim()!;
 
+
+
     if (selectedCity === "" || selectedCity === undefined) {
       this.snackBarService.notifyWarningUser("Vui lòng chọn thành phố!");
     } else if (selectedDistrict === "" || selectedDistrict === undefined) {
@@ -294,7 +321,7 @@ export class PostPropertyComponent implements OnInit, OnChanges {
       this.snackBarService.notifyWarningUser("Vui lòng nhập thông tin pháp lý!");
     } else if (this.selectedFile == undefined){
       this.snackBarService.notifyWarningUser("Vui lòng chọn ảnh đại diện bất động sản!");
-    }else if (description === "") {
+    } else if (description === "") {
       this.snackBarService.notifyWarningUser("Vui lòng nhập mô tả!");
     } else if (topic === "") {
       this.snackBarService.notifyWarningUser("Vui lòng nhập chủ đề!");
@@ -357,10 +384,22 @@ export class PostPropertyComponent implements OnInit, OnChanges {
         ));
 
         const responseUploadSubImg = await firstValueFrom(this.propertyService.uploadSubImages(currProperty.id,this.selectedPreviewsFile))
-        this.isLoading = false;
-        this.cdr.detectChanges();
+
+        const postPro = await firstValueFrom(this.postService.createPost(currProperty.id,topic,description,expiration))
+
+        const changeThumbnail = await firstValueFrom(this.postService.uploadThumnailImg(postPro.id,this.selectedFile))
+
+        const postToAdmin = await firstValueFrom(this.postService.postToAdmin(postPro.id))
+        
+        if(postToAdmin){
+          this.snackBarService.notifySuccessUser("Đăng bài thành công!");
+          setTimeout(()=>{
+            this.router.navigate([''])
+          },2000)
+        }
         
       } catch (error:any) {
+        console.log(error)
         this.snackBarService.notifyErrorUser(error!.error!.message)
         this.isLoading = false;
       }

@@ -1,5 +1,5 @@
 <!-- Contact Start -->
-<div class="container-xxl py-5">
+<div *ngIf="isPermitted" class="container-xxl py-5" >
     <div class="container">
         <!-- Modal Overlay for loading spinner -->
         <div *ngIf="isLoading" class="modal-overlay">
@@ -211,3 +211,12 @@
     </div>
 </div>
 <!-- Contact End -->
+
+<div *ngIf="!isPermitted" class="notification-container">
+    <div class="notification">
+        <div class="notification-info">
+            Bạn đã hết số lần cho phép đăng bài hôm nay
+        </div>
+    </div>
+  </div>
+  

@@ -22,4 +22,13 @@ export class AccountService {
       {user_id,role,day},
       { headers });
   }
+
+  checkPost(user_id: number): Observable<any>{
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    return this.http.post<any>(`${this.apiUrl}/check-post-permission`,
+      {user_id},
+      { headers });
+  }
 }

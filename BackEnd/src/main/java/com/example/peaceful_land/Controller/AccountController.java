@@ -34,13 +34,13 @@ public class AccountController {
 
     @PostMapping(value = "/change-avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadAvatar(@ModelAttribute ChangeAvatarRequest request) {
-        return ResponseEntity.ok(accountService.changeAvatar(request));
+        return ResponseEntity.ok(gson.toJson(accountService.changeAvatar(request)));
     }
 
     @PostMapping("/deposit")
     public ResponseEntity<?> deposit(@RequestBody AddPaymentMethodRequest request) {
         // TODO: Thực hiện chức năng thanh toán trước
-        return ResponseEntity.ok(accountService.addPaymentMethod(request));
+        return ResponseEntity.ok(gson.toJson(accountService.addPaymentMethod(request)));
     }
 
     @PostMapping("/payment-methods")
@@ -50,7 +50,9 @@ public class AccountController {
 
     @DeleteMapping("/payment-method/delete")
     public ResponseEntity<?> deletePaymentMethod(@RequestBody IdRequest request) {
-        return ResponseEntity.ok(accountService.deleteSoftPaymentMethod(request.getUserId(), request.getPaymentMethodId()));
+        return ResponseEntity.ok(gson.toJson(
+                accountService.deleteSoftPaymentMethod(request.getUserId(), request.getPaymentMethodId())
+        ));
     }
 
     // Dùng cho mục đích kiểm tra

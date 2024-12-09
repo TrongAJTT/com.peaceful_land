@@ -32,7 +32,7 @@ public class PostController {
     @PostMapping(value = "/change-thumbnail", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> changeThumbnail(@ModelAttribute ChangePostThumbnailRequest request) {
         String result = postService.changeThumbnail(request);
-        return ok(result);
+        return ok(gson.toJson(result));
     }
 
     @PostMapping("/request-approve")
@@ -76,47 +76,47 @@ public class PostController {
             case VariableUtils.UPDATE_TYPE_SOLD -> {
                 // Xử lý trường hợp đã bán
                 postService.updatePost_SoldOrRented(updatePost, request, true);
-                return ok("Cập nhật trạng thái đã bán bất động sản thành công");
+                return ok(gson.toJson("Cập nhật trạng thái đã bán bất động sản thành công"));
             }
             case VariableUtils.UPDATE_TYPE_RENTED -> {
                 // Xử lý trường hợp đã cho thuê
                 postService.updatePost_SoldOrRented(updatePost, request, false);
-                return ok("Cập nhật trạng thái đã cho thuê bất động sản thành công");
+                return ok(gson.toJson("Cập nhật trạng thái đã cho thuê bất động sản thành công"));
             }
             case VariableUtils.UPDATE_TYPE_RESALE -> {
                 // Xử lý trường hợp mua bán lại
                 postService.updatePost_ReSaleOrReRent(updatePost, request, true);
-                return ok("Cập nhật trạng thái mua bán lại bất động sản thành công");
+                return ok(gson.toJson("Cập nhật trạng thái mua bán lại bất động sản thành công"));
             }
             case VariableUtils.UPDATE_TYPE_RERENT -> {
                 // Xử lý trường hợp cho thuê lại
                 postService.updatePost_ReSaleOrReRent(updatePost, request, false);
-                return ok("Cập nhật trạng thái cho thuê lại bất động sản thành công");
+                return ok(gson.toJson("Cập nhật trạng thái cho thuê lại bất động sản thành công"));
             }
             case VariableUtils.UPDATE_TYPE_PRICE -> {
                 // Xử lý trường hợp cập nhật giá
                 postService.updatePost_Price(updatePost, request);
-                return ok("Cập nhật giá bất động sản thành công");
+                return ok(gson.toJson("Cập nhật giá bất động sản thành công"));
             }
             case VariableUtils.UPDATE_TYPE_OFFER -> {
                 // Xử lý trường hợp thay đổi hình thức
                 postService.updatePost_Offer(updatePost, request);
-                return ok("Cập nhật hình thức bài đăng thành công");
+                return ok(gson.toJson("Cập nhật hình thức bất động sản thành công"));
             }
             case VariableUtils.UPDATE_TYPE_RENTAL_PERIOD -> {
                 // Xử lý trường hợp thay đổi hạn cho thuê
                 postService.updatePost_RentalPeriod(updatePost, request);
-                return ok("Cập nhật hạn cho thuê bài đăng thành công");
+                return ok(gson.toJson("Cập nhật hạn cho thuê bất động sản thành công"));
             }
             case VariableUtils.UPDATE_TYPE_DISCOUNT -> {
                 // TODO: Xử lý trường hợp giảm giá
                 postService.updatePost_Discount(updatePost, request);
-                return ok("Cập nhật giảm gía bài đăng thành công");
+                return ok(gson.toJson("Cập nhật giảm giá bất động sản thành công"));
             }
             default -> {
                 // Xử lý trường hợp cập nhật thông tin bất động sản
                 String result = postService.updatePost_Information(updatePost, request);
-                return ok("Cập nhật thông tin bài rao bất động sản: " + result);
+                return ok(gson.toJson("Cập nhật thông tin bài rao bất động sản: " + result));
             }
         }
     }

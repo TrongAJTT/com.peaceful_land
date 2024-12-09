@@ -16,7 +16,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+
+import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_PROPERTY_IMAGE;
 
 @Service @RequiredArgsConstructor
 public class PropertyService implements IPropertyService {
@@ -59,6 +62,13 @@ public class PropertyService implements IPropertyService {
         if (property == null) {
             throw new PropertyNotFoundException();
         }
+        // Tạo thư mục upload nếu chưa tồn tại
+        try {
+            ImageUtils.createUploadDirIfNotExists(TYPE_UPLOAD_PROPERTY_IMAGE);
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi tạo thư mục upload: " + e.getMessage());
+        }
+        // Lấy danh sách file ảnh
         List<MultipartFile> files = request.getImages();
         StringBuilder log = new StringBuilder();
         int successCount = 0;

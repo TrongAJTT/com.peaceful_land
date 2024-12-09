@@ -24,21 +24,9 @@ public class ImageUtils {
             throw new IllegalArgumentException("Tên tập tin rỗng");
         }
         // Tạo tên file mới để tránh trùng lặp
-        String uniqueFileName = "";
-        if (uploadType == VariableUtils.TYPE_UPLOAD_AVATAR) {
-            uniqueFileName = "avatars/" + UUID.randomUUID() + "_" + fileName;
-        } else if (uploadType == VariableUtils.TYPE_UPLOAD_PROPERTY_IMAGE) {
-            uniqueFileName = "property_imgs/" + UUID.randomUUID() + "_" + fileName;
-        } else if (uploadType == VariableUtils.TYPE_UPLOAD_POST_THUMBNAIL) {
-            uniqueFileName = "post_thumbns/" + UUID.randomUUID() + "_" + fileName;
-        }
-        // Tạo đường dẫn lưu file nếu chưa tồn tại
-        Path uploadDir = Paths.get("uploads");
-        if (!Files.exists(uploadDir)) {
-            Files.createDirectories(uploadDir);
-        }
+        String uniqueFileName = VariableUtils.getStringFromUploadType(uploadType) + "/" + UUID.randomUUID() + "_" + fileName;
         // Lấy đường dẫn đầy đủ đến file
-        Path filePath = Paths.get(uploadDir.toString(), uniqueFileName);
+        Path filePath = Paths.get(VariableUtils.DEFAULT_UPLOAD_DIR, uniqueFileName);
         // Lưu file vào thư mục uploads
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         return uniqueFileName;
@@ -63,6 +51,15 @@ public class ImageUtils {
         String contentType = file.getContentType();
         if(contentType == null || !contentType.startsWith("image/")){
             throw new RuntimeException("Tập tin không phải là hình ảnh");
+        }
+    }
+
+    public static void createUploadDirIfNotExists(int uploadType) throws IOException {
+        Path uploadDir = Paths.get(VariableUtils.DEFAULT_UPLOAD_DIR, VariableUtils.getStringFromUploadType(uploadType));
+        if (!Files.exists(uploadDir)) {
+            if(!Files.exists(uploadDir)) {
+                Files.createDirectories(uploadDir);
+            }
         }
     }
 }

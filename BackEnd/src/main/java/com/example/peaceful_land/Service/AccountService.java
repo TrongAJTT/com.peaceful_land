@@ -213,6 +213,12 @@ public class AccountService implements IAccountService{
         // Kiểm tra file hợp lệ
         MultipartFile file = request.getImage();
         ImageUtils.checkImageFile(file);
+        // Tạo thư mục upload nếu chưa tồn tại
+        try {
+            ImageUtils.createUploadDirIfNotExists(TYPE_UPLOAD_AVATAR);
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi tạo thư mục upload: " + e.getMessage());
+        }
         // Thực hiện thay đổi avatar
         try {
             // Lưu file vào server

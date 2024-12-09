@@ -58,9 +58,14 @@ export class PostService {
       {user_id});
   }
 
-  searchPostByPage(userId: number,page: number, size: number){
+  searchPostByPage(userId: number,page: number, size: number): Observable<any>{
     return this.http.post<any>(`${this.apiUrl}/search?page=${page}&size=${size}`, 
       {userId});
+  }
+
+  getPostById(user_id: number, postId: number): Observable<any>{
+    return this.http.post<any>(`${this.apiUrl}/${postId}`, 
+      {user_id});
   }
 
 }

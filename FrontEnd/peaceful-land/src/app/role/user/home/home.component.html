@@ -78,7 +78,7 @@
                                 <p><i class="fa fa-clock text-success me-2 h-48">Địa chỉ Map: </i>{{post.data.property.map_url}}</p>
                                 <p><i class="fa fa-map-marker-alt text-success me-2">Diện tích: </i>{{post.data.property.area}} mét vuông</p>
                             </div>
-                            <button  class="btn btn-success border border-secondary rounded-pill px-3 mx-3 my-3 text-light mt-3"><i class="fa fa-shopping-bag me-2 text-light"></i> Xem chi tiết</button>
+                            <button (click)="goToDetailPost(post.data.id)"  class="btn btn-success border border-secondary rounded-pill px-3 mx-3 my-3 text-light mt-3"><i class="fa fa-shopping-bag me-2 text-light"></i> Xem chi tiết</button>
 
                         </div>
                     </div>

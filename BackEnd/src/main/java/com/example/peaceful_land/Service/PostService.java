@@ -38,6 +38,7 @@ public class PostService implements IPostService {
     private final RequestTourRepository requestTourRepository;
     private final RequestContactRepository requestContactRepository;
     private final RequestReportRepository requestReportRepository;
+    private final PurchaseRepository purchaseRepository;
 
     @Override
     public Post createPost(PostRequest request) {
@@ -655,5 +656,59 @@ public class PostService implements IPostService {
         requestReportRepository.save(requestReport);
         // Lưu yêu cầu
         return "Gửi yêu cầu báo cáo thành công";
+    }
+
+    @Override
+    public Object extendPost(Long postId, ExtendPostRequest request) {
+        // Lấy thông tin bài rao
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        // Kiểm tra có là chủ sở hữu không
+        if (post.getProperty().getUser().getId() != request.getUserId()) {
+            throw new RuntimeException("Bạn không có quyền gia hạn bài rao này");
+        }
+        Account account = post.getProperty().getUser();
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao chưa được duyệt hoặc đã bị xóa");
+        }
+        // Kiểm tra xem ngày gia hạn có hợp lệ không
+        if (request.getDayExpand() > switch (account.getRole()) {
+            case 0 -> 7;
+            case 1 -> 10;
+            default -> 14;
+        }) throw new RuntimeException("Số ngày gia hạn không hợp lệ");
+        // Kiểm tra số tiền có đủ không
+        byte day = request.getDayExpand();
+        long price = 0L;
+        if (account.getRole() == 0) {
+            if (1<=day && day<=4) price = 15000;
+            else price = 25000;
+        } else if (account.getRole() == 1) {
+            if (1<=day && day<=4) price = 10000;
+            else if (4<day && day<=7) price = 18000;
+            else price = 26000;
+        } else {
+            if (1<=day && day<=4) price = 10000;
+            else if (4<day && day<=7) price = 16000;
+            else if (7<day && day<=10) price = 22000;
+            else price = 28000;
+        }
+        if (account.getAccountBalance() < price) {
+            throw new RuntimeException("Số dư tài khoản không đủ để gia hạn bài rao");
+        }
+        // Gia hạn bài rao
+        LocalDate expiration = post.getExpiration();
+        post.setExpiration(expiration.isBefore(LocalDate.now()) ? LocalDate.now().plusDays(day) : expiration.plusDays(day));
+        postRepository.save(post);
+        // Cập nhật vào nhật ký bài rao
+        postLogRepository.save(post.toPostLog());
+        // Trừ tiền tài khoản
+        account.setAccountBalance(account.getAccountBalance() - price);
+        accountRepository.save(account);
+        // Ghi nhận lại phiên mua
+        purchaseRepository.save( Purchase.builder().user(account).amount(price)
+                .action(VariableUtils.PURCHASE_ACTION_EXTEND_POST).build());
+        // Trả về thông báo thành công
+        return "Gia hạn bài rao thành công. Số ngày gia hạn: " + request.getDayExpand() + ". Số tiền trừ: " + price;
     }
 }

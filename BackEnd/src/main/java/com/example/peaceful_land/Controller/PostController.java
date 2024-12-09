@@ -43,7 +43,7 @@ public class PostController {
         return ok(newRequest);
     }
 
-    @GetMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<?> getPostInformation(@PathVariable Long id, @RequestBody IdRequest request) {
         request.setPostId(id);
         ViewPostResponse post = postService.getPostInformationFromPostId(request);
@@ -192,6 +192,11 @@ public class PostController {
     @PostMapping("/{id}/request-report")
     public ResponseEntity<?> sendReportRequest(@PathVariable Long id, @RequestBody ReportRequest request) {
         return ok(gson.toJson(postService.sendReportRequest(id, request)));
+    }
+
+    @PostMapping("/{id}/manager/extend-expiration")
+    public ResponseEntity<?> extendPost(@PathVariable Long id, @RequestBody ExtendPostRequest request) {
+        return ok(gson.toJson(postService.extendPost(id, request)));
     }
 
 }

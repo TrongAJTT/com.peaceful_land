@@ -19,12 +19,12 @@ public class UserRequestController {
     private final IUserRequestService userRequestService;
     private final Gson gson;
 
-    @GetMapping("/posts")
+    @PostMapping("/posts")
     public ResponseEntity<?> getAllPostRequests(@RequestParam String type) {
         return ResponseEntity.ok(userRequestService.getPostRequestBaseOn(type));
     }
 
-    @GetMapping("/post/{id}")
+    @PostMapping("/post/{id}")
     public ResponseEntity<?> getPostRequestById(@PathVariable Long id) {
         return ResponseEntity.ok(userRequestService.getPostRequestById(id));
     }
@@ -45,7 +45,7 @@ public class UserRequestController {
         }
     }
 
-    @GetMapping("/withdraws")
+    @PostMapping("/withdraws")
     public ResponseEntity<?> getAllWithdrawsRequests(@RequestParam String type) {
         return ResponseEntity.ok(userRequestService.getWithdrawRequestBaseOn(type));
     }

@@ -55,4 +55,6 @@ public interface IPostService {
     Object viewUserRequestOnAllPosts(Long userId, String type);
     // Gửi yêu cầu báo cáo
     Object sendReportRequest(Long postId, ReportRequest request);
+    // Gia hạn bài đăng
+    Object extendPost(Long postId, ExtendPostRequest request);
 }

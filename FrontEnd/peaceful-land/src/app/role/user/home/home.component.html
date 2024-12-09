@@ -61,10 +61,10 @@
                             <div class="position-relative overflow-hidden ">
                                 <div class="position-relative overflow-hidden">
                                     <a *ngIf="!post.data.thumbnUrl || post.data.thumbnUrl === ''">
-                                      <img class="img-fluid img-height img-cover wd-100 w-100" src="/assets/img/house/house-demo.jpg" alt="">
+                                      <img class="img-fluid img-height img-cover wd-100 w-100 h-200" src="/assets/img/house/house-demo.jpg" alt="">
                                     </a>
                                     <a *ngIf="post.data.thumbnUrl">
-                                      <img class="img-fluid img-height img-cover wd-100 w-100" [src]="postsImages[post.data.id] || '/assets/img/house/house-demo.jpg'">
+                                      <img class="img-fluid img-height img-cover wd-100 w-100 h-200" [src]="postsImages[post.data.id] || '/assets/img/house/house-demo.jpg'">
                                     </a>
                                   </div>
                                   
@@ -75,8 +75,8 @@
                             <div class="p-4 pb-0">
                                 <h5 class="text-success mb-3 fw-500">{{post.data.property.price | number:'1.0-0'}}đ</h5>
                                 <a class="c-pointer d-block h5 mb-2 h-72" >Địa chỉ: {{post.data.property.location}}</a>
-                                <p><i class="fa fa-clock text-success me-2 h-48">Địa chỉ Map: </i>{{post.data.property.map_url}}</p>
-                                <p><i class="fa fa-map-marker-alt text-success me-2">Diện tích: </i>{{post.data.property.area}} mét vuông</p>
+                                <p><i class="fa fa-clock text-success me-2 h-48"></i>Địa chỉ Map: {{post.data.property.map_url}}</p>
+                                <p><i class="fa fa-map-marker-alt text-success me-2"></i>Diện tích: {{post.data.property.area}} mét vuông</p>
                             </div>
                             <button (click)="goToDetailPost(post.data.id)"  class="btn btn-success border border-secondary rounded-pill px-3 mx-3 my-3 text-light mt-3"><i class="fa fa-shopping-bag me-2 text-light"></i> Xem chi tiết</button>
 

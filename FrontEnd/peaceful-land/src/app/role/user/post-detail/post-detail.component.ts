@@ -48,6 +48,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
 
   async loadPost() : Promise<void>{
     this.currPost = await firstValueFrom(this.postService.getPostById(this.userId,this.postId))
+    this.changeToImg(this.currPost.data.thumbnUrl,this.currPost.data.id);
   }
 
   async ngAfterViewInit(): Promise<void> {

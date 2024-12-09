@@ -1,6 +1,7 @@
 package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.EmailDetail;
+import com.example.peaceful_land.Entity.PaymentMethod;
 
 import java.time.LocalDateTime;
 
@@ -27,5 +28,14 @@ public interface IEmailService {
 
     // Gửi email thông báo cho người quan tâm răng bài rao được cập nhật
     void sendPostUpdatedEmailToWhoInterested(String emailTo, Long postId, LocalDateTime createdAt, String contentUpdate);
+
+    // Gửi email thông báo cho người quan tâm rằng bài rao đã hết hạn
+
+
+    // Gửi email biên lai rút tiền
+    void sendWithdrawReceipt(String emailTo, Long id, LocalDateTime date, Long amount, PaymentMethod payment);
+
+    // Gửi email phản hồi rút tiền
+    void sendWithdrawResponse(String emailTo, Long id, LocalDateTime date, Long amount, PaymentMethod payment, boolean status, String denyMessageIfFalse);
 
 }

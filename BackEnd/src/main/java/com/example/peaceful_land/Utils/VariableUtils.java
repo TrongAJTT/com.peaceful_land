@@ -35,6 +35,11 @@ public class VariableUtils {
     public static final String PURCHASE_ACTION_EXTEND_ROLE = "Gia hạn gói";
     public static final String PURCHASE_ACTION_EXTEND_POST = "Gia hạn bài đăng";
 
+    public static final String REQUEST_STATE_ALL = "all";
+    public static final String REQUEST_STATE_PENDING = "pending";
+    public static final String REQUEST_STATE_APPROVED = "approved";
+    public static final String REQUEST_STATE_REJECTED = "rejected";
+
     public static final int MAX_POST_NORMAL_TOTAL = 5;
     public static final int MAX_POST_NORMAL_PER_DAY = 1;
     public static final int MAX_POST_BROKER_PER_DAY = 5;

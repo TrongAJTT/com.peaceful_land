@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_AVATAR;
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_POST_THUMBNAIL;
 
 @Service @RequiredArgsConstructor

@@ -2,53 +2,36 @@ package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.PostApprovalResponse;
 import com.example.peaceful_land.DTO.ResponseUserPostReqView;
+import com.example.peaceful_land.DTO.ResponseWithdrawRequest;
 import com.example.peaceful_land.Entity.*;
-import com.example.peaceful_land.Repository.PostRepository;
-import com.example.peaceful_land.Repository.PropertyRepository;
-import com.example.peaceful_land.Repository.RequestPostRepository;
-import com.example.peaceful_land.Repository.UserInterestRepository;
+import com.example.peaceful_land.Repository.*;
+import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service @RequiredArgsConstructor
-public class PostRequestService implements IPostRequestService {
+public class UserRequestService implements IUserRequestService {
 
     private final PropertyRepository propertyRepository;
+    private final RequestWithdrawRepository requestWithdrawRepository;
+    private final PaymentMethodRepository paymentMethodRepository;
     private final PostRepository postRepository;
     private final RequestPostRepository requestPostRepository;
     private final UserInterestRepository userInterestRepository;
     private final IEmailService emailService;
-
-
-    @Override
-    public List<PostApprovalResponse> getAllPostRequests() {
-        List<RequestPost> postRequests = requestPostRepository.findAllByOrderByIdDesc();
-        return postRequests.stream()
-                .map(RequestPost::parsePostApprovalResponse)
-                .toList();
-    }
+    private final AccountRepository accountRepository;
 
     @Override
-    public List<PostApprovalResponse> getPendingPostRequests() {
-        List<RequestPost> postRequests = requestPostRepository.findAllByApprovedEqualsOrderByExpirationDesc(null);
-        return postRequests.stream()
-                .map(RequestPost::parsePostApprovalResponse)
-                .toList();
-    }
-
-    @Override
-    public List<PostApprovalResponse> getApprovedPostRequests() {
-        List<RequestPost> postRequests = requestPostRepository.findAllByApprovedEqualsOrderByExpirationDesc(true);
-        return postRequests.stream()
-                .map(RequestPost::parsePostApprovalResponse)
-                .toList();
-    }
-
-    @Override
-    public List<PostApprovalResponse> getRejectedPostRequests() {
-        List<RequestPost> postRequests = requestPostRepository.findAllByApprovedEqualsOrderByExpirationDesc(false);
+    public List<PostApprovalResponse> getPostRequestBaseOn(String requestState) {
+        List<RequestPost> postRequests = switch(requestState){
+            case VariableUtils.REQUEST_STATE_ALL -> requestPostRepository.findAllByOrderByIdDesc();
+            case VariableUtils.REQUEST_STATE_PENDING -> requestPostRepository.findAllByApprovedEqualsOrderByExpirationDesc(null);
+            case VariableUtils.REQUEST_STATE_APPROVED -> requestPostRepository.findAllByApprovedEqualsOrderByExpirationDesc(true);
+            case VariableUtils.REQUEST_STATE_REJECTED -> requestPostRepository.findAllByApprovedEqualsOrderByExpirationDesc(false);
+            default -> throw new IllegalStateException("Trạng thái yêu cầu không hợp lệ");
+        };
         return postRequests.stream()
                 .map(RequestPost::parsePostApprovalResponse)
                 .toList();
@@ -129,6 +112,53 @@ public class PostRequestService implements IPostRequestService {
                     approvedPost.getDateBegin(),
                     denyMessage
             )
+        ).start();
+    }
+
+    @Override
+    public List<ResponseWithdrawRequest> getWithdrawRequestBaseOn(String requestState) {
+        List<RequestWithdraw> withdrawRequests = switch(requestState){
+            case VariableUtils.REQUEST_STATE_ALL -> requestWithdrawRepository.findAllByOrderByDateBeginDesc();
+            case VariableUtils.REQUEST_STATE_PENDING -> requestWithdrawRepository.findAllByStatusEqualsOrderByDateBeginDesc(RequestWithdraw.STATUS_PENDING);
+            case VariableUtils.REQUEST_STATE_APPROVED -> requestWithdrawRepository.findAllByStatusEqualsOrderByDateBeginDesc(RequestWithdraw.STATUS_APPROVED);
+            case VariableUtils.REQUEST_STATE_REJECTED -> requestWithdrawRepository.findAllByStatusEqualsOrderByDateBeginDesc(RequestWithdraw.STATUS_REJECTED);
+            default -> throw new IllegalStateException("Trạng thái yêu cầu không hợp lệ");
+        };
+        return withdrawRequests.stream()
+                .map(RequestWithdraw::toResponseWithdrawRequest)
+                .toList();
+    }
+
+    @Override
+    public void approveOrRejectWithdrawRequest(Long id, Boolean isApprove, String denyMessageIfFalse) {
+        // Lấy ra yêu cầu
+        RequestWithdraw withdrawRequest = requestWithdrawRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy yêu cầu"));
+        if (withdrawRequest.getStatus() != RequestWithdraw.STATUS_PENDING){
+            throw new IllegalArgumentException("Yêu cầu đã được xử lý");
+        }
+        // Thay đổi trạng thái yêu cầu và số dư tài khoản (nếu có) và lưu vào database
+        Account account = withdrawRequest.getAccount();
+        if (isApprove){
+            withdrawRequest.setStatus(RequestWithdraw.STATUS_APPROVED);
+            // Trừ tiền và lưu vào database
+            account.setAccountBalance(account.getAccountBalance() - withdrawRequest.getAmount() - 3000);
+            accountRepository.save(account);
+        }
+        else {
+            withdrawRequest.setStatus(RequestWithdraw.STATUS_REJECTED);
+            withdrawRequest.setResultMessage(denyMessageIfFalse);
+        }
+        requestWithdrawRepository.save(withdrawRequest);
+        // Gửi email thông báo cho người yêu cầu
+        new Thread(() ->
+            emailService.sendWithdrawResponse(
+                    account.getEmail(),
+                    withdrawRequest.getId(),
+                    withdrawRequest.getDateBegin(),
+                    withdrawRequest.getAmount(),
+                    withdrawRequest.getPayment(),
+                    isApprove, isApprove ? null : denyMessageIfFalse)
         ).start();
     }
 }

@@ -2,7 +2,6 @@ package com.example.peaceful_land.DTO;
 
 import com.example.peaceful_land.Entity.Property;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -47,10 +46,10 @@ public class PropertyRequest {
 
     private Byte frontage;
 
-    @Column(name = "house_orientation")
+    @JsonProperty("house_orientation")
     private String houseOrientation;
 
-    @Column(name = "balcony_orientation")
+    @JsonProperty("balcony_orientation")
     private String balconyOrientation;
     
     // Chuyển đổi sang đối tượng Property
@@ -68,12 +67,12 @@ public class PropertyRequest {
                     .price(getPrice())
                     .area(getArea())
                     .legal(getLegal())
-                    .bedrooms(getBedrooms())
-                    .toilets(getToilets())
-                    .entrance(getEntrance())
-                    .frontage(getFrontage())
-                    .houseOrientation(getHouseOrientation())
-                    .balconyOrientation(getBalconyOrientation())
+                    .bedrooms(getBedrooms() == -1 ? null : getBedrooms())
+                    .toilets(getToilets() == -1 ? null : getToilets())
+                    .entrance(getEntrance() == -1 ? null : getEntrance())
+                    .frontage(getFrontage() == -1 ? null : getFrontage())
+                    .houseOrientation(getHouseOrientation().isEmpty() ? null : getHouseOrientation())
+                    .balconyOrientation(getBalconyOrientation().isEmpty() ? null : getBalconyOrientation())
                     .build();
         }
         catch (Exception e) {

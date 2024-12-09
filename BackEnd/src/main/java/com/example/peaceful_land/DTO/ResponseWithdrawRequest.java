@@ -6,17 +6,22 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data @Getter @Setter @Builder
-public class UpdateAccountInfoRequest {
+public class ResponseWithdrawRequest {
+
+    private Long id;
 
     @JsonProperty("user_id")
     private Long userId;
-    private String name;
-    private String email;
-    private String phone;
-    @JsonProperty("birth_date")
-    private LocalDate birthDate;
+
+    private String status;
+
+    @JsonProperty("deny_message")
+    private String denyMessage;
+
+    @JsonProperty("request_date")
+    private LocalDateTime requestDate;
 
 }

@@ -34,11 +34,18 @@ public class VariableUtils {
     public static final String PURCHASE_ACTION_BROKER_VIP = "Mua gói môi giới VIP";
     public static final String PURCHASE_ACTION_EXTEND_ROLE = "Gia hạn gói";
     public static final String PURCHASE_ACTION_EXTEND_POST = "Gia hạn bài đăng";
+    public static final String PURCHASE_ACTION_WITHDRAW = "Rút tiền";
 
     public static final String REQUEST_STATE_ALL = "all";
     public static final String REQUEST_STATE_PENDING = "pending";
     public static final String REQUEST_STATE_APPROVED = "approved";
     public static final String REQUEST_STATE_REJECTED = "rejected";
+
+    public static final String REQUEST_INTEREST_INFO = "Tôi muốn biết thêm thông tin";
+    public static final String REQUEST_INTEREST_BUY = "Tôi muốn mua / thuê bất động sản này";
+
+    public static final String REQUEST_TOUR_DIRECT = "'Xem trực tiếp'";
+    public static final String REQUEST_TOUR_HOMESTAY = "Trò chuyện video online";
 
     public static final int MAX_POST_NORMAL_TOTAL = 5;
     public static final int MAX_POST_NORMAL_PER_DAY = 1;

@@ -145,4 +145,24 @@ public class PostController {
         return ok(postService.getPostUpdateHistory(IdRequest.builder().postId(id).build()));
     }
 
+    @PostMapping("/{id}/request-tour")
+    public ResponseEntity<?> requestTour(@PathVariable Long id, @RequestBody TourRequest request) {
+        // Lấy thông tin bài rao
+        Post tourPost = postService.checkPostExists(id);
+        return ResponseEntity.ok(postService.requestTour(tourPost.getId(), request));
+    }
+
+    @PostMapping("/{id}/request-contact")
+    public ResponseEntity<?> requestContact(@PathVariable Long id, @RequestBody ContactRequest request) {
+        // Lấy thông tin bài rao
+        Post contactPost = postService.checkPostExists(id);
+        return ResponseEntity.ok(postService.requestContact(contactPost.getId(), request));
+    }
+
+    @PostMapping("/{id}/request-permission")
+    public ResponseEntity<?> getRequestPermission(@PathVariable Long id, @RequestBody IdRequest request) {
+        request.setPostId(id);
+        return ok(gson.toJson(postService.requestPermissionToContactAndTour(request)));
+    }
+
 }

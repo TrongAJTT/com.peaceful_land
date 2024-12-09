@@ -1,5 +1,7 @@
 package com.example.peaceful_land.Entity;
 
+import com.example.peaceful_land.DTO.ContactRequest;
+import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +14,7 @@ public class RequestContact extends BaseEntity {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "property_id")
-    private Property propertyId;
+    private Property property;
 
     @Column
     private String name;
@@ -28,5 +30,15 @@ public class RequestContact extends BaseEntity {
 
     @Column
     private String message;
+
+    public static RequestContact fromContactRequestWithoutProperty(ContactRequest request) {
+        return RequestContact.builder()
+                .name(request.getName())
+                .phone(request.getPhone())
+                .email(request.getEmail())
+                .interestLevel(request.getInterestLevel() == 0 ? VariableUtils.REQUEST_INTEREST_INFO : VariableUtils.REQUEST_INTEREST_BUY)
+                .message(request.getMessage())
+                .build();
+    }
 
 }

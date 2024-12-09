@@ -37,4 +37,11 @@ public interface IPostService {
     Object getPropertyUpdateHistory(IdRequest request);
     // Lịch sử cập nhật bài rao
     Object getPostUpdateHistory(IdRequest request);
+    // Kiểm tra có quyền yêu cầu xem nhà hay liên hệ hay không
+    Object requestPermissionToContactAndTour(IdRequest request);
+    // Yêu cầu xem nhà
+    Object requestTour(Long postId, TourRequest request);
+    // Yêu cầu liên hệ lại
+    Object requestContact(Long postId, ContactRequest request);
+
 }

@@ -68,8 +68,8 @@ export class AuthService {
     localStorage.setItem('userRole', this.userRole);
   }
 
-  register(email: string, password: string, phone: string, name: string,gender: boolean): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, { email, password ,phone,name, gender});
+  register(email: string, password: string, phone: string, name: string,birth_date: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, { email, password ,phone,name, birth_date});
   }
 
   // Optionally, you can store the user details in local storage after successful login
@@ -105,7 +105,7 @@ export class AuthService {
   }
 
   getSaleOrUserStatus() {
-    return this.userRole == 'sale' || 'user';
+    return this.userRole == 'sale' ||  this.userRole == 'user';
   }
 
   getAdminStatus() {

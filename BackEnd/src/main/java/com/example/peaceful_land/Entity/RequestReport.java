@@ -1,5 +1,7 @@
 package com.example.peaceful_land.Entity;
 
+import com.example.peaceful_land.DTO.ReportRequest;
+import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +14,7 @@ public class RequestReport extends BaseEntity {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "property_id")
-    private Property propertyId;
+    private Property property;
 
     @Column
     private String object;
@@ -31,5 +33,18 @@ public class RequestReport extends BaseEntity {
 
     @Column
     private String email;
+
+    public static RequestReport fromReportRequestWithoutProperty(ReportRequest request) {
+        return RequestReport.builder()
+                .object(request.getObject() == VariableUtils.REQUEST_REPORT_OBJECT_ID_POST ?
+                        VariableUtils.REQUEST_REPORT_OBJECT_VI_POST :
+                        VariableUtils.REQUEST_REPORT_OBJECT_VI_MAP)
+                .reasons(request.getReason())
+                .description(request.getDescription())
+                .name(request.getName())
+                .phone(request.getPhone())
+                .email(request.getEmail())
+                .build();
+    }
 
 }

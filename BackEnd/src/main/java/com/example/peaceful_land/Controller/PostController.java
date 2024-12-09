@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -187,6 +188,11 @@ public class PostController {
             throw new DataIntegrityViolationException("Yêu cầu này cần id người dùng");
         }
         return ok(postService.viewUserRequestOnAllPosts(request.getUserId(), type));
+    }
+
+    @PostMapping("/{id}/request-report")
+    public ResponseEntity<?> sendReportRequest(@PathVariable Long id, @RequestBody ReportRequest request) {
+        return ok(gson.toJson(postService.sendReportRequest(id, request)));
     }
 
 }

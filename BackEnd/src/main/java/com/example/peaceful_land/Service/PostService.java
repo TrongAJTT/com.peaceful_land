@@ -37,6 +37,7 @@ public class PostService implements IPostService {
     private final IEmailService emailService;
     private final RequestTourRepository requestTourRepository;
     private final RequestContactRepository requestContactRepository;
+    private final RequestReportRepository requestReportRepository;
 
     @Override
     public Post createPost(PostRequest request) {
@@ -641,4 +642,18 @@ public class PostService implements IPostService {
         }
     }
 
+    @Override
+    public Object sendReportRequest(Long postId, ReportRequest request) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao chưa được duyệt hoặc đã bị xóa");
+        }
+        // Lấy thông tin
+        RequestReport requestReport = RequestReport.fromReportRequestWithoutProperty(request);
+        requestReport.setProperty(post.getProperty());
+        requestReportRepository.save(requestReport);
+        // Lưu yêu cầu
+        return "Gửi yêu cầu báo cáo thành công";
+    }
 }

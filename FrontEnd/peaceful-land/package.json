@@ -28,6 +28,7 @@
     "express": "^4.18.2",
     "font-awesome": "^4.7.0",
     "peaceful-land": "file:",
+    "process": "^0.11.10",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"

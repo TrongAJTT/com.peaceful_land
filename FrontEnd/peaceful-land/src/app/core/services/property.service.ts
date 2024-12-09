@@ -60,38 +60,4 @@ export class PropertyService implements OnInit {
     return this.http.post<any>(`${this.apiUrl}/upload-images`, 
       formData, {headers});
   }
-
-  createPost(property_id: number, title: string, description: string, expiration: string): Observable<any>{
-    const formData: FormData = new FormData(); 
-    formData.append('property_id', property_id.toString()); 
-    formData.append('title', title); 
-    formData.append('description', description); 
-    formData.append('expiration', expiration); 
-
-    const token = this.authService.getToken();  // Lấy JWT từ AuthService
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.post<any>(`${this.apiUrl}/create-post`, 
-      formData, {headers});
-  }
-
-  uploadThumnailImg(post_id: number,img: File): Observable<any>{
-    const formData: FormData = new FormData(); 
-    formData.append('post_id', post_id.toString()); 
-    formData.append('image', img, img.name);
-
-    const token = this.authService.getToken();  // Lấy JWT từ AuthService
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.post<any>(`${this.apiUrl}/change-thumbnail`, 
-      formData, {headers});
-  }
-
-  postToAdmin(post_id: number): Observable<any>{
-    const formData: FormData = new FormData(); 
-    formData.append('post_id', post_id.toString()); 
-
-    const token = this.authService.getToken();  // Lấy JWT từ AuthService
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.post<any>(`${this.apiUrl}/request-approve`, 
-      formData, {headers});
-  }
 }

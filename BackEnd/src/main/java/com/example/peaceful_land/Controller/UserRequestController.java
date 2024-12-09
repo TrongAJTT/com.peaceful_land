@@ -3,6 +3,7 @@ package com.example.peaceful_land.Controller;
 import com.example.peaceful_land.DTO.RejectPostRequest;
 import com.example.peaceful_land.Repository.RequestPostRepository;
 import com.example.peaceful_land.Service.IPostRequestService;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ public class UserRequestController {
 
     private final RequestPostRepository requestPostRepository;
     private final IPostRequestService postRequestService;
+    private final Gson gson;
 
     @GetMapping("/posts")
     public ResponseEntity<?> getAllPostRequests(@RequestParam(required = false) String type) {
@@ -27,7 +29,7 @@ public class UserRequestController {
         } else if (type.equals("rejected")) {
             return ResponseEntity.ok(postRequestService.getRejectedPostRequests());
         } else {
-            return ResponseEntity.badRequest().body("Không hợp lệ");
+            return ResponseEntity.badRequest().body(gson.toJson("Loại bài rao không hợp lệ"));
         }
     }
 
@@ -40,15 +42,15 @@ public class UserRequestController {
     public ResponseEntity<?> getPostRequestById(@PathVariable Long id, @RequestParam String type, @RequestBody(required = false) RejectPostRequest request) {
         if (type.equals("approve")) {
             postRequestService.approvePostRequest(id);
-            return ResponseEntity.ok("Duyệt bài rao thành công");
+            return ResponseEntity.ok(gson.toJson("Duyệt bài rao thành công"));
         } else if (type.equals("reject")) {
             if (request == null || request.getDenyMessage() == null || request.getDenyMessage().isEmpty()) {
-                return ResponseEntity.badRequest().body("Lý do từ chối không được để trống");
+                return ResponseEntity.badRequest().body(gson.toJson("Lý do từ chối không được để trống"));
             }
             postRequestService.rejectPostRequest(id, request.getDenyMessage());
-            return ResponseEntity.ok("Từ chối bài rao thành công");
+            return ResponseEntity.ok(gson.toJson("Từ chối bài rao thành công"));
         } else {
-            return ResponseEntity.badRequest().body("Không hợp lệ");
+            return ResponseEntity.badRequest().body(gson.toJson("Hành động không hợp lệ"));
         }
     }
 

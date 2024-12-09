@@ -1,5 +1,6 @@
 package com.example.peaceful_land.Controller;
 
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -20,6 +21,8 @@ import java.util.Base64;
 @CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/images")
 public class ImagesController {
+
+    private final Gson gson;
 
     @GetMapping()
     public ResponseEntity<Resource> getImage(@RequestParam String path) throws IOException {
@@ -61,7 +64,7 @@ public class ImagesController {
                     .body("data:image/png;base64," + base64Content);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("File not found or unreadable.");
+                    .body(gson.toJson("Không tìm thấy tệp hoặc không thể đọc tệp"));
         }
     }
 

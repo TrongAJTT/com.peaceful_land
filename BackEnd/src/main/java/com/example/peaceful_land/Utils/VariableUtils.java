@@ -21,9 +21,14 @@ public class VariableUtils {
     public static final String DEFAULT_AVATAR = "template/blank_avatar.webp";
     public static final String IMAGE_NA = "template/image_state_not_available.jpg";
 
+    public static final String DEFAULT_UPLOAD_DIR = "uploads";
+
     public static final int TYPE_UPLOAD_AVATAR = 1;
     public static final int TYPE_UPLOAD_PROPERTY_IMAGE = 2;
     public static final int TYPE_UPLOAD_POST_THUMBNAIL = 3;
+    public static final String TYPE_UPLOAD_AVATAR_PATH = "avatars";
+    public static final String TYPE_UPLOAD_PROPERTY_IMAGE_PATH = "property_imgs";
+    public static final String TYPE_UPLOAD_POST_THUMBNAIL_PATH = "post_thumbns";
 
     public static final String PURCHASE_ACTION_BROKER = "Mua gói môi giới";
     public static final String PURCHASE_ACTION_BROKER_VIP = "Mua gói môi giới VIP";
@@ -45,6 +50,15 @@ public class VariableUtils {
             UPDATE_TYPE_RENTAL_PERIOD = "rental-period",
             UPDATE_TYPE_DISCOUNT = "discount",
             UPDATE_TYPE_POST = "post";
+
+    public static String getStringFromUploadType(int uploadType) {
+        return switch (uploadType) {
+            case TYPE_UPLOAD_AVATAR -> TYPE_UPLOAD_AVATAR_PATH;
+            case TYPE_UPLOAD_PROPERTY_IMAGE -> TYPE_UPLOAD_PROPERTY_IMAGE_PATH;
+            case TYPE_UPLOAD_POST_THUMBNAIL -> TYPE_UPLOAD_POST_THUMBNAIL_PATH;
+            default -> "";
+        };
+    }
 
     public static Long getRolePriceFromDayRange(Byte roleId, Integer day) {
         if (Objects.equals(roleId, ROLE_BROKER)) {

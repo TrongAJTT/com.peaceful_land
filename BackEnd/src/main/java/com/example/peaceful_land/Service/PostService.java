@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_AVATAR;
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_POST_THUMBNAIL;
 
 @Service @RequiredArgsConstructor
@@ -76,6 +77,12 @@ public class PostService implements IPostService {
         ImageUtils.checkImageFile(file);
         // Lấy tên file cũ
         String oldThumbnail = post.getThumbnUrl();
+        // Tạo thư mục upload nếu chưa tồn tại
+        try {
+            ImageUtils.createUploadDirIfNotExists(TYPE_UPLOAD_POST_THUMBNAIL);
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi tạo thư mục upload: " + e.getMessage());
+        }
         // Thực hiện thay đổi thumbnail
         try {
             // Lưu file vào server

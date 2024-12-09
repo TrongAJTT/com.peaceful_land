@@ -63,6 +63,9 @@ public class VariableUtils {
             UPDATE_TYPE_DISCOUNT = "discount",
             UPDATE_TYPE_POST = "post";
 
+    public static final String REQUEST_TYPE_CONTACT = "contact";
+    public static final String REQUEST_TYPE_TOUR = "tour";
+
     public static String getStringFromUploadType(int uploadType) {
         return switch (uploadType) {
             case TYPE_UPLOAD_AVATAR -> TYPE_UPLOAD_AVATAR_PATH;

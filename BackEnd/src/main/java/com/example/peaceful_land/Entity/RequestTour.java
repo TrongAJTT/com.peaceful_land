@@ -1,5 +1,6 @@
 package com.example.peaceful_land.Entity;
 
+import com.example.peaceful_land.DTO.ResponseReqTour;
 import com.example.peaceful_land.DTO.TourRequest;
 import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
@@ -48,6 +49,18 @@ public class RequestTour extends BaseEntity {
                 .phone(request.getPhone())
                 .email(request.getEmail())
                 .interestLevel(request.getInterestLevel() == 0 ? VariableUtils.REQUEST_INTEREST_INFO : VariableUtils.REQUEST_INTEREST_BUY)
+                .build();
+    }
+
+    public ResponseReqTour toResponseReqTour() {
+        return ResponseReqTour.builder()
+                .type(tourType)
+                .expectedTime(expectedTime)
+                .name(name)
+                .phone(phone)
+                .email(email)
+                .interestLevel(interestLevel)
+                .createdAt(getDateBegin())
                 .build();
     }
 }

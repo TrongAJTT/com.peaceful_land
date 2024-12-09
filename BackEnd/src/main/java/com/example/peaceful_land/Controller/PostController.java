@@ -3,6 +3,7 @@ package com.example.peaceful_land.Controller;
 import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Post;
 import com.example.peaceful_land.Entity.RequestPost;
+import com.example.peaceful_land.Exception.RequestInvalidException;
 import com.example.peaceful_land.Service.IPostService;
 import com.example.peaceful_land.Utils.VariableUtils;
 import com.google.gson.Gson;
@@ -11,6 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -163,6 +165,28 @@ public class PostController {
     public ResponseEntity<?> getRequestPermission(@PathVariable Long id, @RequestBody IdRequest request) {
         request.setPostId(id);
         return ok(gson.toJson(postService.requestPermissionToContactAndTour(request)));
+    }
+
+    @PostMapping("/{id}/manager/view-request")
+    public ResponseEntity<?> viewRequest(@PathVariable Long id, @RequestParam String type, @RequestBody IdRequest request) {
+        if (!type.equals(VariableUtils.REQUEST_TYPE_TOUR) && !type.equals(VariableUtils.REQUEST_TYPE_CONTACT)) {
+            throw new RequestInvalidException();
+        }
+        if (request.getUserId() == null) {
+            throw new DataIntegrityViolationException("Yêu cầu này cần id người dùng");
+        }
+        return ok(postService.viewUserRequestOnPost(id, request.getUserId(), type));
+    }
+
+    @PostMapping("/manager/view-request")
+    public ResponseEntity<?> viewRequest(@RequestParam String type, @RequestBody IdRequest request) {
+        if (!type.equals(VariableUtils.REQUEST_TYPE_TOUR) && !type.equals(VariableUtils.REQUEST_TYPE_CONTACT)) {
+            throw new RequestInvalidException();
+        }
+        if (request.getUserId() == null) {
+            throw new DataIntegrityViolationException("Yêu cầu này cần id người dùng");
+        }
+        return ok(postService.viewUserRequestOnAllPosts(request.getUserId(), type));
     }
 
 }

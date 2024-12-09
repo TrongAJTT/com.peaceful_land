@@ -12,7 +12,7 @@ public class Transaction extends BaseEntity {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "user_id")
-    private Account userId;
+    private Account account;
 
     @Column
     private Long money;

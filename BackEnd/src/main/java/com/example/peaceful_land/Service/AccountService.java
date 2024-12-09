@@ -349,8 +349,8 @@ public class AccountService implements IAccountService{
             throw new IllegalStateException("Chỉ được tạo một yêu cầu rút tiền trong ngày");
         }
         // Kiểm tra số dư
-        if (account.getAccountBalance() < request.getAmount()) {
-            throw new RuntimeException("Số dư hiện tại không đủ");
+        if (account.getAccountBalance() < request.getAmount() + 3000) {
+            throw new RuntimeException("Số dư hiện tại không đủ " + (request.getAmount() + 3000) + "đ (3000 là phí giao dịch phát sinh)");
         }
         // Kiểm tra số tiền rút có phải là bội số của 50000 không
         if (request.getAmount() % 50000 != 0) {

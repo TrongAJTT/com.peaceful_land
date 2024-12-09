@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_POST_THUMBNAIL;
@@ -28,12 +29,13 @@ public class PostService implements IPostService {
     private final AccountRepository accountRepository;
     private final RequestPostRepository requestPostRepository;
     private final PropertyLogRepository propertyLogRepository;
-    private final DiscountRepository discountRepository;
     private final PostRepository postRepository;
     private final PostLogRepository postLogRepository;
     private final UserInterestRepository userInterestRepository;
     private final PropertyRepository propertyRepository;
     private final IEmailService emailService;
+    private final RequestTourRepository requestTourRepository;
+    private final RequestContactRepository requestContactRepository;
 
     @Override
     public Post createPost(PostRequest request) {
@@ -293,7 +295,6 @@ public class PostService implements IPostService {
             listAction.add(VariableUtils.UPDATE_TYPE_OFFER);
             listAction.add(VariableUtils.UPDATE_TYPE_DISCOUNT);
             listAction.add(VariableUtils.UPDATE_TYPE_POST);
-
         } else {
             if (post.getProperty().getOffer()) {
                 listAction.add(VariableUtils.UPDATE_TYPE_RERENT);
@@ -539,5 +540,54 @@ public class PostService implements IPostService {
                 .orElseThrow(PostNotFoundException::new);
         return postLogRepository.findAllByPostEqualsOrderByDateBeginDesc(post)
                 .stream().map(PostLog::toResponsePostLog).toList();
+    }
+
+    @Override
+    public Object requestPermissionToContactAndTour(IdRequest request) {
+        Post post = postRepository.findById(request.getPostId()).orElseThrow(PostNotFoundException::new);
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao chưa được duyệt hoặc đã bị xóa");
+        }
+        // Kiểm tra nếu người dùng là chủ sở hữu
+        if (post.getProperty().getUser().getId() == request.getUserId()) {
+            throw new RuntimeException("Bạn không thể yêu cầu liên hệ trên bài rao của chính mình");
+        }
+        // Kiểm tra xem trong 2 ngày qua có yêu cầu không?
+        if (requestContactRepository.existsByPropertyAndDateBeginBefore(post.getProperty(), LocalDateTime.now().plusDays(-2)) ||
+            requestTourRepository.existsByPropertyAndDateBeginAfter(post.getProperty(), LocalDateTime.now().plusDays(-2))) {
+            throw new RuntimeException("Bạn đã yêu cầu xem nhà hoặc liên hệ với bài rao này trong vòng 2 ngày qua");
+        }
+        return "Người dùng có quyền yêu cầu xem bất động sản hoặc yêu cầu liên hệ lại";
+    }
+
+    @Override
+    public Object requestTour(Long postId, TourRequest request) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao chưa được duyệt hoặc đã bị xóa");
+        }
+        // Lấy thông tin bài rao
+        RequestTour requestTour = RequestTour.fromTourRequestWithoutProperty(request);
+        requestTour.setProperty(post.getProperty());
+        // Lưu yêu cầu
+        requestTourRepository.save(requestTour);
+        return "Tạo yêu cầu tham quan bất động sản thành công.";
+    }
+
+    @Override
+    public Object requestContact(Long postId, ContactRequest request) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao chưa được duyệt hoặc đã bị xóa");
+        }
+        // Lấy thông tin bài rao
+        RequestContact requestContact = RequestContact.fromContactRequestWithoutProperty(request);
+        requestContact.setProperty(post.getProperty());
+        // Lưu yêu cầu
+        requestContactRepository.save(requestContact);
+        return "Tạo yêu cầu liên hệ lại thành công";
     }
 }

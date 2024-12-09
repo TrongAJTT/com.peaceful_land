@@ -22,6 +22,7 @@ public class UserRequestService implements IUserRequestService {
     private final UserInterestRepository userInterestRepository;
     private final IEmailService emailService;
     private final AccountRepository accountRepository;
+    private final PurchaseRepository purchaseRepository;
 
     @Override
     public List<PostApprovalResponse> getPostRequestBaseOn(String requestState) {
@@ -144,6 +145,14 @@ public class UserRequestService implements IUserRequestService {
             // Trừ tiền và lưu vào database
             account.setAccountBalance(account.getAccountBalance() - withdrawRequest.getAmount() - 3000);
             accountRepository.save(account);
+            // Lưu thanh toán
+            purchaseRepository.save(
+                    Purchase.builder()
+                    .user(account)
+                    .amount(withdrawRequest.getAmount())
+                    .action(VariableUtils.PURCHASE_ACTION_WITHDRAW)
+                    .build()
+            );
         }
         else {
             withdrawRequest.setStatus(RequestWithdraw.STATUS_REJECTED);

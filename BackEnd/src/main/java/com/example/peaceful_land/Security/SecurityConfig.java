@@ -44,6 +44,9 @@ public class SecurityConfig  {
                         .requestMatchers(
                                 HttpMethod.POST,"/posts/find-nearest-*"
                         ).permitAll()
+                        .requestMatchers(
+                                HttpMethod.POST,"/posts/search**"
+                        ).permitAll()
 
                         .requestMatchers(
                                 HttpMethod.GET,"/images/**"

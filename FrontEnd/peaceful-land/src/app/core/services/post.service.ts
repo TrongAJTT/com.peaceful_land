@@ -57,4 +57,17 @@ export class PostService {
     return this.http.post<any>(`${this.apiUrl}/find-nearest-${k}`, 
       {user_id});
   }
+
+  searchPostByPage(userId:number, pageNumber: number, size: number): Observable<any>{
+    console.log(`${this.apiUrl}/search?page=${pageNumber}&size=${size}`)
+    return this.http.post<any>(`${this.apiUrl}/search?page=${pageNumber}&size=${size}`, 
+      {userId});
+  }
+
+  getPostById(user_id:number, post_id:number): Observable<any>{
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.apiUrl}/${post_id}`, 
+      {user_id}, {headers});
+  }
 }

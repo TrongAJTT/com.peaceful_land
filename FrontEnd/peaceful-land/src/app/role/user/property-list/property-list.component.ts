@@ -16,13 +16,13 @@ import { User } from '../../../dto/user';
 })
 export class PropertyListComponent implements OnInit,AfterViewInit {
   currentPage: number = 1;  // Trang mặc định là trang 1
-  postList: any[] = [1];
+  sizePage: number = 2;
   user!: User;
   userId: number = -1;
   postsImages: { [key: number]: string } = {};
 
   topK = 6;
-  new6Post: any[] = [];
+  postList: any[] = [];
 
 
   constructor(
@@ -34,16 +34,21 @@ export class PropertyListComponent implements OnInit,AfterViewInit {
   ){}
 
   async ngOnInit(): Promise<void> {
+    await this.loadPost();
+  }
+
+  async loadPost(): Promise<void>{
     if (typeof localStorage !== 'undefined') {
       if(this.authService.getAuthStatus()){
         this.user = (this.authService.getUserDetails());
         this.userId = this.user.id
       }
   
-      const postList = await firstValueFrom(this.postService.getPostTopK(this.topK,this.userId))
-      this.new6Post = postList
+      const postList = await firstValueFrom(this.postService.searchPostByPage(this.userId,this.currentPage-1,this.sizePage))
+      this.postList = postList.list_data
+      console.log(postList)
 
-      for(var post of this.new6Post){
+      for(var post of this.postList){
         this.changeToImg(post.data.thumbnUrl,post.data.id);
       }
       this.cdr.detectChanges();
@@ -66,6 +71,7 @@ export class PropertyListComponent implements OnInit,AfterViewInit {
 
   loadPage(page: number): void {
     this.currentPage = page;  // Cập nhật trang hiện tại
+    this.loadPost();
   }
 
 

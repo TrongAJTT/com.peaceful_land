@@ -33,30 +33,22 @@ public class UserRequestController {
 
     @GetMapping("/post/{id}")
     public ResponseEntity<?> getPostRequestById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(postRequestService.getPostRequestById(id));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(postRequestService.getPostRequestById(id));
     }
 
     @PostMapping("/post/{id}/action")
     public ResponseEntity<?> getPostRequestById(@PathVariable Long id, @RequestParam String type, @RequestBody(required = false) RejectPostRequest request) {
-        try {
-            if (type.equals("approve")) {
-                postRequestService.approvePostRequest(id);
-                return ResponseEntity.ok("Duyệt bài rao thành công");
-            } else if (type.equals("reject")) {
-                if (request == null || request.getDenyMessage() == null || request.getDenyMessage().isEmpty()) {
-                    return ResponseEntity.badRequest().body("Lý do từ chối không được để trống");
-                }
-                postRequestService.rejectPostRequest(id, request.getDenyMessage());
-                return ResponseEntity.ok("Từ chối bài rao thành công");
-            } else {
-                return ResponseEntity.badRequest().body("Không hợp lệ");
+        if (type.equals("approve")) {
+            postRequestService.approvePostRequest(id);
+            return ResponseEntity.ok("Duyệt bài rao thành công");
+        } else if (type.equals("reject")) {
+            if (request == null || request.getDenyMessage() == null || request.getDenyMessage().isEmpty()) {
+                return ResponseEntity.badRequest().body("Lý do từ chối không được để trống");
             }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            postRequestService.rejectPostRequest(id, request.getDenyMessage());
+            return ResponseEntity.ok("Từ chối bài rao thành công");
+        } else {
+            return ResponseEntity.badRequest().body("Không hợp lệ");
         }
     }
 

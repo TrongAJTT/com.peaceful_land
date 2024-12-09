@@ -8,6 +8,7 @@ import com.example.peaceful_land.Entity.Account;
 import com.example.peaceful_land.Security.JwtResponse;
 import com.example.peaceful_land.Security.JwtTokenProvider;
 import com.example.peaceful_land.Service.IAccountService;
+import com.google.gson.Gson;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +24,7 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     private final IAccountService accountService;
-
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(String userId, String password) {
-//        // accountService.tryLogin(userId, password);
-//        return ResponseEntity.ok("Đăng nhập thành công");
-//    }
+    private final Gson gson;
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
@@ -49,25 +45,25 @@ public class AuthController {
         return ResponseEntity.ok(accountService.register(userInfo));
     }
 
-    // Quên mật khẩu: Gửi mã xác thực về email TODO: Thay thế email thành JWT Token
+    // Quên mật khẩu: Gửi mã xác thực về email
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ResetPasswordRequest request) {
         accountService.forgotPassword(request.getEmail());
-        return ResponseEntity.ok("Đã gửi mã xác thực về email");
+        return ResponseEntity.ok(gson.toJson("Đã gửi mã xác thực về email"));
     }
 
-    // Quên mật khẩu: Xác thực mã OTP TODO: Thay thế email thành JWT Token
+    // Quên mật khẩu: Xác thực mã OTP
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestBody ResetPasswordRequest request) {
         accountService.verifyOtp(request.getEmail(), request.getOtp());
-        return ResponseEntity.ok("Xác thực thành công");
+        return ResponseEntity.ok(gson.toJson("Xác thực thành công"));
     }
 
-    // Quên mật khẩu: Đặt lại mật khẩu mới TODO: Thêm kiểm tra Token đã hết hạn trước khi cho phép đổi mật khẩu
+    // Quên mật khẩu: Đặt lại mật khẩu mới
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         accountService.resetPassword(request.getEmail(), request.getNewPassword());
-        return ResponseEntity.ok("Đặt lại mật khẩu thành công");
+        return ResponseEntity.ok(gson.toJson("Đặt lại mật khẩu thành công"));
     }
 
 

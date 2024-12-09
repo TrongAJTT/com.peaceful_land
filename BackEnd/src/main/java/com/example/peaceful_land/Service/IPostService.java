@@ -29,6 +29,12 @@ public interface IPostService {
     void updatePost_Discount(Post post, UpdatePropertyPostRequest request);
     // Cập nhật thông tin bài rao
     String updatePost_Information(Post post, UpdatePropertyPostRequest request);
-
+    // Truy vấn bài rao theo điều kiện tìm kiếm
     Object searchPost(SearchPostRequest request, int page, int size);
+    // Tìm các bài rao gần nhất
+    Object findNearestPosts(NearestPostsRequest request);
+    // Lịch sử cập nhật bất động sản
+    Object getPropertyUpdateHistory(IdRequest request);
+    // Lịch sử cập nhật bài rao
+    Object getPostUpdateHistory(IdRequest request);
 }

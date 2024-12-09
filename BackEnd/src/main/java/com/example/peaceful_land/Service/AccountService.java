@@ -32,7 +32,7 @@ public class AccountService implements IAccountService{
     private final RedisService redisService;
     private final PropertyRepository propertyRepository;
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
     @Override
     public AccountInfoResponse getAccountInfo(Long userId) {
@@ -48,7 +48,6 @@ public class AccountService implements IAccountService{
     @Override
     public Account tryLogin(String userId, String password) {
         // userId có thể là email hoặc số điện thoại
-        // Xử lý ngoại lệ
         for(Account account:getAccounts()){
             if((account.getEmail().equals(userId) || account.getPhone().equals(userId)) &&
                     passwordEncoder.matches(password,account.getPassword())){
@@ -104,14 +103,14 @@ public class AccountService implements IAccountService{
     public String changePassword(ChangePasswordRequest request) {
         return accountRepository.findById(request.getUserId())
                 .map(account -> {
-                    if (!account.getPassword().equals(request.getOldPassword())) {
+                    if (!passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
                         throw new RuntimeException("Mật khẩu cũ không chính xác");
                     }
-                    account.setPassword(request.getNewPassword()); // TODO: Mã hóa mật khẩu
+                    account.setPassword(passwordEncoder.encode(request.getNewPassword()));
                     accountRepository.save(account);
                     return "Đổi mật khẩu thành công";
                 })
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+                .orElseThrow(() -> new IllegalStateException("Tài khoản không tồn tại"));
     }
 
     @Override
@@ -148,7 +147,7 @@ public class AccountService implements IAccountService{
             throw new RuntimeException("Email không hợp lệ");
         }
         accountRepository.findByEmail(email).ifPresent(account -> {
-            account.setPassword(newPassword); // TODO: Mã hóa mật khẩu
+            account.setPassword(passwordEncoder.encode(newPassword));
             accountRepository.save(account);
         });
     }
@@ -288,12 +287,12 @@ public class AccountService implements IAccountService{
     public PostPermissionResponse checkPostPermission(Long userId) {
         // Kiểm tra tài khoản có tồn tại không
         Account account = accountRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+                .orElseThrow(() -> new IllegalArgumentException("Tài khoản không tồn tại"));
         // Nếu là người dùng thông thường thì kiểm tra có vượt quá lượng bài đăng tối đa không
         if (account.getRole() == VariableUtils.ROLE_NORMAL) {
             long count = propertyRepository.countByUserEquals(account);
             if (count >= VariableUtils.MAX_POST_NORMAL_TOTAL) {
-                throw new RuntimeException("Vượt quá số lượng bài đăng tối đa");
+                throw new IllegalStateException("Vượt quá số lượng bài đăng tối đa");
             }
         }
         // Kiểm tra xem lượng bài đăng ngày hôm nay đã vượt quá giới hạn chưa?
@@ -304,7 +303,7 @@ public class AccountService implements IAccountService{
         );
         int maxPostPerDay = VariableUtils.getPostLimitPerDay(account.getRole());
         if (countToday >= maxPostPerDay) {
-            throw new RuntimeException("Đã đạt tối đa giới hạn bài đăng trong ngày: " + maxPostPerDay);
+            throw new IllegalStateException("Đã đạt tối đa giới hạn bài đăng trong ngày: " + maxPostPerDay);
         }
         // Kiểm tra quyền chọn danh mục bất động sản
         boolean fullCategory = account.getRole() != VariableUtils.ROLE_NORMAL;

@@ -19,22 +19,13 @@ public class PropertyController {
 
     @PostMapping("/create-property")
     public ResponseEntity<?> createProperty(@RequestBody PropertyRequest request) {
-        try {
-            Property newProperty = propertyService.createProperty(request);
-            return ResponseEntity.ok("Property created successfully:\n" + newProperty);
-        }
-        catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        Property newProperty = propertyService.createProperty(request);
+        return ResponseEntity.ok(newProperty);
     }
 
     @PostMapping(value = "/upload-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImages(@ModelAttribute PropertyImagesRequest request) {
-        try{
-            return ResponseEntity.ok(propertyService.uploadImages(request));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(propertyService.uploadImages(request));
     }
 
 }

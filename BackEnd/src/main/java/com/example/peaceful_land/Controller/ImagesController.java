@@ -61,7 +61,7 @@ public class ImagesController {
             // Trả về Base64 trong response
             return ResponseEntity.ok()
                     .contentType(MediaType.TEXT_PLAIN) // Định dạng chuỗi text
-                    .body("data:image/png;base64," + base64Content);
+                    .body(gson.toJson("data:image/png;base64," + base64Content));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(gson.toJson("Không tìm thấy tệp hoặc không thể đọc tệp"));

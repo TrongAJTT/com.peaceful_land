@@ -52,4 +52,9 @@ export class PostService {
     return this.http.post<any>(`${this.apiUrl}/request-approve`, 
       {post_id}, {headers});
   }
+
+  getPostTopK(k: number,user_id: number): Observable<any>{
+    return this.http.post<any>(`${this.apiUrl}/find-nearest-${k}`, 
+      {user_id});
+  }
 }

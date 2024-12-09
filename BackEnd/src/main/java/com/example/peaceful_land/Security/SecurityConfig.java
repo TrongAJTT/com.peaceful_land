@@ -42,7 +42,11 @@ public class SecurityConfig  {
                         ).permitAll()
 
                         .requestMatchers(
-                                HttpMethod.GET,"/posts/**", "/images/**"
+                                HttpMethod.POST,"/posts/find-nearest-*"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,"/images/**"
                         ).permitAll()
 
                         // Secure the API endpoints that require JWT

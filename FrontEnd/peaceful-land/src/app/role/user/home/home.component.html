@@ -13,3 +13,86 @@
     </div>
 </div>
 
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-0 gx-5 align-items-end">
+            <div class="col-lg-6">
+                <div class="text-start mx-auto mb-5 wow slideInLeft" data-wow-delay="0.1s">
+                    <h1 class="mb-3">Bất động sản phổ biến</h1>
+                    <p>Các bất động sản được khách hàng tin tưởng và lựa chọn</p>
+                </div>
+            </div>
+            <div class="col-lg-6 text-start text-lg-end wow slideInRight" data-wow-delay="0.1s">
+                <ul class="nav nav-pills d-inline-flex justify-content-end mb-5">
+                    <li class="nav-item me-2">
+                        <a class="btn btn-outline-success active" data-bs-toggle="pill" href="#tab-1">Mới</a>
+                    </li>
+                    <!-- <li class="nav-item me-2">
+                        <a class="btn btn-outline-success" data-bs-toggle="pill" href="#tab-2">Mới</a>
+                    </li> -->
+                </ul>
+            </div>
+        </div>
+        <div class="tab-content">
+            <!-- <div id="tab-1" class="tab-pane fade show active p-0">
+                <div *ngIf="top6Routes" class="row g-4">
+                    <div *ngFor="let route of top6Routes" class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="property-item rounded overflow-hidden">
+                            <div class="position-relative overflow-hidden">
+                                <a class="c-pointer" *ngIf="!route.img" (click)="goToScheduleHasRouteId(route.id)"><img class="img-fluid img-height img-cover wd-100" src="/assets/img/bus/bus_demo.jpg" alt=""></a>
+                                <a class="c-pointer" *ngIf="route.img" (click)="goToScheduleHasRouteId(route.id)"><img class="img-fluid img-height img-cover wd-100" [src]="'data:image/png;base64,'+route.img"></a>
+                                <div class="bg-white rounded-top text-success position-absolute start-0 bottom-0 mx-4 pt-1 px-3">Limousine</div>
+                            </div>
+                            <div class="p-4 pb-0">
+                                <h5 class="text-success mb-3">{{route.price | formatNumberDot3}}đ</h5>
+                                <a class="c-pointer d-block h5 mb-2" (click)="goToScheduleHasRouteId(route.id)">{{route.start_point}} - {{route.end_point}}</a>
+                                <p><i class="fa fa-clock text-success me-2"></i>{{route.distance}}km - {{ (route.duration / 3600).toFixed(1) }} giờ - {{route.date_begin | date: "d/'M/yyyy, h:mm a"}}</p>
+                                <p><i class="fa fa-map-marker-alt text-success me-2"></i>Bến {{route.start_point}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <div id="tab-1" class="tab-pane fade show active p-0">
+                <div *ngIf="new6Post && new6Post != []" class="row g-4">
+                    <div *ngFor="let post of new6Post" class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="property-item rounded overflow-hidden">
+                            <div class="position-relative overflow-hidden">
+                                <a class="c-pointer" *ngIf="(!post.data.thumbnUrl || post.data.thumbnUrl=='' )"><img class="img-fluid img-height img-cover wd-100" src="/assets/img/house/house-demo.jpg" alt=""></a>
+                                <a class="c-pointer" *ngIf="(post.data.thumbnUrl !=undefined && post.data.thumbnUrl != '') "><img class="img-fluid img-height img-cover wd-100" [src]="changeToImg(post.data.thumbnUrl)"></a>
+                                <div class="bg-white rounded-top text-success position-absolute start-0 bottom-0 mx-4 pt-1 px-3">{{post.data.property.category}}</div>
+                            </div>
+                            <div class="p-4 pb-0">
+                                <h5 class="text-success mb-3">{{post.data.property.price | number:'1.0-0'}}đ</h5>
+                                <a class="c-pointer d-block h5 mb-2" >{{post.data.property.location}}</a>
+                                <p><i class="fa fa-clock text-success me-2"></i>{{post.data.property.map_url}}</p>
+                                <p><i class="fa fa-map-marker-alt text-success me-2"></i>{{post.data.property.area}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- <div id="tab-2" class="tab-pane fade p-0">
+                <div *ngIf="new6Post && new6Post != []" class="row g-4">
+                    <div *ngFor="let post of new6Post" class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="property-item rounded overflow-hidden">
+                            <div class="position-relative overflow-hidden">
+                                <a class="c-pointer" *ngIf="!route.img" (click)="goToScheduleHasRouteId(route.id)"><img class="img-fluid img-height img-cover wd-100" src="/assets/img/bus/bus_demo.jpg" alt=""></a>
+                                <a class="c-pointer" *ngIf="route.img" (click)="goToScheduleHasRouteId(route.id)"><img class="img-fluid img-height img-cover wd-100" [src]="'data:image/png;base64,'+route.img"></a>
+                                <div class="bg-white rounded-top text-success position-absolute start-0 bottom-0 mx-4 pt-1 px-3">{{post.data.property.category}}</div>
+                            </div>
+                            <div class="p-4 pb-0">
+                                <h5 class="text-success mb-3">{{post.data.property.price | number:'1.0-0'}}đ</h5>
+                                <a class="c-pointer d-block h5 mb-2" >{{post.data.property.location}}</a>
+                                <p><i class="fa fa-clock text-success me-2"></i>{{post.data.property.map_url}}</p>
+                                <p><i class="fa fa-map-marker-alt text-success me-2"></i>{{post.data.property.area}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </div>
+</div>

@@ -102,7 +102,7 @@ export class PostPropertyComponent implements OnInit, OnChanges {
         }
       })
 
-    if(this.isPermitted){
+    if(!this.isPermitted){
       return
     }
 

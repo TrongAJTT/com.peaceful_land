@@ -66,8 +66,6 @@ public class AccountService implements IAccountService{
         else if (accountRepository.existsByPhone(userInfo.getPhone())) {
             throw new RuntimeException("Số điện thoại đã tồn tại");
         }
-
-        // TODO: Mã hóa mật khẩu
         return accountRepository.save(
                 Account.builder()
                         .role((byte) 0)
@@ -337,6 +335,19 @@ public class AccountService implements IAccountService{
         // Kiểm tra tài khoản có tồn tại không
         Account account = accountRepository.findById(request.getUserId())
                 .orElseThrow(AccountNotFoundException::new);
+        // Kiểm tra phương thức thanh toán có tồn tại không
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(request.getPaymentMethodId())
+                .orElseThrow(PayMethodNotFoundException::new);
+        if (paymentMethod.getAccount().getId() != account.getId()) {
+            throw new RuntimeException("Tài khoản không sở hữu phương thức thanh toán này");
+        }
+        // Kiểm tra có tạo rút tiền trong hôm nay chưa
+        if (requestWithdrawRepository.existsByAccountEqualsAndDateBeginBetween(
+                account,
+                LocalDate.now().atStartOfDay(),
+                LocalDate.now().atTime(23, 59, 59))) {
+            throw new IllegalStateException("Chỉ được tạo một yêu cầu rút tiền trong ngày");
+        }
         // Kiểm tra số dư
         if (account.getAccountBalance() < request.getAmount()) {
             throw new RuntimeException("Số dư hiện tại không đủ");
@@ -345,9 +356,6 @@ public class AccountService implements IAccountService{
         if (request.getAmount() % 50000 != 0) {
             throw new RuntimeException("Số tiền rút phải là bội số của 50000");
         }
-        // Kiểm tra phương thức thanh toán có tồn tại không
-        PaymentMethod paymentMethod = paymentMethodRepository.findById(request.getPaymentMethodId())
-                .orElseThrow(PayMethodNotFoundException::new);
         // Tạo yêu cầu rút tiền
         RequestWithdraw requestWithdraw = requestWithdrawRepository.save(
                 RequestWithdraw.builder()
@@ -359,7 +367,7 @@ public class AccountService implements IAccountService{
         );
         // Gửi email biên lai yêu cầu rút tiền
         new Thread(() -> emailService.sendWithdrawReceipt(
-                account.getEmail(), requestWithdraw.getId(), request.getAmount(), paymentMethod
+                account.getEmail(), requestWithdraw.getId(), requestWithdraw.getDateBegin(), request.getAmount(), paymentMethod
         )).start();
         return "Tạo yêu cầu rút tiền thành công. Yêu cầu của bạn sẽ được duyệt trong vòng tối đa 48 giờ. Vui lòng theo dõi email để nhận được cập nhật.";
     }

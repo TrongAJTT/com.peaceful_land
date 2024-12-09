@@ -33,6 +33,9 @@ public interface IEmailService {
 
 
     // Gửi email biên lai rút tiền
-    void sendWithdrawReceipt(String emailTo, Long id, Long amount, PaymentMethod payment);
+    void sendWithdrawReceipt(String emailTo, Long id, LocalDateTime date, Long amount, PaymentMethod payment);
+
+    // Gửi email phản hồi rút tiền
+    void sendWithdrawResponse(String emailTo, Long id, LocalDateTime date, Long amount, PaymentMethod payment, boolean status, String denyMessageIfFalse);
 
 }

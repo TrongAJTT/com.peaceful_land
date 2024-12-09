@@ -101,7 +101,11 @@ export class LoginAndRegisterComponent implements OnInit{
       this.authService.login(userId_login,password_login)
         .subscribe({
           next: (response:any) => {
-            window.location.reload();
+            if(response.account.role==3){
+              this.router.navigate(["/admin"]);
+            }else{
+              window.location.reload();
+            }
           },
           error: (response:any) => {
             this.snackbarService.notifyErrorUser(response.error.message)
@@ -177,7 +181,6 @@ export class LoginAndRegisterComponent implements OnInit{
           console.log(response)
         }
       })
-    
   }
 
 

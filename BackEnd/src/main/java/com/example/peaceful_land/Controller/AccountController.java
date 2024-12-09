@@ -55,7 +55,6 @@ public class AccountController {
         ));
     }
 
-    // Dùng cho mục đích kiểm tra
     @GetMapping("/check-post-permission")
     public ResponseEntity<?> checkPostPermission(@RequestBody IdRequest request) {
         return ResponseEntity.ok(accountService.checkPostPermission(request.getUserId()));
@@ -64,6 +63,11 @@ public class AccountController {
     @PostMapping("/update-info")
     public ResponseEntity<?> updateInfo(@RequestBody UpdateAccountInfoRequest request) {
         return ResponseEntity.ok(gson.toJson(accountService.updateAccountInfo(request)));
+    }
+
+    @PostMapping("/request-withdraw")
+    public ResponseEntity<?> requestWithdraw(@RequestBody WithdrawRequest request) {
+        return ResponseEntity.ok(gson.toJson(accountService.createWithdrawRequest(request)));
     }
 
 }

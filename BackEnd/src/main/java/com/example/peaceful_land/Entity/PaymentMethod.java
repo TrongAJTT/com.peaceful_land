@@ -33,4 +33,8 @@ public class PaymentMethod extends BaseEntity {
                 ", accountNumber='" + accountNumber + '\'' +
                 '}';
     }
+
+    public String getMethodAndNameString(){
+        return isWallet ? "Ví " + name : "Ngân hàng " + name;
+    }
 }

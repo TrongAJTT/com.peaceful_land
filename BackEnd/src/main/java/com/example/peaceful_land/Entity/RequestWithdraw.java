@@ -12,10 +12,10 @@ public class RequestWithdraw extends BaseEntity {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "user_id")
-    private Account userId;
+    private Account account;
 
     @ManyToOne @JoinColumn(name = "id_pay_method")
-    private PaymentMethod idPayMethod;
+    private PaymentMethod payment;
 
     @Column
     private Long amount;    // Lượng tiền muốn rút (bội số 50000)

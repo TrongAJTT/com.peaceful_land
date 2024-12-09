@@ -1,6 +1,7 @@
 package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.EmailDetail;
+import com.example.peaceful_land.Entity.PaymentMethod;
 import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -209,6 +210,56 @@ public class EmailService implements IEmailService {
 
             helper.setTo(emailTo);
             helper.setSubject("Bài rao mà bạn theo dõi đã được cập nhật");
+            helper.setText(htmlContent, true);
+
+            // Sending the mail
+            javaMailSender.send(mimeMessage);
+        }
+        catch (MailException | MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendWithdrawReceipt(String emailTo, Long id, Long amount, PaymentMethod payment) {
+        try {
+            System.out.println("[Mail proxy] Sending Notify Update Email to interested user: " + emailTo);
+            // Creating a MimeMessage
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            String htmlContent = String.format(
+                    """
+                    <p>Chúng tôi vui lòng thông báo với bạn rằng yêu cầu rút tiền của bạn đang được xử lý.</p>
+                    <table style="border-collapse: collapse; margin: 25px 0; font-size: 0.9em; font-family: sans-serif; min-width: 400px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+                        <thead>
+                            <tr style="background-color: #009879; color: #ffffff;">
+                                <th style="padding: 12px 15px;">Mã yêu cầu</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Ngày tạo</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Số tiền rút</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style = "border-bottom: 2px solid #009879;">
+                                <th style="padding: 12px 15px;">Phương thức rút</th>
+                                <td style="padding: 12px 15px;">%s - %s</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Kết quả xử lý sẽ có trong vòng tối đa 48 giờ kế tiếp. Hãy chú ý theo dõi email của bạn</p>
+                    """,
+                    id, VariableUtils.convertToVnTimeZoneString(payment.getDateBegin()),
+                    amount, payment.getMethodAndNameString(), payment.getAccountNumber());
+
+            helper.setTo(emailTo);
+            helper.setSubject("Biên lai cho yêu cầu rút tiền của bạn");
             helper.setText(htmlContent, true);
 
             // Sending the mail

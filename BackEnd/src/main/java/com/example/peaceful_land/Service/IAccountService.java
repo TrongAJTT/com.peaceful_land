@@ -52,4 +52,6 @@ public interface IAccountService {
     // Kiểm tra khả năng đăng bài rao
     PostPermissionResponse checkPostPermission(Long userId);
 
+    // Tạo yêu cầu rút tiền khỏi tài khoản
+    String createWithdrawRequest(WithdrawRequest request);
 }

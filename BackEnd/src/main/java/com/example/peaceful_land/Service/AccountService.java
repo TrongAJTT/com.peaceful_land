@@ -4,10 +4,10 @@ import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Account;
 import com.example.peaceful_land.Entity.PaymentMethod;
 import com.example.peaceful_land.Entity.Purchase;
-import com.example.peaceful_land.Repository.AccountRepository;
-import com.example.peaceful_land.Repository.PaymentMethodRepository;
-import com.example.peaceful_land.Repository.PropertyRepository;
-import com.example.peaceful_land.Repository.PurchaseRepository;
+import com.example.peaceful_land.Entity.RequestWithdraw;
+import com.example.peaceful_land.Exception.AccountNotFoundException;
+import com.example.peaceful_land.Exception.PayMethodNotFoundException;
+import com.example.peaceful_land.Repository.*;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +25,13 @@ import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_AVATAR;
 @Service @RequiredArgsConstructor
 public class AccountService implements IAccountService{
 
-    private final AccountRepository accountRepository;
-    private final PurchaseRepository purchaseRepository;
+    private final RequestWithdrawRepository requestWithdrawRepository;
     private final PaymentMethodRepository paymentMethodRepository;
+    private final PurchaseRepository purchaseRepository;
+    private final PropertyRepository propertyRepository;
+    private final AccountRepository accountRepository;
     private final EmailService emailService;
     private final RedisService redisService;
-    private final PropertyRepository propertyRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
@@ -329,5 +330,37 @@ public class AccountService implements IAccountService{
                 .maxLiveTime(maxLiveTime)
                 .fullCategory(fullCategory)
                 .build();
+    }
+
+    @Override
+    public String createWithdrawRequest(WithdrawRequest request) {
+        // Kiểm tra tài khoản có tồn tại không
+        Account account = accountRepository.findById(request.getUserId())
+                .orElseThrow(AccountNotFoundException::new);
+        // Kiểm tra số dư
+        if (account.getAccountBalance() < request.getAmount()) {
+            throw new RuntimeException("Số dư hiện tại không đủ");
+        }
+        // Kiểm tra số tiền rút có phải là bội số của 50000 không
+        if (request.getAmount() % 50000 != 0) {
+            throw new RuntimeException("Số tiền rút phải là bội số của 50000");
+        }
+        // Kiểm tra phương thức thanh toán có tồn tại không
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(request.getPaymentMethodId())
+                .orElseThrow(PayMethodNotFoundException::new);
+        // Tạo yêu cầu rút tiền
+        RequestWithdraw requestWithdraw = requestWithdrawRepository.save(
+                RequestWithdraw.builder()
+                        .account(account)
+                        .payment(paymentMethod)
+                        .amount(request.getAmount())
+                        .status((byte) 0)
+                        .build()
+        );
+        // Gửi email biên lai yêu cầu rút tiền
+        new Thread(() -> emailService.sendWithdrawReceipt(
+                account.getEmail(), requestWithdraw.getId(), request.getAmount(), paymentMethod
+        )).start();
+        return "Tạo yêu cầu rút tiền thành công. Yêu cầu của bạn sẽ được duyệt trong vòng tối đa 48 giờ. Vui lòng theo dõi email để nhận được cập nhật.";
     }
 }

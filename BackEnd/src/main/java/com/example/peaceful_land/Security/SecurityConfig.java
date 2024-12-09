@@ -49,6 +49,14 @@ public class SecurityConfig  {
                         ).permitAll()
 
                         .requestMatchers(
+                                HttpMethod.POST,"/posts/search**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.POST,"/posts/*"
+                        ).permitAll()
+
+                        .requestMatchers(
                                 HttpMethod.GET,"/images/**"
                         ).permitAll()
 

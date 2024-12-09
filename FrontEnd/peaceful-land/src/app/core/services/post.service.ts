@@ -57,4 +57,10 @@ export class PostService {
     return this.http.post<any>(`${this.apiUrl}/find-nearest-${k}`, 
       {user_id});
   }
+
+  searchPostByPage(userId: number,page: number, size: number){
+    return this.http.post<any>(`${this.apiUrl}/search?page=${page}&size=${size}`, 
+      {userId});
+  }
+
 }

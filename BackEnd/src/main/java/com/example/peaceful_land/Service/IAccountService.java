@@ -19,8 +19,8 @@ public interface IAccountService {
     // Đổi mật khẩu tài khoản
     String changePassword(ChangePasswordRequest request);
 
-    // Đổi thông tin tài khoản
-    String changeAccountInfo(AccountPrimaryInfo request);
+    // Cập nhật thông tin tài khoản
+    String updateAccountInfo(UpdateAccountInfoRequest request);
 
     // Quên mật khẩu giai đoạn 1: Gửi mã OTP
     void forgotPassword(String email);
@@ -51,4 +51,5 @@ public interface IAccountService {
 
     // Kiểm tra khả năng đăng bài rao
     PostPermissionResponse checkPostPermission(Long userId);
+
 }

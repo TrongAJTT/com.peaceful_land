@@ -63,8 +63,7 @@ public class AccountController {
 
     @PostMapping("/update-info")
     public ResponseEntity<?> updateInfo(@RequestBody UpdateAccountInfoRequest request) {
-//        return ResponseEntity.ok(accountService.updateInfo(request));
-        return null;
+        return ResponseEntity.ok(gson.toJson(accountService.updateAccountInfo(request)));
     }
 
 }

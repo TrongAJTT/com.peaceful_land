@@ -114,8 +114,17 @@ public class AccountService implements IAccountService{
     }
 
     @Override
-    public String changeAccountInfo(AccountPrimaryInfo request) {
-        return "";
+    public String updateAccountInfo(UpdateAccountInfoRequest request) {
+        return accountRepository.findById(request.getUserId())
+                .map(account -> {
+                    account.setName(request.getName());
+                    account.setEmail(request.getEmail());
+                    account.setPhone(request.getPhone());
+                    account.setBirthDate(request.getBirthDate());
+                    accountRepository.save(account);
+                    return "Cập nhật thông tin thành công";
+                })
+                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
     }
 
     @Override

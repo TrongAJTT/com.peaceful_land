@@ -10,6 +10,8 @@ import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../dto/user';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
+import { PropertyService } from '../../../core/services/property.service';
+import { firstValueFrom } from 'rxjs';
 
 interface Ward {
   Id: string;
@@ -47,6 +49,8 @@ export class PostPropertyComponent implements OnInit, OnChanges {
   user!: User;
   today: any;
   isLoading = true; 
+  imagePreviews: string[] = [];
+  selectedPreviewsFile!: File[];
   wards: Ward[] = [];
   selectedCity: string = '';
   selectedDistrict: string = '';
@@ -72,7 +76,8 @@ export class PostPropertyComponent implements OnInit, OnChanges {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private authService:AuthService,
-    private snackBarService:SnackBarService
+    private snackBarService:SnackBarService,
+    private propertyService:PropertyService
   ) {}
 
   ngOnInit() {
@@ -162,7 +167,6 @@ export class PostPropertyComponent implements OnInit, OnChanges {
     this.propertyForm.get('selectedWard')?.reset();
     this.districts = [];
     this.wards = [];
-  
     const selectedCityId = this.propertyForm.get('selectedCity')?.value;
     if (selectedCityId) {
       const selectedCityData = this.cities.find(city => city.Id === selectedCityId);
@@ -203,13 +207,44 @@ export class PostPropertyComponent implements OnInit, OnChanges {
       reader.readAsDataURL(file);
     }
   }
+
+  onAdditionalImagesSelected(event: any): void {
+    const files: FileList = event.target.files;
+    this.selectedPreviewsFile = event.target.files;
+    this.selectedPreviewsFile = Array.from(this.selectedPreviewsFile); 
+    this.imagePreviews = []; // Reset mảng ảnh preview mỗi khi chọn ảnh mới
+
+    // Lặp qua các file đã chọn và tạo preview cho từng ảnh
+    for (let i = 0; i < files.length; i++) {
+      const reader = new FileReader();
+      
+      reader.onload = (e: any) => {
+        // Thêm đường dẫn ảnh vào mảng preview
+        this.imagePreviews.push(e.target.result);
+        this.cdr.detectChanges(); // Trigger change detection
+      };
+
+      // Đọc file ảnh
+      reader.readAsDataURL(files[i]);
+    }
+  }
   
 
-  handleSubmitProperty() {
+  async handleSubmitProperty() {
     const selectedCity = this.propertyForm.get("selectedCity")?.value?.trim()!;
+    const selectedCityData = this.cities.find(city => city.Id === selectedCity);
+    const selectedCityName = selectedCityData?.Name;
+    
     const selectedDistrict = this.propertyForm.get("selectedDistrict")?.value?.trim()!;
+    const selectedDistrictData = selectedCityData?.Districts.find(district => district.Id === selectedDistrict);
+    const selectedDistrictName = selectedDistrictData?.Name;
+
+
     const selectedWard = this.propertyForm.get("selectedWard")?.value?.trim()!;
-    const location = selectedCity + " " + selectedDistrict + selectedWard;
+    const selectedWardData = selectedDistrictData?.Wards.find(ward => ward.Id === selectedWard);
+    const selectedWardName = selectedWardData?.Name;
+
+    const location = selectedCityName+ ", " + selectedDistrictName + ", " + selectedWardName;
     const locationDetail = this.propertyForm.get("locationDetail")?.value?.trim()!;
     const mapUrl = this.propertyForm.get("mapUrl")?.value?.trim()!;
     const area = this.propertyForm.get("area")?.value!;
@@ -270,10 +305,65 @@ export class PostPropertyComponent implements OnInit, OnChanges {
     } else if (selectedOffer === 0 && rentalPeriod !== "") {
       // Nếu là Mua bán, reset giá trị rentalPeriod về chuỗi rỗng
       this.propertyForm.get("rentalPeriod")?.setValue('');
-    } else {
+    } else if(this.imagePreviews.length==0){
+      this.snackBarService.notifyWarningUser("Vui lòng chọn ít nhất 1 ảnh phụ cho bất động sản!");
+    }else {
       // Nếu không có lỗi, có thể tiếp tục xử lý
+      // console.log(
+      //   location
+      //   ,locationDetail
+      //   ,mapUrl
+      //   ,area
+      //   ,selectedCategory
+      //   ,price
+      //   ,bedrooms
+      //   ,toilets
+      //   ,entrance
+      //   ,frontage
+      //   ,selectedHouseOrientation
+      //   ,selectedBalconyOrientation
+      //   ,legal
+      //   ,image
+      //   ,description
+      //   ,topic
+      //   ,expiration
+      //   ,selectedOffer
+      //   ,rentalPeriod
+      // )
+
+    console.log(this.selectedFile,this.selectedPreviewsFile)
+
       this.snackBarService.notifySuccessUser("Thông tin hợp lệ, đang gửi...");
-      // Thực hiện gửi dữ liệu hoặc các thao tác khác tại đây
+      this.isLoading = true
+      try {
+        // Sending the request and awaiting the response
+        const currProperty = await firstValueFrom(this.propertyService.createProperty(
+          this.user.id,
+          selectedOffer,
+          rentalPeriod,
+          location,
+          locationDetail,
+          mapUrl,
+          selectedCategory,
+          price,
+          area,
+          legal,
+          bedrooms,
+          toilets,
+          entrance,
+          frontage,
+          selectedHouseOrientation,
+          selectedBalconyOrientation
+        ));
+
+        const responseUploadSubImg = await firstValueFrom(this.propertyService.uploadSubImages(currProperty.id,this.selectedPreviewsFile))
+        this.isLoading = false;
+        this.cdr.detectChanges();
+        
+      } catch (error:any) {
+        this.snackBarService.notifyErrorUser(error!.error!.message)
+        this.isLoading = false;
+      }
     }
   }
 }

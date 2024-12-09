@@ -66,5 +66,11 @@ public class AuthController {
         return ResponseEntity.ok(gson.toJson("Đặt lại mật khẩu thành công"));
     }
 
+    // Đăng xuất
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        return ResponseEntity.ok(gson.toJson("Đăng xuất thành công"));
+    }
+
 
 }

@@ -194,4 +194,9 @@ public class PostController {
         return ok(gson.toJson(postService.sendReportRequest(id, request)));
     }
 
+    @PostMapping("/{id}/manager/extend-expiration")
+    public ResponseEntity<?> extendPost(@PathVariable Long id, @RequestBody ExtendPostRequest request) {
+        return ok(gson.toJson(postService.extendPost(id, request)));
+    }
+
 }

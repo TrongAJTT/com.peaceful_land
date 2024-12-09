@@ -25,7 +25,7 @@
             <div class="col-lg-6 text-start text-lg-end wow slideInRight" data-wow-delay="0.1s">
                 <ul class="nav nav-pills d-inline-flex justify-content-end mb-5">
                     <li class="nav-item me-2">
-                        <a class="btn btn-outline-success active" data-bs-toggle="pill" href="#tab-1">Mới</a>
+                        <a class="btn btn-outline-success active" data-bs-toggle="pill" href="#tab-1">Mới nhất</a>
                     </li>
                     <!-- <li class="nav-item me-2">
                         <a class="btn btn-outline-success" data-bs-toggle="pill" href="#tab-2">Mới</a>
@@ -56,19 +56,30 @@
 
             <div id="tab-1" class="tab-pane fade show active p-0">
                 <div *ngIf="new6Post && new6Post != []" class="row g-4">
-                    <div *ngFor="let post of new6Post" class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="property-item rounded overflow-hidden">
-                            <div class="position-relative overflow-hidden">
-                                <a class="c-pointer" *ngIf="(!post.data.thumbnUrl || post.data.thumbnUrl=='' )"><img class="img-fluid img-height img-cover wd-100" src="/assets/img/house/house-demo.jpg" alt=""></a>
-                                <a class="c-pointer" *ngIf="(post.data.thumbnUrl !=undefined && post.data.thumbnUrl != '') "><img class="img-fluid img-height img-cover wd-100" [src]="changeToImg(post.data.thumbnUrl)"></a>
-                                <div class="bg-white rounded-top text-success position-absolute start-0 bottom-0 mx-4 pt-1 px-3">{{post.data.property.category}}</div>
+                    <div *ngFor="let post of new6Post" class=" col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="property-item rounded overflow-hidden shadow c-p">
+                            <div class="position-relative overflow-hidden ">
+                                <div class="position-relative overflow-hidden">
+                                    <a *ngIf="!post.data.thumbnUrl || post.data.thumbnUrl === ''">
+                                      <img class="img-fluid img-height img-cover wd-100 w-100" src="/assets/img/house/house-demo.jpg" alt="">
+                                    </a>
+                                    <a *ngIf="post.data.thumbnUrl">
+                                      <img class="img-fluid img-height img-cover wd-100 w-100" [src]="postsImages[post.data.id] || '/assets/img/house/house-demo.jpg'">
+                                    </a>
+                                  </div>
+                                  
+                                  
+                                <div class="bg-cate rounded-top text-success position-absolute start-0 bottom-0 mx-4 pt-1 px-3">{{post.data.property.category}}</div>
+
                             </div>
                             <div class="p-4 pb-0">
-                                <h5 class="text-success mb-3">{{post.data.property.price | number:'1.0-0'}}đ</h5>
-                                <a class="c-pointer d-block h5 mb-2" >{{post.data.property.location}}</a>
-                                <p><i class="fa fa-clock text-success me-2"></i>{{post.data.property.map_url}}</p>
-                                <p><i class="fa fa-map-marker-alt text-success me-2"></i>{{post.data.property.area}}</p>
+                                <h5 class="text-success mb-3 fw-500">{{post.data.property.price | number:'1.0-0'}}đ</h5>
+                                <a class="c-pointer d-block h5 mb-2 h-72" >Địa chỉ: {{post.data.property.location}}</a>
+                                <p><i class="fa fa-clock text-success me-2 h-48">Địa chỉ Map: </i>{{post.data.property.map_url}}</p>
+                                <p><i class="fa fa-map-marker-alt text-success me-2">Diện tích: </i>{{post.data.property.area}} mét vuông</p>
                             </div>
+                            <button  class="btn btn-success border border-secondary rounded-pill px-3 mx-3 my-3 text-light mt-3"><i class="fa fa-shopping-bag me-2 text-light"></i> Xem chi tiết</button>
+
                         </div>
                     </div>
                 </div>

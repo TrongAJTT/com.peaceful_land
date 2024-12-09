@@ -14,6 +14,7 @@
         <div #navbar_collapse class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto">
                 <a (click)="toggleNavbarCollapse()" routerLink="home" class="nav-item nav-link active">Trang Chủ</a>
+                <a (click)="toggleNavbarCollapse()" routerLink="property_list" class="nav-item nav-link active">Danh sách bài đăng</a>
                 <a *ngIf="isSaleOrUser" (click)="toggleNavbarCollapse()" routerLink="post_property" class="nav-item nav-link">Đăng bài</a>
                 <a (click)="toggleNavbarCollapse()" routerLink="login_and_register" class="nav-item nav-link">
                     <span *ngIf="isLoggedIn">Tài khoản</span>

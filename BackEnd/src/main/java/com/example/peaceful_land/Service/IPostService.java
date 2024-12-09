@@ -6,11 +6,17 @@ import com.example.peaceful_land.Entity.Property;
 import com.example.peaceful_land.Entity.RequestPost;
 
 public interface IPostService {
+    // Tạo bài rao
     Post createPost(PostRequest request);
+    // Kiểm tra bài rao tồn tại hay không
     Post checkPostExists(Long id);
+    // Thay đổi ảnh đại diện bài rao
     String changeThumbnail(ChangePostThumbnailRequest request);
+    // Yêu cầu phê duyệt bài rao
     RequestPost createUserPostRequestApproval(IdRequest postRequest);
+    // Xem thông tin
     ViewPostResponse getPostInformationFromPostId(IdRequest request);
+    // Quan tâm một bài rao
     String interestPost(InterestPostRequest request);
     void sendNotificationToInterestedUsers(Property property, String contentUpdate);
     // Xem trạng thái cập nhật bài rao
@@ -43,5 +49,10 @@ public interface IPostService {
     Object requestTour(Long postId, TourRequest request);
     // Yêu cầu liên hệ lại
     Object requestContact(Long postId, ContactRequest request);
-
+    // Xem yêu cầu người dùng trên 1 bài đăng
+    Object viewUserRequestOnPost(Long postId, Long userId, String type);
+    // Xem yêu cầu người dùng trên tất cả bài đăng
+    Object viewUserRequestOnAllPosts(Long userId, String type);
+    // Gửi yêu cầu báo cáo
+    Object sendReportRequest(Long postId, ReportRequest request);
 }

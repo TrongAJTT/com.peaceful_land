@@ -1,6 +1,7 @@
 package com.example.peaceful_land.Entity;
 
 import com.example.peaceful_land.DTO.ContactRequest;
+import com.example.peaceful_land.DTO.ResponseReqContact;
 import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,6 +39,17 @@ public class RequestContact extends BaseEntity {
                 .email(request.getEmail())
                 .interestLevel(request.getInterestLevel() == 0 ? VariableUtils.REQUEST_INTEREST_INFO : VariableUtils.REQUEST_INTEREST_BUY)
                 .message(request.getMessage())
+                .build();
+    }
+
+    public ResponseReqContact toContactRequest() {
+        return ResponseReqContact.builder()
+                .name(getName())
+                .phone(getPhone())
+                .email(getEmail())
+                .interestLevel(getInterestLevel())
+                .message(getMessage())
+                .createdAt(getDateBegin())
                 .build();
     }
 

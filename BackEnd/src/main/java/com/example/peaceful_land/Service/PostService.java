@@ -4,6 +4,7 @@ import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.*;
 import com.example.peaceful_land.Exception.PostNotFoundException;
 import com.example.peaceful_land.Exception.PropertyNotFoundException;
+import com.example.peaceful_land.Exception.UserNotFoundException;
 import com.example.peaceful_land.Query.PropertySpecification;
 import com.example.peaceful_land.Repository.*;
 import com.example.peaceful_land.Utils.ImageUtils;
@@ -36,6 +37,7 @@ public class PostService implements IPostService {
     private final IEmailService emailService;
     private final RequestTourRepository requestTourRepository;
     private final RequestContactRepository requestContactRepository;
+    private final RequestReportRepository requestReportRepository;
 
     @Override
     public Post createPost(PostRequest request) {
@@ -65,14 +67,14 @@ public class PostService implements IPostService {
 
     @Override
     public Post checkPostExists(Long id) {
-        return postRepository.findById(id).orElseThrow(() -> new RuntimeException("Bài rao không tồn tại"));
+        return postRepository.findById(id).orElseThrow(PostNotFoundException::new);
     }
 
     @Override
     public String changeThumbnail(ChangePostThumbnailRequest request) {
         // Kiểm tra tài khoản tồn tại
         Post post = postRepository.findById(request.getPost_id()).orElse(null);
-        if (post == null) throw new RuntimeException("Bài rao không tồn tại");
+        if (post == null) throw new PostNotFoundException();
         // Kiểm tra file hợp lệ
         MultipartFile file = request.getImage();
         ImageUtils.checkImageFile(file);
@@ -113,7 +115,7 @@ public class PostService implements IPostService {
         // Kiểm tra nếu bài rao tồn tại
         Post post = postRepository.findById(postRequest.getPostId()).orElse(null);
         if (post == null) {
-            throw new RuntimeException("Bài đăng không tồn tại");
+            throw new PostNotFoundException();
         }
         // Lấy vai trò người dùng
         Byte role = post.getProperty().getUser().getRole();
@@ -143,7 +145,7 @@ public class PostService implements IPostService {
         // Kiểm tra nếu bài rao tồn tại
         Post post = postRepository.findById(request.getPostId()).orElse(null);
         if (post == null) {
-            throw new RuntimeException("Bài rao không tồn tại");
+            throw new PostNotFoundException();
         }
         // Kiểm tra nếu bài rao đã bị ẩn
         if (post.getHide()) {
@@ -221,7 +223,7 @@ public class PostService implements IPostService {
     @Override
     public String interestPost(InterestPostRequest request) {
         Account account = accountRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+                .orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(request.getPostId())
                 .orElseThrow(() -> new RuntimeException("Bài rao không tồn tại"));
         // Kiểm tra nếu bài rao đã bị ẩn
@@ -589,5 +591,69 @@ public class PostService implements IPostService {
         // Lưu yêu cầu
         requestContactRepository.save(requestContact);
         return "Tạo yêu cầu liên hệ lại thành công";
+    }
+
+    public Object viewUserRequestOnPost(Long postId, Long userId, String type) {
+        // Lấy thông tin bài rao
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao chưa được duyệt hoặc đã bị xóa");
+        }
+        // Kiểm tra có phải là chủ sở hữu không
+        if (post.getProperty().getUser().getId() != userId) {
+            throw new RuntimeException("Bạn không có quyền xem yêu cầu này");
+        }
+        // Lấy thông tin yêu cầu từ database
+        if (type.equals(VariableUtils.REQUEST_TYPE_TOUR)) {
+            return requestTourRepository.findByPropertyEqualsOrderByIdDesc(post.getProperty())
+                    .stream().map(RequestTour::toResponseReqTour).toList();
+        } else {
+            return requestContactRepository.findByPropertyEqualsOrderByIdDesc(post.getProperty())
+                    .stream().map(RequestContact::toContactRequest).toList();
+        }
+    }
+
+    @Override
+    public Object viewUserRequestOnAllPosts(Long userId, String type) {
+        // Kiểm tra nếu người dùng tồn tại
+        Account account = accountRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        // Lấy thông tin tất cả bài rao
+        List<Property> listProperty = propertyRepository.findByUserEquals(account);
+        // Lấy thông tin yêu cầu từ database
+        if (type.equals(VariableUtils.REQUEST_TYPE_TOUR)) {
+            List<ResponseReqTour> listReqTour = new LinkedList<>();
+            for (Property property : listProperty) {
+                listReqTour.addAll(
+                        requestTourRepository.findByPropertyEqualsOrderByIdDesc(property)
+                        .stream().map(RequestTour::toResponseReqTour).toList()
+                );
+            }
+            return listReqTour;
+        } else {
+            List<ResponseReqContact> listReqContact = new LinkedList<>();
+            for (Property property : listProperty) {
+                listReqContact.addAll(
+                        requestContactRepository.findByPropertyEqualsOrderByIdDesc(property)
+                        .stream().map(RequestContact::toContactRequest).toList()
+                );
+            }
+            return listReqContact;
+        }
+    }
+
+    @Override
+    public Object sendReportRequest(Long postId, ReportRequest request) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        // Kiểm tra nếu bài rao đã bị ẩn
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao chưa được duyệt hoặc đã bị xóa");
+        }
+        // Lấy thông tin
+        RequestReport requestReport = RequestReport.fromReportRequestWithoutProperty(request);
+        requestReport.setProperty(post.getProperty());
+        requestReportRepository.save(requestReport);
+        // Lưu yêu cầu
+        return "Gửi yêu cầu báo cáo thành công";
     }
 }

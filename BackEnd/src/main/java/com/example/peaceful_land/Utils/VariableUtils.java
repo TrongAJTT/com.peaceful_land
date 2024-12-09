@@ -52,6 +52,11 @@ public class VariableUtils {
     public static final int MAX_POST_BROKER_PER_DAY = 5;
     public static final int MAX_POST_BROKER_VIP_PER_DAY = 10;
 
+    public static final int REQUEST_REPORT_OBJECT_ID_POST = 0;
+    public static final int REQUEST_REPORT_OBJECT_ID_MAP = 1;
+    public static final String REQUEST_REPORT_OBJECT_VI_POST = "Tin rao";
+    public static final String REQUEST_REPORT_OBJECT_VI_MAP = "Bản đồ";
+
     public static final String
             UPDATE_TYPE_SOLD = "sold",
             UPDATE_TYPE_RENTED = "rented",
@@ -62,6 +67,9 @@ public class VariableUtils {
             UPDATE_TYPE_RENTAL_PERIOD = "rental-period",
             UPDATE_TYPE_DISCOUNT = "discount",
             UPDATE_TYPE_POST = "post";
+
+    public static final String REQUEST_TYPE_CONTACT = "contact";
+    public static final String REQUEST_TYPE_TOUR = "tour";
 
     public static String getStringFromUploadType(int uploadType) {
         return switch (uploadType) {

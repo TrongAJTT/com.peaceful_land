@@ -5,7 +5,9 @@ import com.example.peaceful_land.Entity.RequestContact;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface RequestContactRepository extends JpaRepository<RequestContact, Long> {
     boolean existsByPropertyAndDateBeginBefore(Property property, LocalDateTime dateTime);
+    List<RequestContact> findByPropertyEqualsOrderByIdDesc(Property property);
 }

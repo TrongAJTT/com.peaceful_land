@@ -8,6 +8,7 @@ import { error } from 'console';
 import { firstValueFrom } from 'rxjs';
 import { ImageService } from '../../../core/services/image.service';
 import { response } from 'express';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -27,7 +28,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnChanges{
     private authService: AuthService,
     private imgService: ImageService,
     private snackbarService: SnackBarService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router,
   ){}
 
   async ngOnInit(): Promise<void> {
@@ -61,6 +63,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnChanges{
     } catch (error:any) {
       this.postsImages[postId] = '/assets/img/house/house-demo.jpg';  // Đặt ảnh mặc định
     }
+  }
+
+  goToPropertyList(){
+    this.router.navigate(['user/property_list'])
   }
   
   

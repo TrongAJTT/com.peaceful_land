@@ -98,6 +98,7 @@ a{
 
 /* Kiểu dáng cho các liên kết trong pagination */
 .page-link {
+    cursor: pointer;
     border: 1px solid #ddd; /* Đường viền mỏng */
     border-radius: 50%; /* Hình tròn cho nút */
     padding: 10px 15px; /* Khoảng cách trong nút */

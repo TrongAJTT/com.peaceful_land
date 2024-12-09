@@ -43,7 +43,7 @@ public class PostController {
         return ok(newRequest);
     }
 
-    @GetMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<?> getPostInformation(@PathVariable Long id, @RequestBody IdRequest request) {
         request.setPostId(id);
         ViewPostResponse post = postService.getPostInformationFromPostId(request);

@@ -55,7 +55,7 @@ public class AccountController {
         ));
     }
 
-    @GetMapping("/check-post-permission")
+    @PostMapping("/check-post-permission")
     public ResponseEntity<?> checkPostPermission(@RequestBody IdRequest request) {
         return ResponseEntity.ok(accountService.checkPostPermission(request.getUserId()));
     }

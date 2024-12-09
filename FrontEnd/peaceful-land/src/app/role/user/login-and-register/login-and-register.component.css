@@ -432,3 +432,7 @@ footer a {
 	justify-content: center;
 	color: white;
   }
+
+  .mb-24{
+	margin-bottom: 24px;
+  }

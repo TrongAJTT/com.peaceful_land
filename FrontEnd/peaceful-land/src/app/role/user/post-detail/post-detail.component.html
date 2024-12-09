@@ -6,35 +6,42 @@
                 <div *ngIf="currPost" class="row g-4">
                     <div class="col-lg-6">
                         <div class="border rounded">
-                            <a href="#">
-                                <img src="{{currPost.image_url}}" class="img-fluid rounded" alt="Image">
+                            <a *ngIf="!currPost.data.thumbnUrl || currPost.data.thumbnUrl === ''">
+                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100" src="/assets/img/house/house-demo.jpg" alt="">
+                            </a>
+                            <a *ngIf="currPost.data.thumbnUrl">
+                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100" [src]="postsImages[currPost.data.id] || '/assets/img/house/house-demo.jpg'">
                             </a>
                         </div>
                     </div>
                     <div  class="col-lg-6">
-                        <h4 class="fw-bold mb-3">{{currPost.name}}</h4>
-                        <p class="mb-3">Loại sản phẩm: {{currPost?.name}}</p>
+                        <!-- <h4 class="fw-bold mb-3">{{currPost.name}}</h4> -->
+                        <p class="mb-3"><strong>Loại sản phẩm:</strong> {{currPost.data.property.category}}</p>
+                        <p class="mb-3"> <strong>Loại giao dịch:</strong> 
+                            <span *ngIf="currPost.data.property.offer"> Cho Thuê</span>
+                            <span *ngIf="!currPost.data.property.offer"> Mua bán</span>
+                        </p>
                         <div class="product-price mb-4">
-                            <!-- Giá cũ và phần trăm giảm giá cùng một hàng -->
-                            <div class="d-flex align-items-center mb-2">
-                              <!-- Giá cũ với dấu gạch và màu xám -->
-                              <h5 class="text-muted text-decoration-line-through mb-0 me-2">
-                                {{ currPost.price }} VNĐ
-                              </h5>
-                              
-                              <!-- Phần trăm giảm giá -->
-                              <span class="badge bg-danger">{{ currPost.discount }}%</span>
-                            </div>
-                          
-                            <!-- Giá thực sau khi giảm giá (ở dòng khác) -->
                             <h3 class="fw-bold mb-0">
-                              {{ currPost.price}} VNĐ
+                              {{ currPost.data.property.price | number:'1.0-0'}} VNĐ
                             </h3>
                           </div>
-                        <p class="mb-4">{{currPost.description}}</p>
-                        <p class="mb-4">{{currPost.long_description}}</p>
-                        <p class="mb-3"><strong>Còn lại: </strong>{{currPost.stock_quantity}} sản phẩm</p>
-                        <a  class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i>Thêm vào giỏ hàng</a>
+                        <p class="mb-3"><strong>Tiêu đề: </strong>{{currPost.data.title}}</p>
+                        <p class="mb-3"><strong>Mô tả: </strong>{{currPost.data.description}}</p>
+                        <p class="mb-3" *ngIf="currPost.data.property.offer"><strong>Thời gian thuê: </strong>{{currPost.data.property.rental_period || '(Chưa cập nhật)'}} </p>
+                        <p class="mb-3"><strong>Địa chỉ: </strong>{{currPost.data.property.location}}</p>
+                        <p class="mb-3"><strong>Địa chỉ chi tiết: </strong>{{currPost.data.property.location_detail}}</p>
+                        <p class="mb-3"><strong>Địa chỉ cụ thể: </strong>{{currPost.data.property.map_url}}</p>
+                        <p class="mb-3"><strong>Hướng nhà: </strong>
+                            <span *ngIf="!currPost.data.property.house_orientation">Chưa cập nhật</span>
+                            <span *ngIf="currPost.data.property.house_orientation">{{currPost.data.property.house_orientation}}</span>
+                        </p>
+                        <p class="mb-3"><strong>
+                            Hướng ban công: </strong> 
+                            <span *ngIf="!currPost.data.property.balcony_orientation">Chưa cập nhật</span>
+                            <span *ngIf="currPost.data.property.house_orientation">{{currPost.data.property.balcony_orientation}}</span>
+                        </p>
+                    
                     </div>
 
 
@@ -55,98 +62,45 @@
                                         <div class="col-6">
                                             <div class="row  align-items-center text-center justify-content-center py-2">
                                                 <div class="col-6">
-                                                    <p class="mb-0">Trọng lượng</p>
+                                                    <p class="mb-0">Số phòng ngủ</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="mb-0">{{currPost.weight}} kg</p>
+                                                    <p class="mb-0">{{currPost.data.property.bedrooms}} phòng</p>
                                                 </div>
                                             </div>
                                             <div class="row bg-light text-center align-items-center justify-content-center py-2">
                                                 <div class="col-6">
-                                                    <p class="mb-0">Mã sản phẩm</p>
+                                                    <p class="mb-0">Số nhà vệ sinh</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="mb-0">{{currPost.sku}}</p>
+                                                    <p class="mb-0">{{currPost.data.property.toilets}} phòng</p>
                                                 </div>
                                             </div>
                                             <div class="row text-center align-items-center justify-content-center py-2">
                                                 <div class="col-6">
-                                                    <p class="mb-0">Kích thước (Dài x Rộng x Cao)</p>
+                                                    <p class="mb-0">Số mặt tiền</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="mb-0">{{currPost.dimensions}}</p>
+                                                    <p class="mb-0">{{currPost.data.property.entrance}} mặt</p>
                                                 </div>
                                             </div>
                                             <div class="row bg-light text-center align-items-center justify-content-center py-2">
                                                 <div class="col-6">
-                                                    <p class="mb-0">Chất liệu</p>
+                                                    <p class="mb-0">Số lối vào</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="mb-0">{{currPost.material}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="row text-center align-items-center justify-content-center py-2">
-                                                <div class="col-6">
-                                                    <p class="mb-0">Màu sắc</p>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p class="mb-0">{{currPost.color}}</p>
+                                                    <p class="mb-0">{{currPost.data.property.frontage}} mặt</p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="tab-pane" id="nav-mission" role="tabpanel" aria-labelledby="nav-mission-tab">
-                                <div class="d-flex">
-                                    <img src="img/avatar.jpg" class="img-fluid rounded-circle p-3" style="width: 100px; height: 100px;" alt="">
-                                    <div class="">
-                                        <p class="mb-2" style="font-size: 14px;">April 12, 2024</p>
-                                        <div class="d-flex justify-content-between">
-                                            <h5>Jason Smith</h5>
-                                            <div class="d-flex mb-3">
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                        <p>The generated Lorem Ipsum is therefore always free from repetition injected humour, or non-characteristic 
-                                            words etc. Susp endisse ultricies nisi vel quam suscipit </p>
-                                    </div>
-                                </div>
-                                <div class="d-flex">
-                                    <img src="img/avatar.jpg" class="img-fluid rounded-circle p-3" style="width: 100px; height: 100px;" alt="">
-                                    <div class="">
-                                        <p class="mb-2" style="font-size: 14px;">April 12, 2024</p>
-                                        <div class="d-flex justify-content-between">
-                                            <h5>Sam Peters</h5>
-                                            <div class="d-flex mb-3">
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
-                                        </div>
-                                        <p class="text-dark">The generated Lorem Ipsum is therefore always free from repetition injected humour, or non-characteristic 
-                                            words etc. Susp endisse ultricies nisi vel quam suscipit </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane" id="nav-vision" role="tabpanel">
-                                <p class="text-dark">Tempor erat elitr rebum at clita. Diam dolor diam ipsum et tempor sit. Aliqu diam
-                                    amet diam et eos labore. 3</p>
-                                <p class="mb-0">Diam dolor diam ipsum et tempor sit. Aliqu diam amet diam et eos labore.
-                                    Clita erat ipsum et lorem et sit</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 <!-- Single Product End -->

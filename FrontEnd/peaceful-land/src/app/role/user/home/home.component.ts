@@ -73,4 +73,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnChanges{
   ngOnChanges(changes: SimpleChanges): void {
     this.cdr.detectChanges()
   }
+
+  goToDetailPost(postId: number){
+    this.router.navigate([`/user/post_detail/${postId}`])
+  }
 }

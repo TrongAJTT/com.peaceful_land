@@ -58,16 +58,16 @@ export class PostService {
       {user_id});
   }
 
-  searchPostByPage(userId:number, pageNumber: number, size: number): Observable<any>{
-    console.log(`${this.apiUrl}/search?page=${pageNumber}&size=${size}`)
-    return this.http.post<any>(`${this.apiUrl}/search?page=${pageNumber}&size=${size}`, 
+
+  searchPostByPage(userId: number,page: number, size: number): Observable<any>{
+    return this.http.post<any>(`${this.apiUrl}/search?page=${page}&size=${size}`, 
       {userId});
   }
 
-  getPostById(user_id:number, post_id:number): Observable<any>{
-    const token = this.authService.getToken();  // Lấy JWT từ AuthService
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.post<any>(`${this.apiUrl}/${post_id}`, 
-      {user_id}, {headers});
+  getPostById(user_id: number, postId: number): Observable<any>{
+    return this.http.post<any>(`${this.apiUrl}/${postId}`, 
+      {user_id});
   }
+
+
 }

@@ -44,7 +44,7 @@ public class VariableUtils {
     public static final String REQUEST_INTEREST_INFO = "Tôi muốn biết thêm thông tin";
     public static final String REQUEST_INTEREST_BUY = "Tôi muốn mua / thuê bất động sản này";
 
-    public static final String REQUEST_TOUR_DIRECT = "'Xem trực tiếp'";
+    public static final String REQUEST_TOUR_DIRECT = "Xem trực tiếp";
     public static final String REQUEST_TOUR_HOMESTAY = "Trò chuyện video online";
 
     public static final int MAX_POST_NORMAL_TOTAL = 5;

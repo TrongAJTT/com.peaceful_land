@@ -66,7 +66,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnChanges{
   }
 
   goToPropertyList(){
-    this.router.navigate(['user/property_list'])
+    this.router.navigate(['user/property_list/no_complete'])
   }
   
   

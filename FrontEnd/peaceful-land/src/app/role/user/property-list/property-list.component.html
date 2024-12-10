@@ -3,7 +3,12 @@
     <div class="row">
         <div class="fw-semibold col-lg-">
             <div *ngIf="postList" class="schedule-section p-3 bg-white shadow rounded">
-                <h4 style="color: #00b98e;" class="mb-4">Danh sách bài đăng</h4>
+                <h4 style="color: #00b98e;" class="mb-4">Danh sách bài rao
+                    <span *ngIf="this.propertyType=='sale'">(Bán)</span>
+                    <span *ngIf="this.propertyType=='rent'">(Cho thuê)</span>
+                    <span *ngIf="this.propertyType=='no_complete'">(Chưa bán/thuê)</span>
+                    <span></span>
+                </h4>
                 <div *ngFor="let post of postList" class="schedule-item shadow">
                     <div class="row">
                         <div class="d-flex col-md-8 flex-row bd-highlight mb-3 justify-content-start align-items-center">

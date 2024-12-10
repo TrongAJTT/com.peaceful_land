@@ -59,10 +59,10 @@
                             <p><strong>Hướng ban công: </strong>{{ post.data.property.balcony_orientation || 'Chưa cập nhật' }}</p>
                         </div>
                         <div class="col-md-2 mt-3">
-                            <div *ngIf="post.data.interested">
+                            <div *ngIf="post.interested">
                                 <p><strong><i class="fas fa-heart text-danger"></i> Đã quan tâm</strong></p>
                             </div>
-                            <div *ngIf="!post.data.interested">
+                            <div *ngIf="!post.interested">
                                 <p><strong><i class="fas fa-heart text-muted"></i> Chưa quan tâm</strong></p>
                             </div>
                         </div>

@@ -77,4 +77,36 @@ export class HomeComponent implements OnInit, AfterViewInit, OnChanges{
   goToDetailPost(postId: number){
     this.router.navigate([`/user/post_detail/${postId}`])
   }
+
+  toggleLike(post:any,event: Event) {
+    // Ngừng sự kiện click của biểu tượng trái tim để không bị bắt bởi thẻ cha
+    event.stopPropagation();
+    if(this.userId==-1){
+      this.snackbarService.notifyWarningUser("Vui lòng đăng nhập trước khi chọn quan tâm!")
+      return
+    }
+    if(post.interested){
+      post.interested = !post.interested;
+      const currInterested = post.interested ? 1: 0 
+      this.postService.changeInterested(post.data.id,this.userId,currInterested,0)
+        .subscribe({
+          next: (response) => this.snackbarService.notifySuccessUser(response),
+          error: (response) => this.snackbarService.notifyWarningUser(response.error.message)
+        })
+    }
+  }
+
+  chooseOptionInterested(post: any,notification: number,event: Event){
+    event.stopPropagation();
+    // Đảo ngược trạng thái isLiked
+    post.interested = !post.interested;
+
+    const currInterested = post.interested ? 1: 0 
+
+    this.postService.changeInterested(post.data.id,this.userId,currInterested,notification)
+      .subscribe({
+        next: (response) => this.snackbarService.notifySuccessUser(response),
+        error: (response) => this.snackbarService.notifyWarningUser(response.error.message)
+      })
+  }
 }

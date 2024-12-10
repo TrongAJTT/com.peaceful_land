@@ -5,17 +5,49 @@
             <div class="col-12">
                 <div *ngIf="currPost" class="row g-4">
                     <div class="col-lg-6">
-                        <div class="border rounded">
+                        <div class="position-relative border rounded">
+                            <div 
+                                class="heart-icon position-absolute top-0 end-0 m-3" 
+                                [ngClass]="{'text-danger': currPost.interested, 'text-muted': !currPost.interested}"
+                                (click)="toggleLike(currPost,$event)"
+                                data-bs-toggle="modal" [attr.data-bs-target]="'#exampleModal'+currPost.data.id"
+                                >
+                                <i class="fa" [ngClass]="currPost.interested && userId!=-1 ? 'fa-heart' : 'fa-heart-o'"></i>
+                            </div>
+
                             <a *ngIf="!currPost.data.thumbnUrl || currPost.data.thumbnUrl === ''">
-                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100" src="/assets/img/house/house-demo.jpg" alt="">
+                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100" (click)="openModal('/assets/img/house/house-demo.jpg')" src="/assets/img/house/house-demo.jpg" alt="">
                             </a>
                             <a *ngIf="currPost.data.thumbnUrl">
-                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100" [src]="postsImages[currPost.data.id] || '/assets/img/house/house-demo.jpg'">
+                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100" (click)="openModal(postsImages[currPost.data.id])" [src]="postsImages[currPost.data.id] || '/assets/img/house/house-demo.jpg'">
                             </a>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-center align-items-center position-relative">
+                                    <button *ngIf="imageList.length>3" (click)="prevImage()" class="btn-direction btn btn-light btn-sm position-absolute start-0">
+                                        <i class="fa fa-chevron-left"></i>
+                                    </button>
+                    
+                                    <div class="image-gallery-wrapper">
+                                        <div class="image-gallery d-flex">
+                                            <div *ngFor="let image of visibleImages; let i = index"
+                                                [ngClass]="{'active': i === activeImageIndex, 'inactive': i !== activeImageIndex}" 
+                                                class="image-item">
+                                                <img class="img-fluid" [src]="image.src" alt="Image" (click)="setActiveImage(i,image.src)">
+                                            </div>
+                                        </div>
+                                    </div>
+                    
+                                    <button *ngIf="imageList.length>3" (click)="nextImage()" class="btn-direction btn btn-light btn-sm position-absolute end-0">
+                                        <i class="fa fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div  class="col-lg-6">
-                        <!-- <h4 class="fw-bold mb-3">{{currPost.name}}</h4> -->
                         <p class="mb-3"><strong>Loại sản phẩm:</strong> {{currPost.data.property.category}}</p>
                         <p class="mb-3"> <strong>Loại giao dịch:</strong> 
                             <span *ngIf="currPost.data.property.offer"> Cho Thuê</span>
@@ -32,6 +64,8 @@
                         <p class="mb-3"><strong>Địa chỉ: </strong>{{currPost.data.property.location}}</p>
                         <p class="mb-3"><strong>Địa chỉ chi tiết: </strong>{{currPost.data.property.location_detail}}</p>
                         <p class="mb-3"><strong>Địa chỉ cụ thể: </strong>{{currPost.data.property.map_url}}</p>
+                        <p class="mb-3"><strong>Diện tích: </strong>{{currPost.data.property.area}} mét vuông</p>
+
                         <p class="mb-3"><strong>Hướng nhà: </strong>
                             <span *ngIf="!currPost.data.property.house_orientation">Chưa cập nhật</span>
                             <span *ngIf="currPost.data.property.house_orientation">{{currPost.data.property.house_orientation}}</span>
@@ -41,6 +75,10 @@
                             <span *ngIf="!currPost.data.property.balcony_orientation">Chưa cập nhật</span>
                             <span *ngIf="currPost.data.property.house_orientation">{{currPost.data.property.balcony_orientation}}</span>
                         </p>
+
+                        <button (click)="toggleSchedule($event)" class="btn btn-danger btn-schedule mb-3" data-bs-toggle="modal" [attr.data-bs-target]="'#scheduleModal'+currPost.data.id">Lên lịch hẹn</button>
+                        <br>
+                        <button class="btn btn-info btn-contact" data-bs-toggle="modal" [attr.data-bs-target]="'#contactModal'+currPost.data.id">Yêu cầu liên hệ</button>
                     
                     </div>
 
@@ -104,3 +142,121 @@
     </div>
 </div>
 <!-- Single Product End -->
+
+<!-- Modal -->
+<div class="modal-child-image" *ngIf="isModalOpen" (click)="closeModal($event)">
+    <div class="modal-child-image-content" (click)="$event.stopPropagation()">
+        <img [src]="modalImageSrc" class="modal-child-image-img">
+    </div>
+</div>
+
+<div *ngIf="currPost">
+    <div class="modal fade" *ngIf="userId !== -1 && !currPost.interested" [id]="'exampleModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Bạn có muốn xem chi tiết tin tức này</h5>
+                <!-- <button type="button" class="btn btn-danger close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button> -->
+            </div>
+            <div class="modal-body">
+                Thông báo sẽ được chủ quản trang web gửi mail khi bạn nhấn đồng ý<span style="color: red;font-weight: 400;"></span>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="chooseOptionInterested(currPost,0,$event)" data-bs-dismiss="modal">Không</button>
+            <button type="button" class="btn btn-danger" (click)="chooseOptionInterested(currPost,1,$event)" data-bs-dismiss="modal">Đồng ý</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" *ngIf="userId!==-1 && isPermitGiveRequestScheduleOrRequest && isModalOverviewOpen" [id]="'scheduleModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form [formGroup]="appointmentForm" (ngSubmit)="submitSchedule($event)">
+                <div class="modal-header d-flex justify-content-between">
+                    <h5 class="modal-title text-center" id="scheduleModalLabel">Đặt lịch hẹn</h5>
+                    <button type="button" class="btn btn-danger close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                    <div class="modal-body" >
+                        <div class="mb-3">
+                            <label for="expected_date" class="form-label">Ngày hẹn</label>
+                            <input type="date" [min]="today" class="form-control" id="expected_date" formControlName="expected_date">
+                        </div>
+                        <div class="mb-3">
+                            <label for="expected_hour" class="form-label">Giờ hẹn (0-23h)</label>
+                            <input type="number" class="form-control" id="expected_hour" formControlName="expected_hour" min="0" max="23">
+                        </div>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Họ tên</label>
+                            <input type="text" class="form-control" id="name" formControlName="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="phone" formControlName="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" formControlName="email">
+                        </div>
+    
+                        <div class="mb-3">
+                            <label class="form-label">Loại cuộc hẹn</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="typeInPerson"  formControlName="type" [value]="true">
+                                <label class="form-check-label" for="typeInPerson">
+                                    Gặp trực tiếp
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="typeVideoCall"  formControlName="type" [value]="false">
+                                <label class="form-check-label" for="typeVideoCall">
+                                    Gọi video call
+                                </label>
+                            </div>
+                        </div>
+                        
+    
+                        <div class="mb-3">
+                            <label class="form-label">Mức độ quan tâm</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="interestLevelTrue" formControlName="interest_level" [value]="true">
+                                <label class="form-check-label" for="interestLevelTrue">
+                                    Tôi muốn biết thêm thông tin chi tiết
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="interestLevelFalse" formControlName="interest_level" [value]="false">
+                                <label class="form-check-label" for="interestLevelFalse">
+                                    Tôi muốn mua/thuê bất động sản này
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"  data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" type="submit" class="btn btn-danger" >Gửi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="modal fade" *ngIf="userId!==-1" [id]="'contactModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-between">
+                    <h5 class="modal-title text-center" id="contactModalLabel">Yêu cầu liên hệ</h5>
+                    <button type="button" class="btn btn-danger close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

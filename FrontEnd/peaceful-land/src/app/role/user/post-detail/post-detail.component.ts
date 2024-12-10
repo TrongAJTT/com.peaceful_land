@@ -7,11 +7,12 @@ import { User } from '../../../dto/user';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ImageService } from '../../../core/services/image.service';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-post-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,ReactiveFormsModule],
   templateUrl: './post-detail.component.html',
   styleUrl: './post-detail.component.css'
 })
@@ -19,8 +20,35 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
   currPost: any;
   user!: User;
   userId: number = -1;
+  today: any;
   postId!: number
   postsImages: { [key: number]: string } = {};
+  activeImageIndex = 0;  // Chỉ số của hình ảnh hiện tại
+  currChildImg = 0;
+  imageList = [
+    { src: '/assets/img/house/house-demo.jpg' },
+    { src: '/assets/img/house/house-demo-1.jpg' },
+    { src: '/assets/img/house/house-demo-2.jpg' },
+    { src: '/assets/img/house/house-demo-3.jpg' },
+  ];
+  modalImageSrc = '';
+  isModalOpen = false;  // Trạng thái của modal
+   // Đặt biến cho việc cuộn ảnh
+  itemsToShow = 3;  // Số lượng ảnh hiển thị một lần
+  isPermitGiveRequestScheduleOrRequest = false;
+  permitMessageError = "";
+  isModalOverviewOpen = true;
+
+  appointmentForm = new FormGroup({
+    expected_date: new FormControl(''),
+    expected_hour: new FormControl(0),
+    name: new FormControl(''),
+    phone: new FormControl(''),
+    email: new FormControl(''),
+    type: new FormControl(true),
+    interest_level: new FormControl(true),
+  })
+
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -32,6 +60,12 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
   ){}
 
   async ngOnInit(): Promise<void> {
+    // Today
+    const now = new Date(); 
+    const month = ('0' + (now.getMonth() + 1)).slice(-2); 
+    const day = ('0' + now.getDate()).slice(-2); 
+    this.today = `${now.getFullYear()}-${month}-${day}`;
+
     if (typeof localStorage !== 'undefined') {
       if(this.authService.getAuthStatus()){
         this.user = (this.authService.getUserDetails());
@@ -43,7 +77,17 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
       this.postId = +params['id'];
     }))
     await this.loadPost()
+    await this.loadPermitContact();
     this.cdr.detectChanges();
+  }
+
+  async loadPermitContact(): Promise<void>{
+    try {
+      const response = await firstValueFrom(this.postService.requestPermitContact(this.userId,this.postId));
+      this.isPermitGiveRequestScheduleOrRequest = true
+    } catch (response:any) {
+      this.permitMessageError = response.error.message
+    }
   }
 
   async loadPost() : Promise<void>{
@@ -65,5 +109,199 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     }
   }
 
+  // Chỉnh ảnh con
 
+
+  // Hàm quay lại ảnh trước
+  prevImage() {
+    if(this.activeImageIndex!=0){
+      if(this.activeImageIndex==2){
+        this.activeImageIndex=1;
+      }else{
+        if(this.currChildImg==1){
+          this.activeImageIndex=0;
+        }
+      }
+      this.currChildImg--;
+    }
+    
+  }
+
+  // Hàm chuyển đến ảnh tiếp theo
+  nextImage() {
+    if(this.activeImageIndex!=2){
+      if(this.activeImageIndex==0){
+        this.activeImageIndex=1;
+      }else{
+        if(this.currChildImg==this.imageList.length-2){
+          this.activeImageIndex=2;
+        }
+      }
+      this.currChildImg++;
+    }
+  }
+
+  // Hàm lấy ra danh sách ảnh cần hiển thị
+  get visibleImages() {
+    let posStart = 0;
+
+    if(this.imageList.length>3){
+      if(this.currChildImg>0 && this.currChildImg<this.imageList.length-1 ){
+        posStart = this.currChildImg-1;
+      }else if(this.currChildImg==this.imageList.length-1){
+        posStart=this.currChildImg-3;
+      }
+    }
+    return this.imageList.slice(posStart, posStart + this.itemsToShow);  // Trả về 3 ảnh bắt đầu từ activeImageIndex
+  }
+
+  // Hàm để đặt ảnh hiện tại khi người dùng click vào một ảnh
+  setActiveImage(index: number,imageSrc: string) {
+    this.openModal(imageSrc); 
+    // Xét theo vị trí ban dầu
+    if(this.activeImageIndex==0){
+      this.currChildImg+=index
+    }else if(this.activeImageIndex==1){
+      if(index==0){
+        this.currChildImg--;
+      }else if(index==1){
+
+      }else{
+        this.currChildImg++;
+      }
+    }else{
+      if(index==0){
+        this.currChildImg-=2;
+      }else if(index==1){
+        this.currChildImg--;
+      }else{
+
+      }
+    }
+
+    this.activeImageIndex=index
+    if(index!=1){
+      // Lấy ảnh giữa khi chọn ảnh đầu ảnh cuối
+      this.activeImageIndex = 1; 
+      if(index==0 && this.currChildImg==0){
+        // Lấy ảnh dầu
+        this.activeImageIndex = 0
+      }else
+      if(index==2 && this.currChildImg==this.imageList.length-1){
+        // Lấy ảnh cuối
+        this.activeImageIndex = 2
+      }
+    }
+  }
+
+  // Hàm mở modal với ảnh được chọn
+  openModal(imageSrc: string) {
+    this.modalImageSrc = imageSrc;
+    this.isModalOpen = true;
+  }
+
+  // Hàm đóng modal khi người dùng click ra ngoài ảnh
+  closeModal(event: MouseEvent) {
+    this.isModalOpen = false;
+  }
+  toggleLike(post:any,event: Event) {
+    // Ngừng sự kiện click của biểu tượng trái tim để không bị bắt bởi thẻ cha
+    event.stopPropagation();
+    if(this.userId==-1){
+      this.snackbarService.notifyWarningUser("Vui lòng đăng nhập trước khi chọn quan tâm!")
+      return
+    }
+    if(post.interested){
+      post.interested = !post.interested;
+      const currInterested = post.interested ? 1: 0 
+      this.postService.changeInterested(post.data.id,this.userId,currInterested,0)
+        .subscribe({
+          next: (response) => this.snackbarService.notifySuccessUser(response),
+          error: (response) => this.snackbarService.notifyWarningUser(response.error.message)
+        })
+    }
+  }
+
+  chooseOptionInterested(post: any,notification: number,event: Event){
+    event.stopPropagation();
+    // Đảo ngược trạng thái isLiked
+    post.interested = !post.interested;
+
+    const currInterested = post.interested ? 1: 0 
+
+    this.postService.changeInterested(post.data.id,this.userId,currInterested,notification)
+      .subscribe({
+        next: (response) => this.snackbarService.notifySuccessUser(response),
+        error: (response) => this.snackbarService.notifyWarningUser(response.error.message)
+      })
+  }
+
+  toggleSchedule(event:Event){
+    event.stopPropagation();
+
+    if(this.userId==-1){
+      this.snackbarService.notifyWarningUser("Vui lòng đăng nhập trước khi chọn quan tâm!")
+      return
+    }
+
+    if(!this.isPermitGiveRequestScheduleOrRequest){
+      this.snackbarService.notifyErrorUser(this.permitMessageError)
+      return
+    }
+  }
+
+  submitSchedule(event:Event){
+    const emailPattern= /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const expected_date = this.appointmentForm.get("expected_date")?.value?.trim() || ""; 
+    const expected_hour = this.appointmentForm.get("expected_hour")?.value || 0; 
+    const name = this.appointmentForm.get("name")?.value?.trim() || ""; 
+    const phone = this.appointmentForm.get("phone")?.value?.trim() || ""; 
+    const email = this.appointmentForm.get("email")?.value?.trim() || ""; 
+    const type = this.appointmentForm.get("type")?.value; 
+    const interest_level = this.appointmentForm.get("interest_level")?.value; 
+    
+    if(expected_date==""){
+      this.snackbarService.notifyWarningUser("Vui lòng nhập ngày hẹn");
+    
+    }else if (expected_hour<0 || expected_hour>23) {
+      this.snackbarService.notifyWarningUser("Giờ hẹn không hợp lệ");
+    
+    }else if (name===""){
+      this.snackbarService.notifyWarningUser("Vui lòng nhập họ tên");
+
+    }else if (phone==="") {
+      this.snackbarService.notifyWarningUser("Vui lòng nhập số điện thoại");
+    
+    }else if (email==="") {
+      this.snackbarService.notifyWarningUser("Vui lòng nhập email");
+    
+    }else if(!emailPattern.test(email)){
+      this.snackbarService.notifyWarningUser("Email không hợp lệ");
+    
+    }else{
+      const typeVal = type? 1:0
+      const interestVal = interest_level? 1:0
+
+      console.log(this.postId,typeVal,expected_date,expected_hour,
+        name,phone,email,interestVal)
+      this.postService.makeSchedule(this.postId,typeVal,expected_date,expected_hour,
+        name,phone,email,interestVal
+      ).subscribe({
+        next: (response) => {
+          this.snackbarService.notifySuccessUser(response)
+          this.isModalOverviewOpen = false
+          this.cdr.detectChanges()
+
+        },
+        error: (response) =>{
+          console.log(response)
+          this.snackbarService.notifyWarningUser(response.error.message)
+        }
+      })
+    }
+  }
+
+  submitContact(event:Event){
+
+  }
 }

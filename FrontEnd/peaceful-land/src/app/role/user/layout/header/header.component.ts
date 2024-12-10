@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
@@ -13,12 +13,14 @@ export class HeaderComponent implements AfterViewInit{
   @ViewChild('navbar_collapse') navbarCollapse!: ElementRef;
 
   constructor(
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ){}
 
   ngAfterViewInit(): void {
     this.isLoggedIn = this.authService.getAuthStatus();
     this.isSaleOrUser = this.authService.getSaleOrUserStatus();
+    this.cdr.detectChanges()
   }
   
   @HostListener('window:scroll', ['$event'])

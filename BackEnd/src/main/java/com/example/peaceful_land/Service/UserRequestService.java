@@ -34,7 +34,7 @@ public class UserRequestService implements IUserRequestService {
             default -> throw new IllegalStateException("Trạng thái yêu cầu không hợp lệ");
         };
         return postRequests.stream()
-                .map(RequestPost::parsePostApprovalResponse)
+                .map(RequestPost::toPostApprovalResponse)
                 .toList();
     }
 
@@ -42,7 +42,7 @@ public class UserRequestService implements IUserRequestService {
     public ResponseUserPostReqView getPostRequestById(Long id) {
         RequestPost postRequest = requestPostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
-        return postRequest.parseResponseUserPostReqView();
+        return postRequest.toResponseUserPostReqView();
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.example.peaceful_land.Entity;
 import com.example.peaceful_land.DTO.PostApprovalResponse;
 import com.example.peaceful_land.DTO.ResponsePost;
 import com.example.peaceful_land.DTO.ResponseUserPostReqView;
+import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,11 +40,11 @@ public class RequestPost extends BaseEntity {
                 '}';
     }
 
-    public PostApprovalResponse parsePostApprovalResponse(){
+    public PostApprovalResponse toPostApprovalResponse(){
         return PostApprovalResponse.builder()
                 .id(getId())
-                .requestDate(getDateBegin())
-                .expiryDate(expiration)
+                .requestDate(getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))
+                .expiryDate(expiration.format(VariableUtils.FORMATTER_DATE))
                 .approved(approved)
                 .denyMessage(denyMessage)
                 .postId(post.getId())
@@ -53,14 +54,14 @@ public class RequestPost extends BaseEntity {
                 .build();
     }
 
-    public ResponseUserPostReqView parseResponseUserPostReqView() {
+    public ResponseUserPostReqView toResponseUserPostReqView() {
         return ResponseUserPostReqView.builder()
                 .id(getId())
                 .data(ResponsePost.fromPost(post))
-                .expiration(expiration)
+                .expiration(expiration.format(VariableUtils.FORMATTER_DATE))
                 .approved(approved)
                 .denyMessage(denyMessage)
-                .createdAt(getDateBegin())
+                .createdAt(getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))
                 .build();
     }
 }

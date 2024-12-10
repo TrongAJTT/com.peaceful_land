@@ -6,15 +6,13 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Data @Getter @Setter @Builder
 public class ResponseReqTour {
 
     private String type;
 
     @JsonProperty("expected_time")
-    private LocalDateTime expectedTime;
+    private String expectedTime;
     private String name;
     private String phone;
     private String email;
@@ -23,6 +21,6 @@ public class ResponseReqTour {
     private String interestLevel;
 
     @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    private String createdAt;
 
 }

@@ -52,7 +52,7 @@ public class RequestContact extends BaseEntity {
                 .email(getEmail())
                 .interestLevel(getInterestLevel())
                 .message(getMessage())
-                .createdAt(getDateBegin())
+                .createdAt(getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package com.example.peaceful_land.Entity;
 
 import com.example.peaceful_land.DTO.ResponsePostLog;
+import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,7 +35,7 @@ public class PostLog extends BaseEntity {
 
     public ResponsePostLog toResponsePostLog() {
         return ResponsePostLog.builder()
-                .createdAt(this.getDateBegin())
+                .createdAt(this.getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))
                 .title(this.title)
                 .description(this.description)
                 .thumbnail_url(this.thumbnUrl)

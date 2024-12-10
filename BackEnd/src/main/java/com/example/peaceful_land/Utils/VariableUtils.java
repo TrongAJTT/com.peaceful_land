@@ -71,6 +71,9 @@ public class VariableUtils {
     public static final String REQUEST_TYPE_CONTACT = "contact";
     public static final String REQUEST_TYPE_TOUR = "tour";
 
+    public static final DateTimeFormatter FORMATTER_DATE_TIME = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    public static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
     public static String getStringFromUploadType(int uploadType) {
         return switch (uploadType) {
             case TYPE_UPLOAD_AVATAR -> TYPE_UPLOAD_AVATAR_PATH;

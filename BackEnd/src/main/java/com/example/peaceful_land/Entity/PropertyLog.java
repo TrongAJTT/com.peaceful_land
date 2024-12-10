@@ -1,6 +1,7 @@
 package com.example.peaceful_land.Entity;
 
 import com.example.peaceful_land.DTO.ResponsePropertyLog;
+import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,7 +36,7 @@ public class PropertyLog extends BaseEntity {
     public ResponsePropertyLog toResponsePropertyLog() {
         return ResponsePropertyLog.builder()
                 .action(getAction())
-                .date(getDateBegin())
+                .date(getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))
                 .price(getPrice())
                 .build();
     }

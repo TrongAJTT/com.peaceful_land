@@ -54,4 +54,7 @@ public interface IAccountService {
 
     // Tạo yêu cầu rút tiền khỏi tài khoản
     String createWithdrawRequest(WithdrawRequest request);
+
+    // Xem lịch sử thanh toán
+    List<PurchaseView> viewPurchasesHistory(Long userId);
 }

@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Data @Getter @Setter @Builder
 public class ResponseReqContact {
 
@@ -20,6 +18,6 @@ public class ResponseReqContact {
     private String message;
 
     @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    private String createdAt;
 
 }

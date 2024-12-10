@@ -151,14 +151,14 @@ public class PostController {
     public ResponseEntity<?> requestTour(@PathVariable Long id, @RequestBody TourRequest request) {
         // Lấy thông tin bài rao
         Post tourPost = postService.checkPostExists(id);
-        return ResponseEntity.ok(postService.requestTour(tourPost.getId(), request));
+        return ResponseEntity.ok(gson.toJson(postService.requestTour(tourPost.getId(), request)));
     }
 
     @PostMapping("/{id}/request-contact")
     public ResponseEntity<?> requestContact(@PathVariable Long id, @RequestBody ContactRequest request) {
         // Lấy thông tin bài rao
         Post contactPost = postService.checkPostExists(id);
-        return ResponseEntity.ok(postService.requestContact(contactPost.getId(), request));
+        return ResponseEntity.ok(gson.toJson(postService.requestContact(contactPost.getId(), request)));
     }
 
     @PostMapping("/{id}/request-permission")

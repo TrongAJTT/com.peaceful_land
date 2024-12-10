@@ -46,9 +46,9 @@ public interface IPostService {
     // Kiểm tra có quyền yêu cầu xem nhà hay liên hệ hay không
     Object requestPermissionToContactAndTour(IdRequest request);
     // Yêu cầu xem nhà
-    Object requestTour(Long postId, TourRequest request);
+    String requestTour(Long postId, TourRequest request);
     // Yêu cầu liên hệ lại
-    Object requestContact(Long postId, ContactRequest request);
+    String requestContact(Long postId, ContactRequest request);
     // Xem yêu cầu người dùng trên 1 bài đăng
     Object viewUserRequestOnPost(Long postId, Long userId, String type);
     // Xem yêu cầu người dùng trên tất cả bài đăng

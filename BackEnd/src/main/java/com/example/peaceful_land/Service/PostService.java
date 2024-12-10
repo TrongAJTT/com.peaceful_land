@@ -237,7 +237,7 @@ public class PostService implements IPostService {
         // Cập nhật thông tin quan tâm, nếu như đã quan tâm (hoặc không quan tâm), mà nhấn lần nữa là xóa đi
         if (userInterest.getId() != null && userInterest.getInterested() == request.isInterested()) {
             userInterestRepository.delete(userInterest);
-            return userInterest.getInterested() ? "Đã xóa dữ liệu quan tâm" : "Đã xóa dữ liệu không quan tâm";
+            return userInterest.getInterested() ? "Đã hủy quan tâm" : "Đã hủy không quan tâm";
         }
         // Cập nhật thông tin quan tâm mới (hoặc tạo mới nếu chưa có) và lưu vào database
         userInterest.setUser(account);
@@ -245,7 +245,7 @@ public class PostService implements IPostService {
         userInterest.setInterested(request.isInterested());
         userInterest.setNotification(request.isNotification());
         userInterestRepository.save(userInterest);
-        return userInterest.getInterested() ? "Đã quan tâm bài đăng" : "Đã không quan tâm bài đăng";
+        return userInterest.getInterested() ? "Quan tâm bài đăng thành công" : "Không quan tâm bài đăng thành công";
     }
 
     @Override
@@ -566,7 +566,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public Object requestTour(Long postId, TourRequest request) {
+    public String requestTour(Long postId, TourRequest request) {
         // Kiểm tra người dùng
         Account account = accountRepository.findById(request.getUserId()).orElseThrow(UserNotFoundException::new);
         // Kiểm tra bài rao
@@ -585,7 +585,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public Object requestContact(Long postId, ContactRequest request) {
+    public String requestContact(Long postId, ContactRequest request) {
         // Kiểm tra người dùng
         Account account = accountRepository.findById(request.getUserId()).orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);

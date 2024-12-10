@@ -17,6 +17,9 @@ public class RequestContact extends BaseEntity {
     @ManyToOne @JoinColumn(name = "property_id")
     private Property property;
 
+    @ManyToOne @JoinColumn(name = "user_id")
+    private Account user;
+
     @Column
     private String name;
 
@@ -32,7 +35,7 @@ public class RequestContact extends BaseEntity {
     @Column
     private String message;
 
-    public static RequestContact fromContactRequestWithoutProperty(ContactRequest request) {
+    public static RequestContact fromContactRequestNoPropertyAccount(ContactRequest request) {
         return RequestContact.builder()
                 .name(request.getName())
                 .phone(request.getPhone())

@@ -13,6 +13,9 @@ public class TourRequest {
 
     private Byte type;   // 1 : directly tour, 0: homestay video call
 
+    @JsonProperty("user_id")
+    private Long userId;
+
     @JsonProperty("expected_date")
     private LocalDate expectedDate;
 

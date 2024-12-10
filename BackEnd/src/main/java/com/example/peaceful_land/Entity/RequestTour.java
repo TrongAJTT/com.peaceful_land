@@ -20,6 +20,9 @@ public class RequestTour extends BaseEntity {
     @ManyToOne @JoinColumn(name = "property_id")
     private Property property;
 
+    @ManyToOne @JoinColumn(name = "user_id")
+    private Account user;
+
     @Column(name = "tour_type")
     private String tourType;
 
@@ -38,7 +41,7 @@ public class RequestTour extends BaseEntity {
     @Column(name = "interest_level")
     private String interestLevel;
 
-    public static RequestTour fromTourRequestWithoutProperty(TourRequest request) {
+    public static RequestTour fromTourRequestNoPropertyAccount(TourRequest request) {
         return RequestTour.builder()
                 .tourType(request.getType() == 0 ? VariableUtils.REQUEST_TOUR_HOMESTAY : VariableUtils.REQUEST_TOUR_DIRECT)
                 .expectedTime(LocalDateTime.of(

@@ -547,6 +547,7 @@ public class PostService implements IPostService {
 
     @Override
     public Object requestPermissionToContactAndTour(IdRequest request) {
+        Account account = accountRepository.findById(request.getUserId()).orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(request.getPostId()).orElseThrow(PostNotFoundException::new);
         // Kiểm tra nếu bài rao đã bị ẩn
         if (post.getHide()) {
@@ -557,8 +558,8 @@ public class PostService implements IPostService {
             throw new RuntimeException("Bạn không thể yêu cầu liên hệ trên bài rao của chính mình");
         }
         // Kiểm tra xem trong 2 ngày qua có yêu cầu không?
-        if (requestContactRepository.existsByPropertyAndDateBeginBefore(post.getProperty(), LocalDateTime.now().plusDays(-2)) ||
-            requestTourRepository.existsByPropertyAndDateBeginAfter(post.getProperty(), LocalDateTime.now().plusDays(-2))) {
+        if (requestContactRepository.existsByPropertyAndUserAndDateBeginAfter(post.getProperty(), account, LocalDateTime.now().plusDays(-2)) ||
+            requestTourRepository.existsByPropertyAndUserAndDateBeginAfter(post.getProperty(), account, LocalDateTime.now().plusDays(-2))) {
             throw new RuntimeException("Bạn đã yêu cầu xem nhà hoặc liên hệ với bài rao này trong vòng 2 ngày qua");
         }
         return "Người dùng có quyền yêu cầu xem bất động sản hoặc yêu cầu liên hệ lại";
@@ -566,14 +567,18 @@ public class PostService implements IPostService {
 
     @Override
     public Object requestTour(Long postId, TourRequest request) {
+        // Kiểm tra người dùng
+        Account account = accountRepository.findById(request.getUserId()).orElseThrow(UserNotFoundException::new);
+        // Kiểm tra bài rao
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         // Kiểm tra nếu bài rao đã bị ẩn
         if (post.getHide()) {
             throw new RuntimeException("Bài rao chưa được duyệt hoặc đã bị xóa");
         }
         // Lấy thông tin bài rao
-        RequestTour requestTour = RequestTour.fromTourRequestWithoutProperty(request);
+        RequestTour requestTour = RequestTour.fromTourRequestNoPropertyAccount(request);
         requestTour.setProperty(post.getProperty());
+        requestTour.setUser(account);
         // Lưu yêu cầu
         requestTourRepository.save(requestTour);
         return "Tạo yêu cầu tham quan bất động sản thành công.";
@@ -581,14 +586,17 @@ public class PostService implements IPostService {
 
     @Override
     public Object requestContact(Long postId, ContactRequest request) {
+        // Kiểm tra người dùng
+        Account account = accountRepository.findById(request.getUserId()).orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         // Kiểm tra nếu bài rao đã bị ẩn
         if (post.getHide()) {
             throw new RuntimeException("Bài rao chưa được duyệt hoặc đã bị xóa");
         }
         // Lấy thông tin bài rao
-        RequestContact requestContact = RequestContact.fromContactRequestWithoutProperty(request);
+        RequestContact requestContact = RequestContact.fromContactRequestNoPropertyAccount(request);
         requestContact.setProperty(post.getProperty());
+        requestContact.setUser(account);
         // Lưu yêu cầu
         requestContactRepository.save(requestContact);
         return "Tạo yêu cầu liên hệ lại thành công";

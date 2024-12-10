@@ -9,6 +9,9 @@ import lombok.Setter;
 @Data @Getter @Setter @Builder
 public class ContactRequest {
 
+    @JsonProperty("user_id")
+    private Long userId;
+
     private String name;
 
     private String phone;

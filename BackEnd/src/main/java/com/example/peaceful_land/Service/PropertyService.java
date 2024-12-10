@@ -107,4 +107,11 @@ public class PropertyService implements IPropertyService {
         return "Lưu tập tin thành công";
     }
 
+    @Override
+    public List<String> getImages(Long propertyId) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(PropertyNotFoundException::new);
+        return propertyImageRepository.findAllByPropertyEquals(property)
+                .stream().map(PropertyImage::getFileUrl).toList();
+    }
 }

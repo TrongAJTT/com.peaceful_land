@@ -23,3 +23,7 @@
 .h-48{
     height: 48px;
 }
+
+.h-200{
+    height: 300px !important;
+}

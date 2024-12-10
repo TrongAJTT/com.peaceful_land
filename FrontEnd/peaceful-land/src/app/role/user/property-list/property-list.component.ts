@@ -6,6 +6,7 @@ import { ImageService } from '../../../core/services/image.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { User } from '../../../dto/user';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-property-list',
@@ -30,6 +31,7 @@ export class PropertyListComponent implements OnInit,AfterViewInit {
     private authService: AuthService,
     private imgService: ImageService,
     private snackbarService: SnackBarService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ){}
 
@@ -46,7 +48,6 @@ export class PropertyListComponent implements OnInit,AfterViewInit {
   
       const postList = await firstValueFrom(this.postService.searchPostByPage(this.userId,this.currentPage-1,this.sizePage))
       this.postList = postList.list_data
-      console.log(postList)
 
       for(var post of this.postList){
         this.changeToImg(post.data.thumbnUrl,post.data.id);
@@ -74,5 +75,7 @@ export class PropertyListComponent implements OnInit,AfterViewInit {
     this.loadPost();
   }
 
-
+  goToDetailPost(postId: number){
+    this.router.navigate([`/user/post_detail/${postId}`])
+  }
 }

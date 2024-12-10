@@ -14,7 +14,17 @@
         <div #navbar_collapse class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto">
                 <a (click)="toggleNavbarCollapse()" routerLink="home" class="nav-item nav-link active">Trang Chủ</a>
-                <a (click)="toggleNavbarCollapse()" routerLink="property_list" class="nav-item nav-link active">Danh sách bài đăng</a>
+                <!-- <a (click)="toggleNavbarCollapse()" routerLink="property_list" class="nav-item nav-link active">Danh sách bài đăng</a> -->
+                <div class="nav-item nav-link dropdown p-0">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" (click)="toggleNavbarCollapse()">
+                        Danh sách bài rao
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" [routerLink]="['property_list', 'sale']">Bán</a></li>
+                        <li><a class="dropdown-item" [routerLink]="['property_list', 'rent']">Cho thuê</a></li>
+                        <li><a class="dropdown-item" [routerLink]="['property_list', 'no_complete']">chưa bán/thuê</a></li>
+                    </ul>
+                </div>
                 <a *ngIf="isSaleOrUser" (click)="toggleNavbarCollapse()" routerLink="post_property" class="nav-item nav-link">Đăng bài</a>
                 <a (click)="toggleNavbarCollapse()" routerLink="login_and_register" class="nav-item nav-link">
                     <span *ngIf="isLoggedIn">Tài khoản</span>

@@ -16,10 +16,10 @@
                             </div>
 
                             <a *ngIf="!currPost.data.thumbnUrl || currPost.data.thumbnUrl === ''">
-                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100" (click)="openModal('/assets/img/house/house-demo.jpg')" src="/assets/img/house/house-demo.jpg" alt="">
+                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100 c-p" (click)="openModal('/assets/img/house/house-demo.jpg')" src="/assets/img/house/house-demo.jpg" alt="">
                             </a>
                             <a *ngIf="currPost.data.thumbnUrl">
-                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100" (click)="openModal(postsImages[currPost.data.id])" [src]="postsImages[currPost.data.id] || '/assets/img/house/house-demo.jpg'">
+                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100 c-p" (click)="openModal(postsImages[currPost.data.id])" [src]="postsImages[currPost.data.id] || '/assets/img/house/house-demo.jpg'">
                             </a>
                         </div>
 
@@ -67,18 +67,18 @@
                         <p class="mb-3"><strong>Diện tích: </strong>{{currPost.data.property.area}} mét vuông</p>
 
                         <p class="mb-3"><strong>Hướng nhà: </strong>
-                            <span *ngIf="!currPost.data.property.house_orientation">Chưa cập nhật</span>
-                            <span *ngIf="currPost.data.property.house_orientation">{{currPost.data.property.house_orientation}}</span>
+                            <span *ngIf="!currPost.data.property.house_orientation || currPost.data.property.house_orientation==''">Chưa cập nhật</span>
+                            <span *ngIf="currPost.data.property.house_orientation && currPost.data.property.house_orientation!=''">{{currPost.data.property.house_orientation}}</span>
                         </p>
                         <p class="mb-3"><strong>
                             Hướng ban công: </strong> 
-                            <span *ngIf="!currPost.data.property.balcony_orientation">Chưa cập nhật</span>
-                            <span *ngIf="currPost.data.property.house_orientation">{{currPost.data.property.balcony_orientation}}</span>
+                            <span *ngIf="!currPost.data.property.balcony_orientation || currPost.data.property.balcony_orientation==''">Chưa cập nhật</span>
+                            <span *ngIf="currPost.data.property.balcony_orientation && currPost.data.property.balcony_orientation!=''">{{currPost.data.property.balcony_orientation}}</span>
                         </p>
 
-                        <button (click)="toggleSchedule($event)" class="btn btn-danger btn-schedule mb-3" data-bs-toggle="modal" [attr.data-bs-target]="'#scheduleModal'+currPost.data.id">Lên lịch hẹn</button>
+                        <button (click)="toggleScheduleOrContact($event)" class="btn btn-danger btn-schedule mb-3" data-bs-toggle="modal" [attr.data-bs-target]="'#scheduleModal'+currPost.data.id">Lên lịch hẹn</button>
                         <br>
-                        <button class="btn btn-info btn-contact" data-bs-toggle="modal" [attr.data-bs-target]="'#contactModal'+currPost.data.id">Yêu cầu liên hệ</button>
+                        <button (click)="toggleScheduleOrContact($event)"  class="btn btn-info btn-contact" data-bs-toggle="modal" [attr.data-bs-target]="'#contactModal'+currPost.data.id">Yêu cầu liên hệ</button>
                     
                     </div>
 
@@ -247,15 +247,55 @@
     </div>
     
 
-    <div class="modal fade" *ngIf="userId!==-1" [id]="'contactModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal fade" *ngIf="userId!==-1 && isPermitGiveRequestScheduleOrRequest && isModalOverviewOpen" [id]="'contactModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header d-flex justify-content-between">
-                    <h5 class="modal-title text-center" id="contactModalLabel">Yêu cầu liên hệ</h5>
-                    <button type="button" class="btn btn-danger close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
+                <form [formGroup]="contactForm" (ngSubmit)="submitContact($event)">
+                    <div class="modal-header d-flex justify-content-between">
+                        <h5 class="modal-title text-center" id="contactModalLabel">Yêu cầu liên hệ</h5>
+                        <button type="button" class="btn btn-danger close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" >
+                        <div class="mb-3">
+                            <label for="name-contact" class="form-label">Họ tên</label>
+                            <input type="text" class="form-control" id="name-contact" formControlName="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone-contact" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="phone-contact" formControlName="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email-contact" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email-contact" formControlName="email">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="message-contact" class="form-label">Lời nhắn</label>
+                            <textarea type="text" class="form-control" id="message-contact" formControlName="message"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mức độ quan tâm</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="interestLevelTrue-contact" formControlName="interest_level" [value]="true">
+                                <label class="form-check-label" for="interestLevelTrue-contact">
+                                    Tôi muốn biết thêm thông tin chi tiết
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="interestLevelFalse-contact" formControlName="interest_level" [value]="false">
+                                <label class="form-check-label" for="interestLevelFalse-contact">
+                                    Tôi muốn mua/thuê bất động sản này
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"  data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" type="submit" class="btn btn-danger" >Gửi</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

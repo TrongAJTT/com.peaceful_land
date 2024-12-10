@@ -69,5 +69,34 @@ export class PostService {
       {user_id});
   }
 
+  changeInterested(postId: number, user_id: number, interested: number, notification: number): Observable<any>{
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.apiUrl}/${postId}/interest`, 
+      {user_id, interested,notification}, {headers});
+  }
 
+  requestPermitContact(user_id: number,postId: number): Observable<any>{
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.apiUrl}/${postId}/request-permission`, 
+      {user_id}, {headers});
+  }
+
+  makeSchedule(postId: number,type: number,expected_date:string,expected_hour: number,
+    name:string,phone: string,email: string,
+    interest_level:number): Observable<any>{
+      const token = this.authService.getToken();  // Lấy JWT từ AuthService
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      return this.http.post<any>(`${this.apiUrl}/${postId}/request-tour`, 
+        {type,expected_date,expected_hour,name,phone,email,interest_level}, {headers});
+    }
+
+    makeContact(postId:number,name:string, phone: string,email: string,
+      interest_level:number,message: string): Observable<any>{
+      const token = this.authService.getToken();  // Lấy JWT từ AuthService
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      return this.http.post<any>(`${this.apiUrl}/${postId}/request-tour`, 
+        {name,phone,email,interest_level,message}, {headers});
+    }
 }

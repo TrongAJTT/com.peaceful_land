@@ -17,3 +17,141 @@
     margin-bottom: 0; /* Loại bỏ khoảng cách dưới của h5 */
   }
   
+
+  /* xử lí ảnh con */
+  /* Cấu trúc flex cho danh sách ảnh */
+.image-gallery {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  justify-content: center;
+}
+
+.image-item {
+  flex: 0 0 auto;
+  margin-right: 10px;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Đảm bảo ảnh con có cùng kích thước */
+.image-item img {
+  width: 160px; /* Kích thước của ảnh con */
+  height: 160px; /* Kích thước của ảnh con */
+  object-fit: cover;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Hiển thị ảnh hiện tại với độ sáng bình thường */
+.image-item.active img {
+  opacity: 1;
+}
+
+/* Mờ các ảnh không active */
+.image-item.inactive img {
+  opacity: 0.5;
+}
+
+/* Tạo vùng bấm cho nút chuyển ảnh */
+.btn-direction{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+
+/* Đảm bảo responsive */
+@media (max-width: 767px) {
+  .image-item img {
+    width: 60px; /* Kích thước ảnh con nhỏ hơn trên màn hình nhỏ */
+    height: 60px;
+  }
+}
+
+
+/* CSS cho modal */
+.modal-child-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Nền mờ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Đảm bảo modal luôn hiển thị trên các thành phần khác */
+}
+
+.modal-child-image-content {
+  background-color: white;
+  padding: 20px;
+  width: 86%;
+  height: 86%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+
+}
+
+.modal-child-image-img {
+  width: 90%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
+.heart-icon {
+  cursor: pointer;
+  z-index: 10;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px; /* Tăng không gian xung quanh biểu tượng */
+  background-color: rgba(255, 255, 255, 0.6); /* Lớp phủ nền nhẹ để tạo sự dễ bấm */
+  border-radius: 50%; /* Tạo viền tròn */
+  border: 3px solid rgba(0, 0, 0, 0.2); /* Viền mờ để tạo sự nổi bật */
+}
+
+.heart-icon i {
+font-size: 24px; /* Tăng kích thước trái tim */
+}
+
+.heart-icon:hover {
+background-color: rgba(255, 255, 255, 0.8); /* Màu nền thay đổi khi hover */
+}
+
+.heart-icon:active {
+background-color: rgba(255, 255, 255, 1); /* Màu nền khi bấm */
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close {
+  margin-left: auto;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.btn-contact, .btn-schedule{
+  width: 180px;
+  height: 50px;
+}

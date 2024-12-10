@@ -27,3 +27,29 @@
 .h-200{
     height: 300px !important;
 }
+
+.heart-icon {
+    cursor: pointer;
+    z-index: 10;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 10px; /* Tăng không gian xung quanh biểu tượng */
+    background-color: rgba(255, 255, 255, 0.6); /* Lớp phủ nền nhẹ để tạo sự dễ bấm */
+    border-radius: 50%; /* Tạo viền tròn */
+    border: 3px solid rgba(0, 0, 0, 0.2); /* Viền mờ để tạo sự nổi bật */
+  }
+  
+.heart-icon i {
+font-size: 24px; /* Tăng kích thước trái tim */
+}
+
+.heart-icon:hover {
+background-color: rgba(255, 255, 255, 0.8); /* Màu nền thay đổi khi hover */
+}
+
+.heart-icon:active {
+background-color: rgba(255, 255, 255, 1); /* Màu nền khi bấm */
+}
+  
+  

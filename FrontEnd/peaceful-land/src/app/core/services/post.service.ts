@@ -59,9 +59,9 @@ export class PostService {
   }
 
 
-  searchPostByPage(userId: number,page: number, size: number): Observable<any>{
+  searchPostByPage(userId: number,offer: boolean,status: boolean,page: number, size: number): Observable<any>{
     return this.http.post<any>(`${this.apiUrl}/search?page=${page}&size=${size}`, 
-      {userId});
+      {userId,offer,status});
   }
 
   getPostById(user_id: number, postId: number): Observable<any>{
@@ -92,11 +92,11 @@ export class PostService {
         {type,expected_date,expected_hour,name,phone,email,interest_level}, {headers});
     }
 
-    makeContact(postId:number,name:string, phone: string,email: string,
-      interest_level:number,message: string): Observable<any>{
-      const token = this.authService.getToken();  // Lấy JWT từ AuthService
-      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-      return this.http.post<any>(`${this.apiUrl}/${postId}/request-tour`, 
-        {name,phone,email,interest_level,message}, {headers});
-    }
+  makeContact(postId:number,name:string, phone: string,email: string,
+    interest_level:number,message: string): Observable<any>{
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.apiUrl}/${postId}/request-contact`, 
+      {name,phone,email,interest_level,message}, {headers});
+  }
 }

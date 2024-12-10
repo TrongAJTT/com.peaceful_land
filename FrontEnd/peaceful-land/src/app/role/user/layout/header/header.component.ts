@@ -1,5 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -14,7 +15,8 @@ export class HeaderComponent implements AfterViewInit{
 
   constructor(
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router:Router
   ){}
 
   ngAfterViewInit(): void {
@@ -39,4 +41,5 @@ export class HeaderComponent implements AfterViewInit{
       this.navbarCollapse.nativeElement.classList.add("show")
     }
   }
+
 }

@@ -11,7 +11,7 @@ const routes: Routes = [
   {path: "", component: DefaultComponent,children: [
     { path: "home", component: HomeComponent, pathMatch: "full" },
     { path: 'login_and_register', component: LoginAndRegisterComponent},
-    { path: 'property_list', component: PropertyListComponent},
+    { path: 'property_list/:type', component: PropertyListComponent},
     { path: 'post_detail/:id', component: PostDetailComponent},
     { path: 'post_property', component: PostPropertyComponent},
     { path: "**", redirectTo: "home", pathMatch: "full"},

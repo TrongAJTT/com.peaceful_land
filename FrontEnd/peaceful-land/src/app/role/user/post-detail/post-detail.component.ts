@@ -8,6 +8,7 @@ import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ImageService } from '../../../core/services/image.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import e from 'express';
 
 @Component({
   selector: 'app-post-detail',
@@ -49,6 +50,13 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     interest_level: new FormControl(true),
   })
 
+  contactForm = new FormGroup({
+    name: new FormControl(''),
+    phone: new FormControl(''),
+    email: new FormControl(''),
+    message: new FormControl(''),
+    interest_level: new FormControl(true),
+  })
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -78,7 +86,18 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     }))
     await this.loadPost()
     await this.loadPermitContact();
+    await this.loadInfoUserFormGroup();
     this.cdr.detectChanges();
+  }
+
+  async loadInfoUserFormGroup(): Promise<void>{
+    this.appointmentForm.get("name")?.setValue(this.user.name);
+    this.appointmentForm.get("phone")?.setValue(this.user.phone);
+    this.appointmentForm.get("email")?.setValue(this.user.email);
+
+    this.contactForm.get("name")?.setValue(this.user.name);
+    this.contactForm.get("phone")?.setValue(this.user.phone);
+    this.contactForm.get("email")?.setValue(this.user.email);
   }
 
   async loadPermitContact(): Promise<void>{
@@ -149,7 +168,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
       if(this.currChildImg>0 && this.currChildImg<this.imageList.length-1 ){
         posStart = this.currChildImg-1;
       }else if(this.currChildImg==this.imageList.length-1){
-        posStart=this.currChildImg-3;
+        posStart=this.currChildImg-2;
       }
     }
     return this.imageList.slice(posStart, posStart + this.itemsToShow);  // Trả về 3 ảnh bắt đầu từ activeImageIndex
@@ -236,7 +255,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
       })
   }
 
-  toggleSchedule(event:Event){
+  toggleScheduleOrContact(event:Event){
     event.stopPropagation();
 
     if(this.userId==-1){
@@ -261,7 +280,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     const interest_level = this.appointmentForm.get("interest_level")?.value; 
     
     if(expected_date==""){
-      this.snackbarService.notifyWarningUser("Vui lòng nhập ngày hẹn");
+      this.snackbarService.notifyWarningUser("Vui lòng chọn ngày hẹn");
     
     }else if (expected_hour<0 || expected_hour>23) {
       this.snackbarService.notifyWarningUser("Giờ hẹn không hợp lệ");
@@ -281,9 +300,6 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     }else{
       const typeVal = type? 1:0
       const interestVal = interest_level? 1:0
-
-      console.log(this.postId,typeVal,expected_date,expected_hour,
-        name,phone,email,interestVal)
       this.postService.makeSchedule(this.postId,typeVal,expected_date,expected_hour,
         name,phone,email,interestVal
       ).subscribe({
@@ -291,7 +307,6 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
           this.snackbarService.notifySuccessUser(response)
           this.isModalOverviewOpen = false
           this.cdr.detectChanges()
-
         },
         error: (response) =>{
           console.log(response)
@@ -302,6 +317,42 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
   }
 
   submitContact(event:Event){
+    const emailPattern= /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const name = this.contactForm.get("name")?.value?.trim() || ""; 
+    const phone = this.contactForm.get("phone")?.value?.trim() || ""; 
+    const email = this.contactForm.get("email")?.value?.trim() || ""; 
+    const message = this.contactForm.get("message")?.value?.trim() || ""; 
+    const interest_level = this.contactForm.get("interest_level")?.value; 
 
+    if (name===""){
+      this.snackbarService.notifyWarningUser("Vui lòng nhập họ tên");
+
+    }else if (phone==="") {
+      this.snackbarService.notifyWarningUser("Vui lòng nhập số điện thoại");
+    
+    }else if (email==="") {
+      this.snackbarService.notifyWarningUser("Vui lòng nhập email");
+    
+    }else if(!emailPattern.test(email)){
+      this.snackbarService.notifyWarningUser("Email không hợp lệ");
+    
+    }else if(message==""){
+      this.snackbarService.notifyWarningUser("Vui lòng nhập lời nhắn");
+    
+    }else{
+      const interestVal = interest_level? 1:0
+      this.postService.makeContact(this.postId,name,phone,email,interestVal,message)
+        .subscribe({
+        next: (response) => {
+          this.snackbarService.notifySuccessUser(response)
+          this.isModalOverviewOpen = false
+          this.cdr.detectChanges()
+        },
+        error: (response) =>{
+          console.log(response)
+          this.snackbarService.notifyWarningUser(response.error.message)
+        }
+      })
+    }
   }
 }

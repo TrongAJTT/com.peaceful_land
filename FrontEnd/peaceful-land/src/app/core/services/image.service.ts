@@ -15,4 +15,8 @@ export class ImageService {
   changeToImgBase64(nameImg: string): Observable<any>{
     return this.http.get<any>(`${this.apiUrl}/base64?path=${nameImg}`);
   }
+
+  changeToImgServer(nameImg: string): Observable<any>{
+    return this.http.get<any>(`${this.apiUrl}/path=${nameImg}`);
+  }
 }

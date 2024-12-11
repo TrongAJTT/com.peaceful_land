@@ -1,3 +1,4 @@
+
 .product-price .badge {
     font-size: 1.2rem;
     padding: 0.5rem;
@@ -185,4 +186,132 @@ background-color: rgba(255, 255, 255, 1); /* Màu nền khi bấm */
 .bg-light{
   --bs-bg-opacity: 1;
   background-color: #b1c8e0 !important;
+}
+/* Đảm bảo bảng chiếm toàn bộ chiều rộng và có không gian giữa các cột */
+table {
+  width: 100%;
+  margin-top: 30px;
+  border-collapse: collapse;
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1); /* Thêm bóng nhẹ */
+}
+
+/* Định dạng tiêu đề của bảng */
+th {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 15px;
+  font-size: 16px;
+  text-align: left;
+  text-transform: uppercase; /* Chữ hoa cho tiêu đề */
+  letter-spacing: 1px; /* Khoảng cách chữ */
+  border-top-left-radius: 8px; /* Bo tròn góc trên trái */
+  border-top-right-radius: 8px; /* Bo tròn góc trên phải */
+}
+
+/* Định dạng các ô dữ liệu */
+td {
+  background-color: #f9f9f9;
+  padding: 12px 15px;
+  text-align: left;
+  font-size: 14px;
+  color: #555;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Đổi màu các ô khi hover */
+tr:hover td {
+  background-color: #f1f1f1;
+  cursor: pointer; /* Thêm hiệu ứng con trỏ */
+  transform: scale(1.02); /* Thêm hiệu ứng mở rộng nhẹ */
+  transition: all 0.3s ease; /* Thêm chuyển động mượt mà */
+}
+
+/* Thêm màu nền cho các dòng chẵn */
+tr:nth-child(even) td {
+  background-color: #f2f2f2;
+}
+
+/* Thêm một dòng viền dưới cho các dòng cuối cùng */
+tr:last-child td {
+  border-bottom: 2px solid #4CAF50;
+}
+
+/* Tạo hiệu ứng bóng cho bảng */
+table {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px; /* Bo tròn các góc bảng */
+  overflow: hidden; /* Đảm bảo không bị tràn khi bo góc */
+}
+
+/* Định dạng cột giá */
+td:last-child {
+  font-weight: bold;
+  color: #FF5733;
+}
+
+/* Định dạng cho các ô dữ liệu trong bảng khi có hover */
+td:hover {
+  background-color: #d9d9d9;
+}
+
+/* Định dạng bảng khi không có dữ liệu */
+td:empty {
+  background-color: #f2f2f2;
+  color: #ccc;
+}
+
+
+/* Định dạng cho nút "Xem thêm" */
+.toggle-btn {
+  padding: 6px 15px;  /* Điều chỉnh padding cho nút nhỏ hơn */
+  font-size: 14px;  /* Kích thước font chữ vừa phải */
+  font-weight: 500;  /* Độ đậm của chữ vừa phải */
+  border-radius: 5px;  /* Tạo góc tròn nhẹ cho nút */
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Hiệu ứng chuyển động khi hover */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng nhẹ */
+  background-color: #28a745;  /* Màu xanh lá cho nút "Xem thêm" */
+  color: white;  /* Màu chữ trắng */
+  width: auto;  /* Nút không chiếm toàn bộ chiều rộng */
+  margin: 10px 0;  /* Cách nút với bảng */
+  display: inline-block;  /* Hiển thị nút trên cùng dòng */
+  text-align: center;
+}
+
+/* Khi hover vào nút */
+.toggle-btn:hover {
+  background-color: #218838;  /* Xanh đậm hơn khi hover */
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2); /* Bóng đậm hơn khi hover */
+  transform: translateY(-1px);  /* Di chuyển lên khi hover */
+}
+
+/* Nút "Ẩn đi" khi tất cả được hiển thị */
+.toggle-btn.btn-secondary {
+  background-color: #6c757d;  /* Màu xám cho nút "Ẩn đi" */
+  color: white;
+}
+
+/* Khi hover vào nút "Ẩn đi" */
+.toggle-btn.btn-secondary:hover {
+  background-color: #5a6268;  /* Xám đậm hơn khi hover */
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2); /* Bóng đậm khi hover */
+  transform: translateY(-1px);  /* Di chuyển lên khi hover */
+}
+
+/* Giới hạn chiều rộng của nút */
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* Căn phải */
+}
+
+
+.img-thumbnail {
+  width: 150px;  /* Adjust this value as needed */
+  height: auto;  /* Keeps the aspect ratio intact */
+  object-fit: cover;  /* Ensures the image fills the container without stretching */
 }

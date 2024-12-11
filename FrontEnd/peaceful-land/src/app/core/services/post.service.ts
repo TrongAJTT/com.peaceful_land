@@ -95,4 +95,12 @@ export class PostService{
     return this.http.post<any>(`${this.apiUrl}/${postId}/request-contact`, 
       {user_id,name,phone,email,interest_level,message}, {headers});
   }
+
+  getLogsOfPro(proId: number): Observable<any>{
+    return this.http.get<any>(`${this.apiUrl}/${proId}/property-logs`);
+  }
+
+  getLogsOfPost(proId: number): Observable<any>{
+    return this.http.get<any>(`${this.apiUrl}/${proId}/post-logs`);
+  }
 }

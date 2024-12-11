@@ -3,7 +3,7 @@
     <nav class="navbar navbar-expand-lg bg-white navbar-light py-0 px-4">
         <a routerLink="home" class="navbar-brand d-flex align-items-center text-center">
             <div class="icon p-2 me-2">
-                <img class="img-fluid" src="/assets/img/icon-deal.png" alt="Icon" style="width: 30px; height: 30px;">
+                <img class="img-fluid" src="/assets/img/icon-house-demo.png" alt="Icon" style="width: 30px; height: 30px;">
             </div>
             <h3 class="m-0 text-primary">Peaceful Land</h3>
         </a>
@@ -25,7 +25,19 @@
                         <li><a class="dropdown-item" [routerLink]="['property_list', 'no_complete']">chưa bán/thuê</a></li>
                     </ul>
                 </div>
-                <a *ngIf="isSaleOrUser" (click)="toggleNavbarCollapse()" routerLink="post_property" class="nav-item nav-link">Đăng bài</a>
+                <div class="nav-item nav-link dropdown p-0">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" (click)="toggleNavbarCollapse()">
+                        Quản lý bài rao
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li>
+                            <a class="dropdown-item" *ngIf="isSaleOrUser" (click)="toggleNavbarCollapse()" routerLink="post_property">Tạo bài rao</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" *ngIf="isSaleOrUser" (click)="toggleNavbarCollapse()" routerLink="post_dashboard">Danh sách bài rao</a>
+                        </li>
+                    </ul>
+                </div>
                 <a (click)="toggleNavbarCollapse()" routerLink="login_and_register" class="nav-item nav-link">
                     <span *ngIf="isLoggedIn">Tài khoản</span>
                     <span *ngIf="!isLoggedIn">Đăng nhập</span>
@@ -34,4 +46,3 @@
         </div>
     </nav>
 </div>
-<!-- Navbar End -->

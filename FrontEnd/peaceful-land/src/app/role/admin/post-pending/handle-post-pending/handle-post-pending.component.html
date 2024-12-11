@@ -147,6 +147,78 @@
                 </div>
             </div>
         </div>
+
+        <div class="row g-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="text-success"><i class="fa-solid fa-house-flag"></i> Lịch sử bất động sản</h2>
+                <div class="button-container">
+                    <button
+                        class="btn toggle-btn"
+                        [ngClass]="showAllProLog ? 'btn-secondary' : 'btn-success'"
+                        (click)="toggleViewPro()">
+                        <i  [ngClass]="showAllProLog ? 'fa-solid fa-minus' : 'fa-solid fa-plus'"></i> 
+                        {{ showAllProLog ? 'Ẩn đi' : 'Xem thêm' }}
+                    </button>
+                </div>
+            </div>
+            <table *ngIf="dataProLog && dataProLog.length>0" class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Ngày</th>
+                  <th>Hành động</th>
+                  <th>Giá</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of displayedData">
+                  <td>{{ item.date }}</td>
+                  <td>{{ item.action }}</td>
+                  <td>{{ item.price | number:'1.0-0' }} VNĐ</td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
+
+
+        <div class="row g-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="text-success"><i class="fa-solid fa-signs-post"></i> Lịch sử bài đăng</h2>
+                <div class="button-container">
+                    <button
+                        class="btn toggle-btn"
+                        [ngClass]="showAllPostLog ? 'btn-secondary' : 'btn-success'"
+                        (click)="toggleViewPost()">
+                        <i [ngClass]="showAllPostLog ? 'fa-solid fa-minus' : 'fa-solid fa-plus'"></i> 
+                        {{ showAllPostLog ? 'Ẩn đi' : 'Xem thêm' }}
+                    </button>
+                </div>
+            </div>
+            
+            <table class="table table-striped"  *ngIf="dataPostLog && dataPostLog !=[]">
+                <thead>
+                    <tr>
+                        <th>Ảnh</th>
+                        <th>Tiêu đề</th>
+                        <th>Mô tả</th>
+                        <th>Ngày tạo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let post_log of displayedDataPost">
+                        <td>
+                            <img (click)="openModal(post_log.thumbnail_url)"
+                              [src]="post_log.thumbnail_url" 
+                              alt="Thumbnail" 
+                              class="img-thumbnail"
+                              (error)="onImageError(post_log)" />
+                          </td>
+                        <td>{{ post_log.title }}</td>
+                        <td>{{ post_log.description }}</td>
+                        <td>{{ post_log.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <!-- Single Product End -->

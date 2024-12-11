@@ -27,25 +27,24 @@ public class SecurityConfig  {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
-                        // Allow access to /auth/register and /auth/login without JWT TODO: đổi các đường dẫn theo login
+                        // Allow access to /auth/register and /auth/login without JWT
                         .requestMatchers(
-                                //Các request không dùng Jwt
-                                "/auth/register",
-                                "/auth/login",
-                                //Loại request dùng jwt lấy tất cả đường dẫn con  TODO: đây chỉ là mẫu vui lòng sửa lại
-                                "/user-requests/**",
-                                "/products/**",
-                                //Loại request dùng jwt lấy đúng đường dẫn TODO: đây chỉ là mẫu vui lòng sửa lại
-                                "/colors",
-                                "/brands",
-                                "/categories"
+                                "/auth/**"
                         ).permitAll()
 
-                        .requestMatchers( HttpMethod.POST,"/posts/find-nearest-*"   ).permitAll()
-                        .requestMatchers( HttpMethod.POST,"/posts/search**"         ).permitAll()
-                        .requestMatchers( HttpMethod.POST,"/posts/*"                ).permitAll()
-                        .requestMatchers( HttpMethod.GET,"/images/**"               ).permitAll()
-                        .requestMatchers( HttpMethod.GET,"/properties/*/get-images" ).permitAll()
+                        .requestMatchers( HttpMethod.POST,
+                                "/posts/find-nearest-*",
+                                "/posts/search**",
+                                "/posts/*",
+                                "/posts/*/request-permission"
+                        ).permitAll()
+
+                        .requestMatchers( HttpMethod.GET,
+                                "/images/**",
+                                "/properties/*/get-images",
+                                "/posts/*/property-logs",
+                                "/posts/*/post-logs"
+                        ).permitAll()
 
                         // Secure the API endpoints that require JWT
                         .requestMatchers("/api/**").authenticated()  // Protect /api/** endpoints

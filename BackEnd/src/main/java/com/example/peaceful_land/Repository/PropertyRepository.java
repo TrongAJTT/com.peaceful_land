@@ -15,5 +15,6 @@ public interface PropertyRepository extends JpaRepository<Property, Long>, JpaSp
     long countByUserEquals(Account account);
     long countByDateBeginBetweenAndUserEquals(LocalDateTime dateBegin, LocalDateTime dateEnd, Account account);
     List<Property> findByUserEquals(Account account);
+    List<Property> findByUserEqualsAndHideEquals(Account account, boolean hide);
     Page<Property> findAll(Specification<Property> spec, Pageable pageable);
 }

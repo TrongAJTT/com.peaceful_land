@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -707,6 +709,75 @@ public class PostService implements IPostService {
         return "Gia hạn bài rao thành công. Số ngày gia hạn: " + request.getDayExpand() + ". Số tiền trừ: " + price;
     }
 
+    @Override
+    public List<ResponsePost> viewUserPosts(Long userId) {
+        Account account = accountRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        List<Property> listProperties = propertyRepository.findByUserEqualsAndHideEquals(account, false);
+        List<ResponsePost> listPosts = new ArrayList<>();
+        for (Property property : listProperties) {
+            Post post = postRepository.findByProperty(property);
+            if (post != null) {
+                listPosts.add(ResponsePost.fromPost(post));
+            }
+        }
+        return listPosts;
+    }
 
+    public void SYSTEM_scanAndDeleteUnusedThumbs() {
+        new Thread(() -> {
+            List<String> listThumbs = postRepository.findAllThumbnails().stream()
+                            .filter(avt -> !avt.equals(VariableUtils.IMAGE_NA)).toList();
+            List<String> listLogThumbs = postLogRepository.findAllThumbnails().stream()
+                            .filter(avt -> !avt.equals(VariableUtils.IMAGE_NA)).toList();
+            Path uploadDir = Path.of(VariableUtils.UPLOAD_DIR_POST_THUMB);
+            try {
+                // Lấy danh sách tất cả các tệp trong thư mục uploads/thumbns
+                List<Path> allFiles = Files.walk(uploadDir)
+                        .filter(Files::isRegularFile) // Chỉ lấy các tệp, không lấy thư mục
+                        .toList();
+
+                // Xóa tệp trên server nếu không nằm trong listThumbs
+                for (Path file : allFiles) {
+                    String fileName = file.getFileName().toString();
+                    // Kiểm tra xem tệp có nằm trong listThumbs không
+                    if (!listThumbs.contains(VariableUtils.UPLOAD_DIR_POST_POSTFIX + fileName) &&
+                            !listLogThumbs.contains(VariableUtils.UPLOAD_DIR_POST_POSTFIX + fileName)) {
+                        Files.delete(file);
+                        System.out.println(VariableUtils.getServerScanPrefix() + "Delete unused post thumbnail " + file);
+                    }
+                }
+
+                // Đổi tệp trên database nếu không nằm trong server
+                for (String thumb : listThumbs) {
+                    Path thumbPath = Path.of(uploadDir.toString(), thumb.split("/")[1]);
+                    if (!Files.exists(thumbPath)) {
+                        Optional<Post> post = postRepository.findByThumbnUrl(thumb);
+                        if (post.isPresent()){
+                            post.get().setThumbnUrl(VariableUtils.IMAGE_NA);
+                            postRepository.save(post.get());
+                            System.out.println(VariableUtils.getServerScanPrefix() + "Change thumbnail of post " + post.get().getId() + " to default on database");
+                        }
+                    }
+                }
+
+                for (String logThumb : listLogThumbs){
+                    Path logThumbnPath = Path.of(uploadDir.toString(), logThumb.split("/")[1]);
+                    if (!Files.exists(logThumbnPath)){
+                        List<PostLog> postLogList = postLogRepository.findByThumbnUrl(logThumb);
+                        for(PostLog postLog : postLogList) {
+                            postLog.setThumbnUrl(VariableUtils.IMAGE_NA);
+                            postLogRepository.save(postLog);
+                            System.out.println(VariableUtils.getServerScanPrefix() + "Change thumbnail of post log " + postLog.getId() + " to default on database");
+                        }
+                    }
+                }
+
+                System.out.println(">>>\n" + VariableUtils.getServerStatPrefix() + "Scan and delete unused post thumbnail completed\n<<<");
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
 
 }

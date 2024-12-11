@@ -199,4 +199,9 @@ public class PostController {
         return ok(gson.toJson(postService.extendPost(id, request)));
     }
 
+    @PostMapping("/my-posts")
+    public ResponseEntity<?> getMyPosts(@RequestBody IdRequest request) {
+        return ok(postService.viewUserPosts(request.getUserId()));
+    }
+
 }

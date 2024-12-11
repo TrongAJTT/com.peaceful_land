@@ -32,7 +32,7 @@ public interface IAccountService {
     void resetPassword(String email, String newPassword);
 
     // Mua vai trò
-    Account purchaseRole(PurchaseRoleRequest id);
+    String purchaseRole(PurchaseRoleRequest id);
 
     // Thay đổi avatar
     String changeAvatar(ChangeAvatarRequest request);

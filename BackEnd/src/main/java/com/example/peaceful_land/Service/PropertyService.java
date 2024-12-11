@@ -12,12 +12,16 @@ import com.example.peaceful_land.Repository.PropertyLogRepository;
 import com.example.peaceful_land.Repository.PropertyRepository;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_PROPERTY_IMAGE;
 
@@ -114,4 +118,47 @@ public class PropertyService implements IPropertyService {
         return propertyImageRepository.findAllByPropertyEquals(property)
                 .stream().map(PropertyImage::getFileUrl).toList();
     }
+
+    @Transactional
+    public void SYSTEM_scanAndDeleteUnusedImages() {
+        new Thread(() -> {
+            List<String> listImg = propertyImageRepository.findAllThumbnails().stream()
+                    .filter(thum -> !thum.equals(VariableUtils.IMAGE_NA)).toList();
+            Path uploadDir = Path.of(VariableUtils.UPLOAD_DIR_PROP_IMG);
+            try {
+                // Lấy danh sách tất cả các tệp trong thư mục uploads/avatars
+                List<Path> allFiles = Files.walk(uploadDir)
+                        .filter(Files::isRegularFile) // Chỉ lấy các tệp, không lấy thư mục
+                        .toList();
+
+                // Xóa tệp trên server nếu không nằm trong listAvatars
+                for (Path file : allFiles) {
+                    String fileName = file.getFileName().toString();
+                    // Kiểm tra xem tệp có nằm trong listAvatars không
+                    if (!listImg.contains(VariableUtils.UPLOAD_DIR_PROP_POSTFIX + fileName)) {
+                        // Xóa tệp nếu không nằm trong danh sách
+                        Files.delete(file);
+                        System.out.println(VariableUtils.getServerScanPrefix() + "Delete unused property images on server storage " + file);
+                    }
+                }
+
+                // Xóa tệp trong database nếu không nằm trong server
+                for (String thumb : listImg) {
+                    Path thumbPath = Path.of(uploadDir.toString(), thumb.split("/")[1]);
+                    if (!Files.exists(thumbPath)) {
+                        System.out.println(thumb);
+                        Optional<PropertyImage> propertyImage = propertyImageRepository.findByFileUrl(thumb);
+                        propertyImage.ifPresent(propertyImageRepository::delete);
+                        System.out.println(VariableUtils.getServerScanPrefix() + "Delete unused property images on database " + thumbPath);
+                    }
+                }
+
+                System.out.println(">>>\n" + VariableUtils.getServerScanPrefix() + "Scan and delete unused property images completed\n<<<");
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
 }

@@ -5,6 +5,8 @@ import com.example.peaceful_land.Entity.Post;
 import com.example.peaceful_land.Entity.Property;
 import com.example.peaceful_land.Entity.RequestPost;
 
+import java.util.List;
+
 public interface IPostService {
     // Tạo bài rao
     Post createPost(PostRequest request);
@@ -57,4 +59,6 @@ public interface IPostService {
     Object sendReportRequest(Long postId, ReportRequest request);
     // Gia hạn bài đăng
     Object extendPost(Long postId, ExtendPostRequest request);
+    // Xem danh sách bài rao của một người
+    List<ResponsePost> viewUserPosts(Long userId);
 }

@@ -409,7 +409,6 @@ public class AccountService implements IAccountService{
                 for (String avatar : listAvatars) {
                     Path thumbPath = Path.of(uploadDir.toString(), avatar.split("/")[1]);
                     if (!Files.exists(thumbPath)) {
-                        System.out.println(avatar);
                         Optional<Account> account = accountRepository.findByAvatarUrl(avatar);
                         if (account.isPresent()){
                             account.get().setAvatarUrl(VariableUtils.DEFAULT_AVATAR);

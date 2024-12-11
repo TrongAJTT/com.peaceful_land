@@ -18,7 +18,7 @@ public class Application {
 		accountService.encodeOldPassword();
 
 		ScheduledTasks scheduledTasks = applicationContext.getBean(ScheduledTasks.class);
-		scheduledTasks.processDataAtStartOfDay();
+		scheduledTasks.handleExpiredData();
 		scheduledTasks.deleteUnusedImages();
 	}
 }

@@ -39,7 +39,7 @@ public class AccountService implements IAccountService{
     public AccountInfoResponse getAccountInfo(Long userId) {
         return accountRepository.findById(userId)
                 .map(AccountInfoResponse::from)
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+                .orElseThrow(AccountNotFoundException::new);
     }
 
     public List<Account> getAccounts(){
@@ -370,5 +370,15 @@ public class AccountService implements IAccountService{
                 account.getEmail(), requestWithdraw.getId(), requestWithdraw.getDateBegin(), request.getAmount(), paymentMethod
         )).start();
         return "Tạo yêu cầu rút tiền thành công. Yêu cầu của bạn sẽ được duyệt trong vòng tối đa 48 giờ. Vui lòng theo dõi email để nhận được cập nhật.";
+    }
+
+    @Override
+    public List<PurchaseView> viewPurchasesHistory(Long userId) {
+        return purchaseRepository.findAllByUser(
+                    accountRepository.findById(userId).orElseThrow(AccountNotFoundException::new)
+                )
+                .stream()
+                .map(Purchase::toPurchaseView)
+                .toList();
     }
 }

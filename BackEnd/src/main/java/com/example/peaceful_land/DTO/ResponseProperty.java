@@ -1,14 +1,12 @@
 package com.example.peaceful_land.DTO;
 
 import com.example.peaceful_land.Entity.Property;
+import com.example.peaceful_land.Utils.VariableUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data @Getter @Setter @Builder
 public class ResponseProperty {
@@ -21,7 +19,7 @@ public class ResponseProperty {
     private Boolean status; // Trạng thái: 0 - Đã bán hoặc cho thuê, 1 - sẵn sàng
 
     @JsonProperty("rental_period")
-    private LocalDate rentalPeriod; // Thời gian thuê
+    private String rentalPeriod; // Thời gian thuê
 
     private String location;
 
@@ -47,15 +45,16 @@ public class ResponseProperty {
     private String balconyOrientation;
 
     @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     public static ResponseProperty fromProperty(Property property) {
+        String rentalPeriod = property.getRentalPeriod() == null ? null : property.getRentalPeriod().format(VariableUtils.FORMATTER_DATE);
         return ResponseProperty.builder()
                 .id(property.getId())
                 .userId(property.getUser().getId())
                 .offer(property.getOffer())
                 .status(property.getStatus())
-                .rentalPeriod(property.getRentalPeriod())
+                .rentalPeriod(rentalPeriod)
                 .location(property.getLocation())
                 .locationDetail(property.getLocationDetail())
                 .mapUrl(property.getMapUrl())
@@ -69,7 +68,7 @@ public class ResponseProperty {
                 .frontage(property.getFrontage())
                 .houseOrientation(property.getHouseOrientation())
                 .balconyOrientation(property.getBalconyOrientation())
-                .createdAt(property.getDateBegin())
+                .createdAt(property.getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))
                 .build();
     }
 

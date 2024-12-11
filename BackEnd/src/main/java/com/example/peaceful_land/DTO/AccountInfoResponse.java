@@ -1,13 +1,12 @@
 package com.example.peaceful_land.DTO;
 
 import com.example.peaceful_land.Entity.Account;
+import com.example.peaceful_land.Utils.VariableUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
 
 @Data @Getter @Setter @Builder
 public class AccountInfoResponse {
@@ -18,7 +17,7 @@ public class AccountInfoResponse {
     private String phone;
     private Long balance;
     @JsonProperty("birth_day")
-    private LocalDate birthDay;
+    private String birthDay;
 
     public static AccountInfoResponse from(Account account){
         return AccountInfoResponse.builder()
@@ -27,7 +26,7 @@ public class AccountInfoResponse {
                 .email(account.getEmail())
                 .phone(account.getPhone())
                 .balance(account.getAccountBalance())
-                .birthDay(account.getBirthDate())
+                .birthDay(account.getBirthDate().format(VariableUtils.FORMATTER_DATE))
                 .build();
     }
 

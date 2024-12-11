@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data @Getter @Setter @Builder
-public class ResponsePropertyLog {
+public class PurchaseView {
     private String date;
+    private Long amount;
     private String action;
-    private Long price;
 }

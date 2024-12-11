@@ -70,4 +70,9 @@ public class AccountController {
         return ResponseEntity.ok(gson.toJson(accountService.createWithdrawRequest(request)));
     }
 
+    @PostMapping("/history-purchases")
+    public ResponseEntity<?> getHistoryPurchases(@RequestBody IdRequest request) {
+        return ResponseEntity.ok(accountService.viewPurchasesHistory(request.getUserId()));
+    }
+
 }

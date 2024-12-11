@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Data @Getter @Setter @Builder
 public class ResponseWithdrawRequest {
 
@@ -22,6 +20,6 @@ public class ResponseWithdrawRequest {
     private String denyMessage;
 
     @JsonProperty("request_date")
-    private LocalDateTime requestDate;
+    private String requestDate;
 
 }

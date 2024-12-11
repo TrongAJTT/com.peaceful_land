@@ -58,12 +58,12 @@ public class RequestTour extends BaseEntity {
     public ResponseReqTour toResponseReqTour() {
         return ResponseReqTour.builder()
                 .type(tourType)
-                .expectedTime(expectedTime)
+                .expectedTime(expectedTime.format(VariableUtils.FORMATTER_DATE_TIME))
                 .name(name)
                 .phone(phone)
                 .email(email)
                 .interestLevel(interestLevel)
-                .createdAt(getDateBegin())
+                .createdAt(getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))
                 .build();
     }
 }

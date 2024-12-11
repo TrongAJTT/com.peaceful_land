@@ -3,19 +3,16 @@ package com.example.peaceful_land.DTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 @Data @Getter @Setter @Builder
 @NoArgsConstructor @AllArgsConstructor
 public class PostApprovalResponse {
     private Long id;
 
     @JsonProperty("request_date")
-    private LocalDateTime requestDate;
+    private String requestDate;
 
     @JsonProperty("expiry_date")
-    private LocalDate expiryDate;
+    private String expiryDate;
 
     private Boolean approved;
 

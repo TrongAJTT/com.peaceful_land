@@ -6,12 +6,10 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Data @Getter @Setter @Builder
 public class ResponsePostLog {
     @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    private String createdAt;
     private String title;
     private String description;
     private String thumbnail_url;

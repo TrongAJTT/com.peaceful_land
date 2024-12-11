@@ -1,6 +1,7 @@
 package com.example.peaceful_land.Entity;
 
 import com.example.peaceful_land.DTO.ResponseWithdrawRequest;
+import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,7 +38,7 @@ public class RequestWithdraw extends BaseEntity {
                 .userId(account.getId())
                 .status(status == STATUS_PENDING ? "Đang chờ xử lý" : this.status == STATUS_APPROVED ? "Đã duyệt" : "Đã từ chối")
                 .denyMessage(resultMessage)
-                .requestDate(getDateBegin())
+                .requestDate(getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))
                 .build();
     }
 

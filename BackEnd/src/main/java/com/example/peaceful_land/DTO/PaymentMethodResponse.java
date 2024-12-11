@@ -1,13 +1,12 @@
 package com.example.peaceful_land.DTO;
 
 import com.example.peaceful_land.Entity.PaymentMethod;
+import com.example.peaceful_land.Utils.VariableUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Data @Getter @Setter @Builder
 public class PaymentMethodResponse {
@@ -23,7 +22,7 @@ public class PaymentMethodResponse {
     private String accountNumber;
 
     @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     public static PaymentMethodResponse from(PaymentMethod method){
         return PaymentMethodResponse.builder()
@@ -31,7 +30,7 @@ public class PaymentMethodResponse {
                 .isWallet(method.getIsWallet())
                 .name(method.getName())
                 .accountNumber(method.getAccountNumber())
-                .createdAt(method.getDateBegin())
+                .createdAt(method.getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))
                 .build();
     }
 

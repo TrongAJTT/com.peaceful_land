@@ -1,14 +1,12 @@
 package com.example.peaceful_land.DTO;
 
 import com.example.peaceful_land.Entity.Post;
+import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data @Getter @Setter @Builder
 public class ResponsePost {
@@ -22,8 +20,8 @@ public class ResponsePost {
     @Column(name = "thumbn_url")
     private String thumbnUrl;
 
-    private LocalDate expiration;
-    private LocalDateTime createdAt;
+    private String expiration;
+    private String createdAt;
 
     public static ResponsePost fromPost(Post post) {
         return ResponsePost.builder()
@@ -33,8 +31,8 @@ public class ResponsePost {
                 .status(post.getStatus())
                 .description(post.getDescription())
                 .thumbnUrl(post.getThumbnUrl())
-                .expiration(post.getExpiration())
-                .createdAt(post.getDateBegin())
+                .expiration(post.getExpiration().format(VariableUtils.FORMATTER_DATE))
+                .createdAt(post.getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))
                 .build();
     }
 

@@ -1,5 +1,7 @@
 package com.example.peaceful_land.Entity;
 
+import com.example.peaceful_land.DTO.PurchaseView;
+import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,5 +21,13 @@ public class Purchase extends BaseEntity {
 
     @Column
     private String action;
+
+    public PurchaseView toPurchaseView() {
+        return PurchaseView.builder()
+                .amount(amount)
+                .action(action)
+                .date(getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))
+                .build();
+    }
 
 }

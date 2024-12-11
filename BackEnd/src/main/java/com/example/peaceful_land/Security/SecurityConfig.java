@@ -41,24 +41,11 @@ public class SecurityConfig  {
                                 "/categories"
                         ).permitAll()
 
-                        .requestMatchers(
-                                HttpMethod.POST,"/posts/find-nearest-*"
-                        ).permitAll()
-                        .requestMatchers(
-                                HttpMethod.POST,"/posts/search**"
-                        ).permitAll()
-
-                        .requestMatchers(
-                                HttpMethod.POST,"/posts/search**"
-                        ).permitAll()
-
-                        .requestMatchers(
-                                HttpMethod.POST,"/posts/*"
-                        ).permitAll()
-
-                        .requestMatchers(
-                                HttpMethod.GET,"/images/**"
-                        ).permitAll()
+                        .requestMatchers( HttpMethod.POST,"/posts/find-nearest-*"   ).permitAll()
+                        .requestMatchers( HttpMethod.POST,"/posts/search**"         ).permitAll()
+                        .requestMatchers( HttpMethod.POST,"/posts/*"                ).permitAll()
+                        .requestMatchers( HttpMethod.GET,"/images/**"               ).permitAll()
+                        .requestMatchers( HttpMethod.GET,"/properties/*/get-images" ).permitAll()
 
                         // Secure the API endpoints that require JWT
                         .requestMatchers("/api/**").authenticated()  // Protect /api/** endpoints

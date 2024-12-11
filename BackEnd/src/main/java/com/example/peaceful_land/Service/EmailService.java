@@ -119,8 +119,20 @@ public class EmailService implements IEmailService {
             String htmlContent = String.format(
                     """
                     <p>Chúng tôi vui lòng thông báo với bạn rằng bài rao của bạn đã được duyệt.</p>
-                    <p><b>Mã bài rao:</b> %s.</p>
-                    <p><b>Ngày tạo:</b> %s.</p>
+                    <table style="border-collapse: collapse; margin: 25px 0; font-size: 0.9em; font-family: sans-serif; min-width: 400px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+                        <thead>
+                            <tr style="background-color: #009879; color: #ffffff;">
+                                <th style="padding: 12px 15px;">Mã bài rao</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #009879;">
+                                <th style="padding: 12px 15px;">Ngày duyệt</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     """, postId, VariableUtils.convertToVnTimeZoneString(createdAt));
 
             helper.setTo(emailTo);
@@ -146,8 +158,20 @@ public class EmailService implements IEmailService {
             String htmlContent = String.format(
                     """
                     <p>Chúng tôi vui lòng thông báo với bạn rằng một bài rao mà bạn quan tâm đã được duyệt.</p>
-                    <p><b>Mã bài rao:</b> %s.</p>
-                    <p><b>Ngày bắt đầu quan tâm:</b> %s.</p>
+                    <table style="border-collapse: collapse; margin: 25px 0; font-size: 0.9em; font-family: sans-serif; min-width: 400px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+                        <thead>
+                            <tr style="background-color: #009879; color: #ffffff;">
+                                <th style="padding: 12px 15px;">Mã bài rao</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #009879;">
+                                <th style="padding: 12px 15px;">Ngày bắt đầu quan tâm</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <p>Hãy kiểm tra ngay để biết thêm thông tin chi tiết về bất động sản bạn nhé!.</p>
                     """, postId, VariableUtils.convertToVnTimeZoneString(createdAt));
 
@@ -174,9 +198,24 @@ public class EmailService implements IEmailService {
             String htmlContent = String.format(
                     """
                     <p>Chúng tôi xin chia buồn thông báo với bạn rằng một bài rao của bạn đã bị từ chối duyệt.</p>
-                    <p><b>Mã bài rao:</b> %s.</p>
-                    <p><b>Ngày tạo:</b> %s.</p>
-                    <p><b>Lý do:</b> %s.</p>
+                    <table style="border-collapse: collapse; margin: 25px 0; font-size: 0.9em; font-family: sans-serif; min-width: 400px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+                        <thead>
+                            <tr style="background-color: #009879; color: #ffffff;">
+                                <th style="padding: 12px 15px;">Mã bài rao</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Ngày tạo</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #009879;">
+                                <th style="padding: 12px 15px;">Lý do</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <p>Hãy chú ý hơn trong bài rao sau bạn nhé!.</p>
                     """, postId, VariableUtils.convertToVnTimeZoneString(createdAt), reason);
 
@@ -203,9 +242,24 @@ public class EmailService implements IEmailService {
             String htmlContent = String.format(
                     """
                     <p>Chúng tôi vui lòng thông báo với bạn rằng một bài rao mà bạn quan tâm đã được cập nhật.</p>
-                    <p><b>Mã bài rao:</b> %s.</p>
-                    <p><b>Thời gian bắt đầu quan tâm:</b> %s.</p>
-                    <p><b>Nội dung cập nhật:</b> %s.</p>
+                    <table style="border-collapse: collapse; margin: 25px 0; font-size: 0.9em; font-family: sans-serif; min-width: 400px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+                        <thead>
+                            <tr style="background-color: #009879; color: #ffffff;">
+                                <th style="padding: 12px 15px;">Mã bài rao</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Thời gian bắt đầu quan tâm</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #009879;">
+                                <th style="padding: 12px 15px;">Nội dung cập nhật</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     """, postId, VariableUtils.convertToVnTimeZoneString(createdAt), contentUpdate);
 
             helper.setTo(emailTo);

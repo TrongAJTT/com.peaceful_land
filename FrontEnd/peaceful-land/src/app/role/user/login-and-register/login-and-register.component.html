@@ -1,4 +1,4 @@
-<div *ngIf="!authService.getAuthStatus()" #container class="container mt-24" id="container">
+<div *ngIf="!authService.getAuthStatus()" #container class="container z--1  mt-24" id="container">
 	<div class="form-container sign-up-container">
 		<form [formGroup]="registerForm" (ngSubmit)="handleRegister($event)">
 			<h1>Đăng kí</h1>

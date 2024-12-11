@@ -16,7 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -158,19 +161,6 @@ public class AccountService implements IAccountService{
             account.setPassword(passwordEncoder.encode(newPassword));
             accountRepository.save(account);
         });
-    }
-
-    @Override
-    public boolean resetRoleIfExpired(Long id) {
-        return accountRepository.findById(id).map(account -> {
-            if (account.getRoleExpiration().isBefore(LocalDate.now())) {
-                account.setRole((byte) 0);
-                account.setRoleExpiration(LocalDate.of(9999, 12, 31));
-                accountRepository.save(account);
-                return true;
-            }
-            return false;
-        }).orElse(false);
     }
 
     @Override
@@ -381,4 +371,51 @@ public class AccountService implements IAccountService{
                 .map(Purchase::toPurchaseView)
                 .toList();
     }
+
+    public void SYSTEM_scanAndResetRoleIfExpired() {
+        new Thread(() -> {
+            List<Account> accountList = accountRepository.findAllByRoleExpirationBefore(LocalDate.now());
+            for (Account account : accountList) {
+                account.setRole(VariableUtils.ROLE_NORMAL);
+                account.setRoleExpiration(LocalDate.of(9999, 12, 31));
+                accountRepository.save(account);
+            }
+            String message = ">>>\n" + VariableUtils.getServerStatPrefix() + ( accountList.isEmpty() ?
+                    "No account is reset" :
+                    "Reset these accounts with id " + Arrays.toString(accountList.stream().map(Account::getId).toArray()) + " role to normal"
+            ) + "\n<<<";
+            System.out.println(message);
+        }).start();
+    }
+
+    public void SYSTEM_scanAndDeleteUnusedAvatar(){
+        new Thread(() -> {
+            List<String> listAvatars = accountRepository.findAllAvatarUrls().stream()
+                    .filter(avt -> !avt.equals(VariableUtils.DEFAULT_AVATAR)).toList();
+            Path uploadDir = Path.of(VariableUtils.UPLOAD_DIR_AVATAR);
+            try {
+                // Lấy danh sách tất cả các tệp trong thư mục uploads/avatars
+                List<Path> allFiles = Files.walk(uploadDir)
+                        .filter(Files::isRegularFile) // Chỉ lấy các tệp, không lấy thư mục
+                        .toList();
+
+                // Duyệt qua từng tệp
+                for (Path file : allFiles) {
+                    String fileName = file.getFileName().toString();
+                    // Kiểm tra xem tệp có nằm trong listAvatars không
+                    if (!listAvatars.contains(fileName)) {
+                        // Xóa tệp nếu không nằm trong danh sách
+                        Files.delete(file);
+                        System.out.println(VariableUtils.getServerScanPrefix() + "Delete unused avatar " + file);
+                    }
+                }
+
+                System.out.println(">>>\n" + VariableUtils.getServerScanPrefix() + "Scan and delete unused avatar completed\n<<<");
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
 }

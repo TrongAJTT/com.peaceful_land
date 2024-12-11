@@ -38,7 +38,7 @@ public class UserRequestController {
             if (request == null || request.getDenyMessage() == null || request.getDenyMessage().isEmpty()) {
                 return ResponseEntity.badRequest().body(gson.toJson("Lý do từ chối không được để trống"));
             }
-            userRequestService.rejectPostRequest(id, request.getDenyMessage());
+            userRequestService.rejectPostRequestFromId(id, request.getDenyMessage());
             return ResponseEntity.ok(gson.toJson("Từ chối bài rao thành công"));
         } else {
             return ResponseEntity.badRequest().body(gson.toJson("Không hợp lệ"));

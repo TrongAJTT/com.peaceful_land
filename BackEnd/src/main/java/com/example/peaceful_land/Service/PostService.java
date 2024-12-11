@@ -687,7 +687,10 @@ public class PostService implements IPostService {
         }) throw new RuntimeException("Số ngày gia hạn không hợp lệ");
         // Kiểm tra số tiền có đủ không
         byte day = request.getDayExpand();
-        long price = getPrice(account, day);
+        long price = VariableUtils.getExtendPrice(account.getRole(), day);
+        if (account.getAccountBalance() < price) {
+            throw new RuntimeException("Số dư tài khoản không đủ để gia hạn bài rao");
+        }
         // Gia hạn bài rao
         LocalDate expiration = post.getExpiration();
         post.setExpiration(expiration.isBefore(LocalDate.now()) ? LocalDate.now().plusDays(day) : expiration.plusDays(day));
@@ -704,24 +707,6 @@ public class PostService implements IPostService {
         return "Gia hạn bài rao thành công. Số ngày gia hạn: " + request.getDayExpand() + ". Số tiền trừ: " + price;
     }
 
-    private static long getPrice(Account account, byte day) {
-        long price;
-        if (account.getRole() == 0) {
-            if (1<= day && day <=4) price = 15000;
-            else price = 25000;
-        } else if (account.getRole() == 1) {
-            if (1<= day && day <=4) price = 10000;
-            else if (4< day && day <=7) price = 18000;
-            else price = 26000;
-        } else {
-            if (1<= day && day <=4) price = 10000;
-            else if (4< day && day <=7) price = 16000;
-            else if (7< day && day <=10) price = 22000;
-            else price = 28000;
-        }
-        if (account.getAccountBalance() < price) {
-            throw new RuntimeException("Số dư tài khoản không đủ để gia hạn bài rao");
-        }
-        return price;
-    }
+
+
 }

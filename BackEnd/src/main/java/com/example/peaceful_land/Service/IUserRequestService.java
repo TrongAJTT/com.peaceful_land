@@ -11,7 +11,7 @@ public interface IUserRequestService {
     List<PostApprovalResponse> getPostRequestBaseOn(String requestState);
     ResponseUserPostReqView getPostRequestById(Long id);
     void approvePostRequest(Long id);
-    void rejectPostRequest(Long id, String denyMessage);
+    void rejectPostRequestFromId(Long id, String denyMessage);
 
     List<ResponseWithdrawRequest> getWithdrawRequestBaseOn(String requestState);
     void approveOrRejectWithdrawRequest(Long id, Boolean isApprove, String denyMessageIfFalse);

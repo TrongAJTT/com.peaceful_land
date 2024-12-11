@@ -9,6 +9,8 @@ import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @Service @RequiredArgsConstructor
@@ -87,17 +89,21 @@ public class UserRequestService implements IUserRequestService {
     }
 
     @Override
-    public void rejectPostRequest(Long id, String denyMessage) {
+    public void rejectPostRequestFromId(Long id, String denyMessage) {
         // Lấy ra yêu cầu
         RequestPost postRequest = requestPostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
+        rejectPostRequest(postRequest, denyMessage);
+    }
+
+    private void rejectPostRequest(RequestPost request, String denyMessage) {
         // Thay đổi trạng thái yêu cầu và lưu vào database
-        postRequest.setApproved(false);
-        postRequest.setDenyMessage(denyMessage);
-        requestPostRepository.save(postRequest);
+        request.setApproved(false);
+        request.setDenyMessage(denyMessage);
+        requestPostRepository.save(request);
         // Thay đổi trạng thái bài rao và lưu vào database nếu có
-        Post approvedPost = postRequest.getPost();
-        if (postRequest.getHide()){
+        Post approvedPost = request.getPost();
+        if (request.getHide()){
             approvedPost.setHide(false);
             postRepository.save(approvedPost);
             // Thay đổi trạng thái bất động sản và lưu vào database
@@ -107,12 +113,12 @@ public class UserRequestService implements IUserRequestService {
         }
         // Gửi email thông báo cho người đăng bài
         new Thread(() ->
-            emailService.sendPostRejectedEmailToOwner(
-                    approvedPost.getProperty().getUser().getEmail(),
-                    approvedPost.getId(),
-                    approvedPost.getDateBegin(),
-                    denyMessage
-            )
+                emailService.sendPostRejectedEmailToOwner(
+                        approvedPost.getProperty().getUser().getEmail(),
+                        approvedPost.getId(),
+                        approvedPost.getDateBegin(),
+                        denyMessage
+                )
         ).start();
     }
 
@@ -170,4 +176,20 @@ public class UserRequestService implements IUserRequestService {
                     isApprove, isApprove ? null : denyMessageIfFalse)
         ).start();
     }
+
+    public void SYSTEM_scanForExpiredPostRequests() {
+        new Thread(() -> {
+            List<RequestPost> listRequestPost = requestPostRepository.findAllByExpirationBeforeAndApproved(LocalDate.now(), null);
+            for (RequestPost requestPost : listRequestPost) {
+                rejectPostRequest(requestPost, "Hết hạn yêu cầu nhưng quản trị viên vẫn chưa xử lý");
+            }
+            String message = ">>>\n" + VariableUtils.getServerStatPrefix() + ( listRequestPost.isEmpty() ?
+                    "No post request expired" :
+                    "Automatically rejected these post request " + Arrays.toString(listRequestPost.stream()
+                            .map(p -> p.getPost().getId()).toArray()) + " due to expiration"
+            ) + "\n<<<";
+            System.out.println(message);
+        }).start();
+    }
+
 }

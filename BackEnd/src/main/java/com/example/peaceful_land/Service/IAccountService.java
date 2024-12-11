@@ -31,9 +31,6 @@ public interface IAccountService {
     // Quên mật khẩu giai đoạn 3: Đặt lại mật khẩu
     void resetPassword(String email, String newPassword);
 
-    // Đặt lại vai trò nếu đã hết hạn
-    boolean resetRoleIfExpired(Long id);
-
     // Mua vai trò
     Account purchaseRole(PurchaseRoleRequest id);
 
@@ -57,4 +54,5 @@ public interface IAccountService {
 
     // Xem lịch sử thanh toán
     List<PurchaseView> viewPurchasesHistory(Long userId);
+
 }

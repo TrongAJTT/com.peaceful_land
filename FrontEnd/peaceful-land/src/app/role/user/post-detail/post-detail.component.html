@@ -11,7 +11,7 @@
                           </p>
                           
                           <p class="text-danger" style="font-size: calc(1em + 6px)">
-                            <i class="fas fa-calendar-times"></i> Ngày hết hạn duyệt: {{ currPost.expiration | date: 'dd/MM/yyyy' }}
+                            <i class="fas fa-calendar-times"></i> Ngày hết hạn duyệt: {{ currPost.data.expiration | date: 'dd/MM/yyyy' }}
                           </p>
                     </div>
                 </div>
@@ -24,7 +24,7 @@
                                 (click)="toggleLike(currPost,$event)"
                                 data-bs-toggle="modal" [attr.data-bs-target]="'#exampleModal'+currPost.data.id"
                                 >
-                                <i class="fa" [ngClass]="currPost.interested && userId!=-1 ? 'fa-heart' : 'fa-heart-o'"></i>
+                                <i  [ngClass]="currPost.interested && userId!=-1 ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
                             </div>
 
                             <a *ngIf="!currPost.data.thumbnUrl || currPost.data.thumbnUrl === ''">
@@ -149,6 +149,77 @@
                         </div>
                     </div>
                 </div>
+                <div class="row g-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="text-success"><i class="fa-solid fa-house-flag"></i> Lịch sử bất động sản</h2>
+                        <div class="button-container">
+                            <button
+                                class="btn toggle-btn"
+                                [ngClass]="showAllProLog ? 'btn-secondary' : 'btn-success'"
+                                (click)="toggleViewPro()">
+                                <i  [ngClass]="showAllProLog ? 'fa-solid fa-minus' : 'fa-solid fa-plus'"></i> 
+                                {{ showAllProLog ? 'Ẩn đi' : 'Xem thêm' }}
+                            </button>
+                        </div>
+                    </div>
+                    <table *ngIf="dataProLog && dataProLog.length>0" class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Ngày</th>
+                          <th>Hành động</th>
+                          <th>Giá</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of displayedData">
+                          <td>{{ item.date }}</td>
+                          <td>{{ item.action }}</td>
+                          <td>{{ item.price | number:'1.0-0' }} VNĐ</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                </div>
+
+
+                <div class="row g-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="text-success"><i class="fa-solid fa-signs-post"></i> Lịch sử bài đăng</h2>
+                        <div class="button-container">
+                            <button
+                                class="btn toggle-btn"
+                                [ngClass]="showAllPostLog ? 'btn-secondary' : 'btn-success'"
+                                (click)="toggleViewPost()">
+                                <i [ngClass]="showAllPostLog ? 'fa-solid fa-minus' : 'fa-solid fa-plus'"></i> 
+                                {{ showAllPostLog ? 'Ẩn đi' : 'Xem thêm' }}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <table class="table table-striped"  *ngIf="dataPostLog && dataPostLog !=[]">
+                        <thead>
+                            <tr>
+                                <th>Ảnh</th>
+                                <th>Tiêu đề</th>
+                                <th>Mô tả</th>
+                                <th>Ngày tạo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let post_log of displayedDataPost">
+                                <td>
+                                    <img (click)="openModal(post_log.thumbnail_url)"
+                                      [src]="post_log.thumbnail_url" 
+                                      alt="Thumbnail" 
+                                      class="img-thumbnail"
+                                      (error)="onImageError(post_log)" />
+                                  </td>
+                                <td>{{ post_log.title }}</td>
+                                <td>{{ post_log.description }}</td>
+                                <td>{{ post_log.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -163,14 +234,15 @@
 </div>
 
 <div *ngIf="currPost">
+    <!-- Modal thay đổi trạng thái quan tâm -->
     <div class="modal fade" *ngIf="userId !== -1 && !currPost.interested"  [id]="'exampleModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Bạn có muốn xem chi tiết tin tức này</h5>
-                <!-- <button type="button" class="btn btn-danger close" data-bs-dismiss="modal" aria-label="Close">
+                <button type="button" class="btn btn-danger close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
-                </button> -->
+                </button>
             </div>
             <div class="modal-body">
                 Thông báo sẽ được chủ quản trang web gửi mail khi bạn nhấn đồng ý<span style="color: red;font-weight: 400;"></span>
@@ -184,6 +256,7 @@
     </div>
 
 
+    <!-- Modal lên lịch hẹn -->
     <div class="modal fade" #scheduleModal *ngIf="userId!==-1 && isPermitGiveRequestScheduleOrRequest " [id]="'scheduleModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -258,7 +331,7 @@
         </div>
     </div>
     
-
+    <!-- Modal yêu cầu liên hệ -->
     <div class="modal fade" #contactModal *ngIf="userId!==-1 && isPermitGiveRequestScheduleOrRequest " [id]="'contactModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

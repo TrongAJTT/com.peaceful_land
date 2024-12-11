@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
 import { PostService } from '../../../core/services/post.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -27,21 +27,26 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
   user!: User;
   userId: number = -1;
   today: any;
+  imagesListRaw!: any;
   postId!: number
   postsThumbImage: string = "";
   activeImageIndex = 0;  // Chỉ số của hình ảnh hiện tại
   currChildImg = 0;
-  imageList = [
-    { src: '/assets/img/house/house-demo.jpg' },
-    { src: '/assets/img/house/house-demo-1.jpg' },
-    { src: '/assets/img/house/house-demo-2.jpg' },
-    { src: '/assets/img/house/house-demo-3.jpg' },
-  ];
+  imageList!: any[ ];
   modalImageSrc = '';
-  isModalOpen = false;  // Trạng thái của modal
+  isModalOpen = false;  
   itemsToShow = 3;  // Số lượng ảnh hiển thị một lần
   isPermitGiveRequestScheduleOrRequest = false;
   permitMessageError = "";
+  
+  showAllProLog = false; 
+  displayedData!: any;  
+  dataProLog!: any[ ];
+  
+  showAllPostLog=false;
+  displayedDataPost!: any;  
+  dataPostLog!: any[];
+
 
   appointmentForm = new FormGroup({
     expected_date: new FormControl(''),
@@ -90,13 +95,48 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
       this.postId = +params['id'];
     }))
     await this.loadPost()
-    await this.loadProImages()
+    const proImagesList = await this.loadProImages()
+    this.changeImagesToBase64(this.imagesListRaw)
+    await this.loadLogPro();
+    await this.loadLogPost();
     await this.loadPermitContact();
     await this.loadInfoUserFormGroup();
     this.cdr.detectChanges();
   }
 
+  async loadLogPro(): Promise<void>{
+    try{
+      this.dataProLog = await firstValueFrom(this.postService.getLogsOfPro(this.postId));
+      this.displayedData = this.dataProLog.slice(0, 5); 
+    }catch(e){
+      this.displayedData = []
+    }
+  }
+
+  onImageError(post_log: any): void {
+    post_log.thumbnail_url = '/assets/img/house/house-demo.jpg';
+  }
+
+  async loadLogPost(): Promise<void> {
+
+    try{
+      this.dataPostLog = await firstValueFrom(this.postService.getLogsOfPost(this.postId));
+      this.displayedDataPost = this.dataPostLog.slice(0, 5); 
+      const loadImagePromises = this.dataPostLog.map((post) => 
+        post.thumbnail_url = `http://localhost:8080/api/images?path=${post.thumbnail_url}`
+      );
+      // Wait for all images to load
+      await Promise.all(loadImagePromises);
+    }catch(e){
+      this.displayedDataPost = []
+    }
+  }
+  
+  
   async loadInfoUserFormGroup(): Promise<void>{
+    if(this.userId==-1){
+      return
+    }
     this.appointmentForm.get("name")?.setValue(this.user.name);
     this.appointmentForm.get("phone")?.setValue(this.user.phone);
     this.appointmentForm.get("email")?.setValue(this.user.email);
@@ -112,7 +152,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
       this.isPermitGiveRequestScheduleOrRequest = true
     } catch (response:any) {
       this.isPermitGiveRequestScheduleOrRequest = false
-      this.permitMessageError = response.error.message
+      this.permitMessageError =  response.error?.message
     }
   }
 
@@ -122,7 +162,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
   }
 
   async loadProImages() : Promise<void>{
-    const proImages = await firstValueFrom(this.propertyService.getProImages(this.currPost.data.property.id))
+    this.imagesListRaw = await firstValueFrom(this.propertyService.getProImages(this.currPost.data.property.id))
   }
 
   async ngAfterViewInit(): Promise<void> {
@@ -130,14 +170,23 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     this.cdr.detectChanges();
   }
 
-  // async changeToImg(thumbnUrl: string, postId: number): Promise<void> {
-  //   try {
-  //     const response = await firstValueFrom(this.imgService.changeToImgBase64(thumbnUrl));
-  //     this.postsThumbImage[postId] = response;  // Lưu ảnh vào biến
-  //   } catch (error:any) {
-  //     this.postsThumbImage[postId] = '/assets/img/house/house-demo.jpg';  // Đặt ảnh mặc định
-  //   }
-  // }
+  async changeImagesToBase64(proImages: string[]): Promise<void> {
+    const imageList: { src: string }[] = [];
+  
+    // Loop through each image URL in the proImages array
+    for (let i = 0; i < proImages.length; i++) {
+      try {
+        // Assuming imgService.changeToImgBase64 returns a base64 string for each image URL
+        const base64Image = await firstValueFrom(this.imgService.changeToImgBase64(proImages[i]));
+        
+        // Push the base64 image into the imageList array
+        imageList.push({ src: base64Image });
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    this.imageList = imageList;
+  }
 
   async changeToImg(thumbUrl: string): Promise<void> {
     try {
@@ -280,7 +329,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     event.stopPropagation();
 
     if(this.userId==-1){
-      this.snackbarService.notifyWarningUser("Vui lòng đăng nhập trước khi chọn quan tâm!")
+      this.snackbarService.notifyWarningUser("Vui lòng đăng nhập trước khi thực hiện liên hệ!")
       return
     }
 
@@ -432,11 +481,17 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     document.body.classList.remove('modal-open');
     document.body.style.overflow = ''; // Reset overflow to allow scrolling
   }
-  
-  
-  
 
 
+  // Hàm để toggle giữa xem thêm và ẩn đi
+  toggleViewPro() {
+    this.showAllProLog = !this.showAllProLog;  // Đảo ngược trạng thái
+    this.displayedData = this.showAllProLog ? this.dataProLog : this.dataProLog.slice(0, 5);
+  }
 
+  toggleViewPost() {
+    this.showAllPostLog = !this.showAllPostLog;  // Đảo ngược trạng thái
+    this.displayedDataPost = this.showAllPostLog ? this.dataPostLog : this.dataPostLog.slice(0, 5);
+  }
 
 }

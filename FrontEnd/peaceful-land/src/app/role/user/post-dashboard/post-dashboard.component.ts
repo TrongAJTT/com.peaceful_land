@@ -1,27 +1,25 @@
-import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { PostService } from '../../../core/services/post.service';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { firstValueFrom, Subject } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { PostService } from '../../../core/services/post.service';
 import { UserRequestService } from '../../../core/services/user-request.service';
-import { DataTablesModule } from 'angular-datatables';
 import { Router } from '@angular/router';
-
+import { DataTablesModule } from 'angular-datatables';
 
 @Component({
-  selector: 'app-post-pending',
+  selector: 'app-post-dashboard',
   standalone: true,
   imports: [DataTablesModule,CommonModule],
-  templateUrl: './post-pending.component.html',
-  styleUrl: './post-pending.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.Emulated,
+  templateUrl: './post-dashboard.component.html',
+  styleUrl: './post-dashboard.component.css'
 })
-export class PostPendingComponent implements OnInit, AfterViewInit{
+export class PostDashboardComponent {
   headerList = ['Mã bài đăng','Trạng thái','Tiêu đề','Địa chỉ','Ngày yêu cầu'
     ,'Ngày hết hạn yêu cầu','Hiển thị'];
   dtTrigger: Subject<any> = new Subject<any>();
   postList!: any[];
 
+  
   constructor(
     private postService:PostService,
     private userRequestService:UserRequestService,
@@ -78,4 +76,5 @@ export class PostPendingComponent implements OnInit, AfterViewInit{
   goToHandle(postId: number){
     this.router.navigate([`admin/post_pending/handle/${postId}`])
   }
+
 }

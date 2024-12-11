@@ -74,6 +74,8 @@ export class PostPropertyComponent implements OnInit, OnChanges {
   selectedOffer: number = 0;  // 0: Mua bán, 1: Cho thuê
   rentalPeriod: string = ''; 
   propertyForm!: FormGroup;
+  isModalOpen = false;  
+  modalImageSrc = '';
 
 
 
@@ -404,5 +406,16 @@ export class PostPropertyComponent implements OnInit, OnChanges {
         this.isLoading = false;
       }
     }
+  }
+
+  openModal(imageSrc: string | ArrayBuffer | null) {
+    if (typeof imageSrc === 'string') {
+      this.modalImageSrc = imageSrc;
+      this.isModalOpen = true;
+    }
+  }
+
+  closeModal(event: MouseEvent) {
+    this.isModalOpen = false;
   }
 }

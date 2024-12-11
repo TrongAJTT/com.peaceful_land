@@ -21,7 +21,9 @@ public class VariableUtils {
     public static final String DEFAULT_AVATAR = "template/blank_avatar.webp";
     public static final String IMAGE_NA = "template/image_state_not_available.jpg";
 
-    public static final String DEFAULT_UPLOAD_DIR = "uploads";
+    public static final String UPLOAD_DIR_ROOT = "uploads";
+    public static final String UPLOAD_DIR_AVATAR = "uploads/avatars";
+    public static final String UPLOAD_DIR_PROP_IMG = "uploads/property_imgs";
 
     public static final int TYPE_UPLOAD_AVATAR = 1;
     public static final int TYPE_UPLOAD_PROPERTY_IMAGE = 2;
@@ -71,8 +73,8 @@ public class VariableUtils {
     public static final String REQUEST_TYPE_CONTACT = "contact";
     public static final String REQUEST_TYPE_TOUR = "tour";
 
-    public static final DateTimeFormatter FORMATTER_DATE_TIME = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-    public static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    public static final DateTimeFormatter FORMATTER_DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static String getStringFromUploadType(int uploadType) {
         return switch (uploadType) {
@@ -161,6 +163,32 @@ public class VariableUtils {
         // Định dạng thời gian thành chuỗi mong muốn
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return zonedCreatedAt.format(formatter);
+    }
+
+    public static long getExtendPrice(Byte roleId, byte day) {
+        long price;
+        if (roleId == 0) {
+            if (1<= day && day <=4) price = 15000;
+            else price = 25000;
+        } else if (roleId == 1) {
+            if (1<= day && day <=4) price = 10000;
+            else if (4< day && day <=7) price = 18000;
+            else price = 26000;
+        } else {
+            if (1<= day && day <=4) price = 10000;
+            else if (4< day && day <=7) price = 16000;
+            else if (7< day && day <=10) price = 22000;
+            else price = 28000;
+        }
+        return price;
+    }
+
+    public static String getServerScanPrefix() {
+        return LocalDateTime.now() + " SERVER SCAN --- ";
+    }
+
+    public static String getServerStatPrefix() {
+        return LocalDateTime.now() + " SERVER STAT --- ";
     }
 
 }

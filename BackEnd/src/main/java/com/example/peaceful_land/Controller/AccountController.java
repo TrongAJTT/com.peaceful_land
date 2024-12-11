@@ -29,7 +29,7 @@ public class AccountController {
 
     @PostMapping("/purchase-role")
     public ResponseEntity<?> purchaseRole(@RequestBody PurchaseRoleRequest request) {
-        return ResponseEntity.ok(accountService.purchaseRole(request));
+        return ResponseEntity.ok(gson.toJson(accountService.purchaseRole(request)));
     }
 
     @PostMapping(value = "/change-avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

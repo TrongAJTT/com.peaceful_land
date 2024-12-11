@@ -6,9 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data @Getter @Setter
-public class RejectPostRequest {
+public class MessageRequest {
 
     @JsonProperty("deny_message")
     private String denyMessage;
+
+    @JsonProperty("reply_message")
+    private String replyMessage;
 
 }

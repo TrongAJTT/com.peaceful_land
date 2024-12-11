@@ -3,7 +3,10 @@ package com.example.peaceful_land.Controller;
 import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Post;
 import com.example.peaceful_land.Entity.RequestPost;
+import com.example.peaceful_land.Exception.PropertyNotFoundException;
 import com.example.peaceful_land.Exception.RequestInvalidException;
+import com.example.peaceful_land.Repository.PostRepository;
+import com.example.peaceful_land.Repository.PropertyRepository;
 import com.example.peaceful_land.Service.IPostService;
 import com.example.peaceful_land.Utils.VariableUtils;
 import com.google.gson.Gson;
@@ -24,6 +27,8 @@ public class PostController {
 
     private final IPostService postService;
     private final Gson gson;
+    private final PostRepository postRepository;
+    private final PropertyRepository propertyRepository;
 
     @PostMapping("/create-post")
     public ResponseEntity<?> createPost(@RequestBody PostRequest request) {
@@ -202,6 +207,15 @@ public class PostController {
     @PostMapping("/my-posts")
     public ResponseEntity<?> getMyPosts(@RequestBody IdRequest request) {
         return ok(postService.viewUserPosts(request.getUserId()));
+    }
+
+    @GetMapping("/from-property/{id}")
+    public ResponseEntity<?> getPostsFromProperty(@PathVariable Long id) {
+        return ok(gson.toJson(
+                postRepository.findByProperty(
+                        propertyRepository.findById(id).orElseThrow(PropertyNotFoundException::new)
+                ).getId()
+        ));
     }
 
 }

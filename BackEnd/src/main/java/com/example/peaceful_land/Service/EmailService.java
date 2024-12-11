@@ -2,6 +2,7 @@ package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.EmailDetail;
 import com.example.peaceful_land.Entity.PaymentMethod;
+import com.example.peaceful_land.Entity.RequestReport;
 import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -357,6 +358,63 @@ public class EmailService implements IEmailService {
 
             helper.setTo(emailTo);
             helper.setSubject("Thông báo kết quả cho yêu cầu rút tiền của bạn");
+            helper.setText(htmlContent, true);
+
+            // Sending the mail
+            javaMailSender.send(mimeMessage);
+        }
+        catch (MailException | MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendRequestHandledEmail(RequestReport request, String replyMessage) {
+        try {
+            System.out.println("[Mail proxy] Sending Notify Update Email to interested user: " + request.getEmail());
+            // Creating a MimeMessage
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            String htmlContent = String.format(
+                    """
+                    <p>Chúng tôi vui lòng thông báo với bạn rằng báo cáo của bạn đã được xử lý.</p>
+                    <table style="border-collapse: collapse; margin: 25px 0; font-size: 0.9em; font-family: sans-serif; min-width: 400px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+                        <thead>
+                            <tr style="background-color: #009879; color: #ffffff;">
+                                <th style="padding: 12px 15px;">Mã báo cáo</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Thời gian</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Đối tượng</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Lý do</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Nội dung</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #009879;">
+                                <th style="padding: 12px 15px;">Phản hồi</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    """, request.getId(), VariableUtils.convertToVnTimeZoneString(request.getDateBegin()), request.getObject(),
+                    request.getReasons(), request.getDescription(), replyMessage
+            );
+
+            helper.setTo(request.getEmail());
+            helper.setSubject("Phản hồi đối với yêu cầu báo cáo " + request.getId() );
             helper.setText(htmlContent, true);
 
             // Sending the mail

@@ -1,6 +1,6 @@
 package com.example.peaceful_land.Controller;
 
-import com.example.peaceful_land.DTO.RejectPostRequest;
+import com.example.peaceful_land.DTO.MessageRequest;
 import com.example.peaceful_land.Repository.RequestPostRepository;
 import com.example.peaceful_land.Service.IUserRequestService;
 import com.example.peaceful_land.Utils.VariableUtils;
@@ -30,7 +30,7 @@ public class UserRequestController {
     }
 
     @PostMapping("/post/{id}/action")
-    public ResponseEntity<?> doActionToPostRequest(@PathVariable Long id, @RequestParam String type, @RequestBody(required = false) RejectPostRequest request) {
+    public ResponseEntity<?> doActionToPostRequest(@PathVariable Long id, @RequestParam String type, @RequestBody(required = false) MessageRequest request) {
         if (type.equals(VariableUtils.REQUEST_STATE_APPROVED)) {
             userRequestService.approvePostRequest(id);
             return ResponseEntity.ok(gson.toJson("Duyệt bài rao thành công"));
@@ -51,7 +51,7 @@ public class UserRequestController {
     }
 
     @PostMapping("/withdraw/{id}/action")
-    public ResponseEntity<?> doActionToWithdrawRequest(@PathVariable Long id, @RequestParam String type, @RequestBody(required = false) RejectPostRequest request) {
+    public ResponseEntity<?> doActionToWithdrawRequest(@PathVariable Long id, @RequestParam String type, @RequestBody(required = false) MessageRequest request) {
         if (type.equals(VariableUtils.REQUEST_STATE_APPROVED)) {
             userRequestService.approveOrRejectWithdrawRequest(id, true, null);
             return ResponseEntity.ok(gson.toJson("Duyệt yêu cầu rút tiền thành công"));
@@ -66,5 +66,20 @@ public class UserRequestController {
         }
     }
 
+    @PostMapping("/reports")
+    public ResponseEntity<?> getReportsRequests(@RequestParam String type) {
+        return ResponseEntity.ok(userRequestService.getReportRequestBaseOn(type));
+    }
+
+    @PostMapping("/report/{id}")
+    public ResponseEntity<?> getReportRequestById(@PathVariable Long id) {
+        return ResponseEntity.ok(userRequestService.getReportDetailInfoId(id));
+    }
+
+    @PostMapping("/report/{id}/handle")
+    public ResponseEntity<?> handleReport(@PathVariable Long id, @RequestBody MessageRequest request) {
+        userRequestService.handleReport(id, request.getReplyMessage());
+        return ResponseEntity.ok(gson.toJson("Xử lý báo cáo thành công"));
+    }
 
 }

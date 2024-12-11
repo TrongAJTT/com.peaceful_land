@@ -1,6 +1,7 @@
 package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.PostApprovalResponse;
+import com.example.peaceful_land.DTO.ResponseReport;
 import com.example.peaceful_land.DTO.ResponseUserPostReqView;
 import com.example.peaceful_land.DTO.ResponseWithdrawRequest;
 
@@ -16,4 +17,7 @@ public interface IUserRequestService {
     List<ResponseWithdrawRequest> getWithdrawRequestBaseOn(String requestState);
     void approveOrRejectWithdrawRequest(Long id, Boolean isApprove, String denyMessageIfFalse);
 
+    List<ResponseReport> getReportRequestBaseOn(String requestState);
+    ResponseReport getReportDetailInfoId(Long id);
+    void handleReport(Long id, String replyMessage);
 }

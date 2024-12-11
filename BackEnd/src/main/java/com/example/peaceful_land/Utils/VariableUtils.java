@@ -46,6 +46,7 @@ public class VariableUtils {
     public static final String REQUEST_STATE_PENDING = "pending";
     public static final String REQUEST_STATE_APPROVED = "approved";
     public static final String REQUEST_STATE_REJECTED = "rejected";
+    public static final String REQUEST_STATE_HANDLED = "handled";
 
     public static final String REQUEST_INTEREST_INFO = "Tôi muốn biết thêm thông tin";
     public static final String REQUEST_INTEREST_BUY = "Tôi muốn mua / thuê bất động sản này";

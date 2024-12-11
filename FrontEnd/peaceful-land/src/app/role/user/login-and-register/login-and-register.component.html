@@ -51,7 +51,9 @@
 					<div class="user-info mb-24">
 						<div class="user-details">
 							<div class="user-avatar">
-								<img src="/assets/img/testimonial-1.jpg" alt="User Avatar">
+								<!-- <img src="/assets/img/testimonial-1.jpg" alt="User Avatar"> -->
+								<img *ngIf="!user.avatarUrl || user.avatarUrl === ''"   src="/assets/img/testimonial-1.jpg" alt="">
+								<img *ngIf="user.avatarUrl"  [src]="userImage || '/assets/img/testimonial-1.jpg'">
 								<div class="user-data">
 									<h3>{{user.name}}</h3>
 									<p> <b>Số điện thoại: </b>{{user.phone}}1</p>

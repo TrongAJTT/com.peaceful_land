@@ -1,6 +1,8 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { NgModule, OnInit } from '@angular/core';
+import { Router, RouterModule, Routes } from '@angular/router';
 import { AuthAdminGuard } from './core/guards/auth_admin.guard';
+import { AuthService } from './core/services/auth.service';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 
 const routes: Routes = [
@@ -19,5 +21,9 @@ const routes: Routes = [
 @NgModule({
   imports: [RouterModule.forRoot(routes, { useHash: true ,onSameUrlNavigation: 'reload'})],
   exports: [RouterModule],
+  providers: [
+    { provide: LocationStrategy, useClass: HashLocationStrategy }  // Sử dụng HashLocationStrategy
+  ]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule { 
+}

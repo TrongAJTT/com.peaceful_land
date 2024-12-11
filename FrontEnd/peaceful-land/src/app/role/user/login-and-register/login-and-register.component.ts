@@ -6,6 +6,8 @@ import { AuthService } from '../../../core/services/auth.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
 import { User } from '../../../dto/user';
 import { AccountService } from '../../../core/services/account.service';
+import { ImageService } from '../../../core/services/image.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-login-and-register',
@@ -16,6 +18,7 @@ import { AccountService } from '../../../core/services/account.service';
 })
 export class LoginAndRegisterComponent implements OnInit{
   @ViewChild('container') container!: ElementRef;
+  userImage: string = '';
   today!: string;
   user!: User;
   packages = {
@@ -73,6 +76,7 @@ export class LoginAndRegisterComponent implements OnInit{
     private snackbarService:SnackBarService,
     public authService:AuthService,
     private accountService:AccountService,
+    private imgService:ImageService,
     private router:Router,
     private cdr: ChangeDetectorRef,
   ){}
@@ -81,6 +85,8 @@ export class LoginAndRegisterComponent implements OnInit{
     if(this.authService.getAuthStatus()){
       this.user = this.authService.getUserDetails();
     }
+    this.changeToImg(this.user.avatarUrl)
+    this.cdr.detectChanges()
 
     // Today
     const now = new Date(); 
@@ -183,5 +189,12 @@ export class LoginAndRegisterComponent implements OnInit{
       })
   }
 
-
+  async changeToImg(imgUrl: string): Promise<void> {
+    try {
+      const response = await firstValueFrom(this.imgService.changeToImgBase64(imgUrl));
+      this.userImage = response;  // Lưu ảnh vào biến
+    } catch (error:any) {
+      this.userImage = '/assets/img/testimonial-1.jpg';  // Đặt ảnh mặc định
+    }
+  }
 }

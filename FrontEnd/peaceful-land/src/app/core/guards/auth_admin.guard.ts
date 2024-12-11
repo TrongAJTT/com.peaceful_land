@@ -14,7 +14,7 @@ export class AuthAdminGuard implements CanActivate {
       sessionStorage.setItem('currentUrl', location.hash);
       return true;
     } else {
-      this.router.navigate(['/']);
+      this.router.navigate(['/user']);
       return false;
     }
   }

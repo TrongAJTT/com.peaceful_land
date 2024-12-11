@@ -10,9 +10,11 @@ import { CommonModule, HashLocationStrategy, IMAGE_CONFIG, LocationStrategy } fr
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; 
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { UserModule } from './role/user/user.module';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { DataTablesModule } from 'angular-datatables';
 
 @NgModule({
   declarations: [
@@ -27,13 +29,15 @@ import { UserModule } from './role/user/user.module';
     ReactiveFormsModule,
     BrowserAnimationsModule,
     MatSnackBarModule,
+    NgbModule,
+    DataTablesModule,
     
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     provideClientHydration(),
+    provideHttpClient(),
     provideAnimationsAsync(),
-    {provide: LocationStrategy, useClass: HashLocationStrategy},
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     {
       provide: IMAGE_CONFIG,
       useValue: {

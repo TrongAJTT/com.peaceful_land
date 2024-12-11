@@ -287,3 +287,9 @@ td:empty {
   background-color: #f2f2f2;
   color: #ccc;
 }
+
+.img-thumbnail {
+  width: 150px;  /* Adjust this value as needed */
+  height: auto;  /* Keeps the aspect ratio intact */
+  object-fit: cover;  /* Ensures the image fills the container without stretching */
+}

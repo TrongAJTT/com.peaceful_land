@@ -29,3 +29,41 @@
     font-size: 50px;
   }
   
+  
+/* CSS cho modal */
+.modal-child-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Nền mờ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Đảm bảo modal luôn hiển thị trên các thành phần khác */
+}
+
+.modal-child-image-content {
+  background-color: white;
+  padding: 20px;
+  width: 86%;
+  height: 86%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+
+}
+
+.modal-child-image-img {
+  width: 90%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
+.c-p{
+  cursor: pointer;
+}

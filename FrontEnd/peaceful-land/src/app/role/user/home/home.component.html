@@ -66,7 +66,7 @@
                                     (click)="toggleLike(post,$event)"
                                     data-bs-toggle="modal" [attr.data-bs-target]="'#exampleModal'+post.data.id"
                                     >
-                                    <i class="fa" [ngClass]="post.interested && userId!=-1 ? 'fa-heart' : 'fa-heart-o'"></i>
+                                    <i  [ngClass]="post.interested && userId!=-1 ?'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
                                   </div>
 
                                     <a class="c-p" (click)="goToDetailPost(post.data.id)" *ngIf="!post.data.thumbnUrl || post.data.thumbnUrl === ''">

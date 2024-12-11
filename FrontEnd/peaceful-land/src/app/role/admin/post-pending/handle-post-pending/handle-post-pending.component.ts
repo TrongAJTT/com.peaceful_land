@@ -31,15 +31,20 @@ export class HandlePostPendingComponent implements OnInit, AfterViewInit{
   postsThumbImage: string = "";
   activeImageIndex = 0;  // Chỉ số của hình ảnh hiện tại
   currChildImg = 0;
-  imageList = [
-    { src: '/assets/img/house/house-demo.jpg' },
-    { src: '/assets/img/house/house-demo-1.jpg' },
-    { src: '/assets/img/house/house-demo-2.jpg' },
-    { src: '/assets/img/house/house-demo-3.jpg' },
-  ];
+  imageList!: any[ ];
+  imagesListRaw!: any;
   modalImageSrc = '';
   isModalOpen = false;  // Trạng thái của modal
   itemsToShow = 3;  // Số lượng ảnh hiển thị một lần
+
+  showAllProLog = false; 
+  displayedData!: any;  
+  dataProLog!: any[ ];
+  
+  showAllPostLog=false;
+  displayedDataPost!: any;  
+  dataPostLog!: any[];
+
 
   rejectForm = new FormGroup({
     message: new FormControl(''),
@@ -77,8 +82,39 @@ export class HandlePostPendingComponent implements OnInit, AfterViewInit{
       this.postId = +params['id'];
     }))
     await this.loadPost()
-    await this.loadProImages()
+    const proImagesList = await this.loadProImages()
+    this.changeImagesToBase64(this.imagesListRaw)
+    await this.loadLogPro();
+    await this.loadLogPost();
     this.cdr.detectChanges();
+  }
+
+  async loadLogPro(): Promise<void>{
+    try{
+      this.dataProLog = await firstValueFrom(this.postService.getLogsOfPro(this.postId));
+      this.displayedData = this.dataProLog.slice(0, 5); 
+    }catch(e){
+      this.displayedData = []
+    }
+  }
+
+  onImageError(post_log: any): void {
+    post_log.thumbnail_url = '/assets/img/house/house-demo.jpg';
+  }
+
+  async loadLogPost(): Promise<void> {
+
+    try{
+      this.dataPostLog = await firstValueFrom(this.postService.getLogsOfPost(this.postId));
+      this.displayedDataPost = this.dataPostLog.slice(0, 5); 
+      const loadImagePromises = this.dataPostLog.map((post) => 
+        post.thumbnail_url = `http://localhost:8080/api/images?path=${post.thumbnail_url}`
+      );
+      // Wait for all images to load
+      await Promise.all(loadImagePromises);
+    }catch(e){
+      this.displayedDataPost = []
+    }
   }
 
   async ngAfterViewInit(): Promise<void> {
@@ -92,7 +128,7 @@ export class HandlePostPendingComponent implements OnInit, AfterViewInit{
   }
 
   async loadProImages() : Promise<void>{
-    const proImages = await firstValueFrom(this.propertyService.getProImages(this.currPost.data.property.id))
+    this.imagesListRaw = await firstValueFrom(this.propertyService.getProImages(this.currPost.data.property.id))
   }
 
   async changeToImg(thumbUrl: string): Promise<void> {
@@ -239,6 +275,24 @@ export class HandlePostPendingComponent implements OnInit, AfterViewInit{
     }
   }
 
+  async changeImagesToBase64(proImages: string[]): Promise<void> {
+    const imageList: { src: string }[] = [];
+  
+    // Loop through each image URL in the proImages array
+    for (let i = 0; i < proImages.length; i++) {
+      try {
+        // Assuming imgService.changeToImgBase64 returns a base64 string for each image URL
+        const base64Image = await firstValueFrom(this.imgService.changeToImgBase64(proImages[i]));
+        
+        // Push the base64 image into the imageList array
+        imageList.push({ src: base64Image });
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    this.imageList = imageList;
+  }
+
   openRejectModal() {
     const modalElement = this.rejectModal.nativeElement as HTMLElement;
     const backdrop = document.createElement('div');
@@ -268,5 +322,15 @@ export class HandlePostPendingComponent implements OnInit, AfterViewInit{
   }
 
 
+  // Hàm để toggle giữa xem thêm và ẩn đi
+  toggleViewPro() {
+    this.showAllProLog = !this.showAllProLog;  // Đảo ngược trạng thái
+    this.displayedData = this.showAllProLog ? this.dataProLog : this.dataProLog.slice(0, 5);
+  }
+
+  toggleViewPost() {
+    this.showAllPostLog = !this.showAllPostLog;  // Đảo ngược trạng thái
+    this.displayedDataPost = this.showAllPostLog ? this.dataPostLog : this.dataPostLog.slice(0, 5);
+  }
 
 }

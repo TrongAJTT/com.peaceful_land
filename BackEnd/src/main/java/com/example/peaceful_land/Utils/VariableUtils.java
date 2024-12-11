@@ -196,4 +196,17 @@ public class VariableUtils {
         return LocalDateTime.now() + " SERVER STAT --- ";
     }
 
+    public static LocalDateTime getBeginOfWeek(){
+        return LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)
+                .minusDays(LocalDateTime.now().getDayOfWeek().getValue()-1);
+    }
+
+    public static LocalDateTime getBeginOfMonth(){
+        return LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).withDayOfMonth(1);
+    }
+
+    public static LocalDateTime getBeginOfYear(){
+        return LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).withDayOfYear(1);
+    }
+
 }

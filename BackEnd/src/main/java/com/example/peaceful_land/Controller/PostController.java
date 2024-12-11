@@ -2,7 +2,6 @@ package com.example.peaceful_land.Controller;
 
 import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Post;
-import com.example.peaceful_land.Entity.RequestPost;
 import com.example.peaceful_land.Exception.PropertyNotFoundException;
 import com.example.peaceful_land.Exception.RequestInvalidException;
 import com.example.peaceful_land.Repository.PostRepository;
@@ -44,8 +43,7 @@ public class PostController {
 
     @PostMapping("/request-approve")
     public ResponseEntity<?> requestApprove(@RequestBody IdRequest request) {
-        RequestPost newRequest = postService.createUserPostRequestApproval(request);
-        return ok(newRequest);
+        return ok(gson.toJson(postService.createUserPostRequestApproval(request)));
     }
 
     @PostMapping("/{id}")
@@ -216,6 +214,11 @@ public class PostController {
                         propertyRepository.findById(id).orElseThrow(PropertyNotFoundException::new)
                 ).getId()
         ));
+    }
+
+    @PostMapping("/{id}/s_remove")
+    public ResponseEntity<?> removePost(@PathVariable Long id, @RequestBody AdminBanRemoveRequest request) {
+        return ok(gson.toJson(postService.removePost(id, request)));
     }
 
 }

@@ -3,7 +3,6 @@ package com.example.peaceful_land.Service;
 import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Post;
 import com.example.peaceful_land.Entity.Property;
-import com.example.peaceful_land.Entity.RequestPost;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public interface IPostService {
     // Thay đổi ảnh đại diện bài rao
     String changeThumbnail(ChangePostThumbnailRequest request);
     // Yêu cầu phê duyệt bài rao
-    RequestPost createUserPostRequestApproval(IdRequest postRequest);
+    String createUserPostRequestApproval(IdRequest postRequest);
     // Xem thông tin
     ViewPostResponse getPostInformationFromPostId(IdRequest request);
     // Quan tâm một bài rao
@@ -61,4 +60,6 @@ public interface IPostService {
     Object extendPost(Long postId, ExtendPostRequest request);
     // Xem danh sách bài rao của một người
     List<ResponsePost> viewUserPosts(Long userId);
+    // Xóa bài rao
+    String removePost(Long postId, AdminBanRemoveRequest request);
 }

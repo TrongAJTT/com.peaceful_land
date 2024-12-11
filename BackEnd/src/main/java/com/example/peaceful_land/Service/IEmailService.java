@@ -2,6 +2,7 @@ package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.EmailDetail;
 import com.example.peaceful_land.Entity.PaymentMethod;
+import com.example.peaceful_land.Entity.Post;
 import com.example.peaceful_land.Entity.RequestReport;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,9 @@ public interface IEmailService {
 
     // Gửi email với template xác nhận tài khoản
     void sendForgotPassVerifyEmail(String emailTo, String VerificationCode);
+
+    // Gửi email với template gửi bài rao
+    void sendPostRequestConfirmation(Post post);
 
     // Gửi email với template xác nhận bài rao được duyệt đến người rao bài
     void sendPostApprovedEmailToOwner(String emailTo, Long postId, LocalDateTime createdAt);
@@ -38,5 +42,11 @@ public interface IEmailService {
 
     // Gửi email thông báo yêu cầu đã được xử lý
     void sendRequestHandledEmail(RequestReport request, String replyMessage);
+
+    // Gửi email thông báo khóa tài khoản
+    void sendAccountLockedEmail(String emailTo, String reason);
+
+    // Gửi email xóa bài rao
+    void sendPostDeletedEmail(String emailTo, Long postId, LocalDateTime createdAt, String reason);
 
 }

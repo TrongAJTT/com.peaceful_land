@@ -2,6 +2,7 @@ package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.EmailDetail;
 import com.example.peaceful_land.Entity.PaymentMethod;
+import com.example.peaceful_land.Entity.Post;
 import com.example.peaceful_land.Entity.RequestReport;
 import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.mail.MessagingException;
@@ -110,6 +111,135 @@ public class EmailService implements IEmailService {
     }
 
     @Override
+    public void sendPostRequestConfirmation(Post post) {
+        try {
+            System.out.println("[Mail proxy] Sending Post Approved Email to owner: " + post.getProperty().getUser().getEmail());
+            // Creating a MimeMessage
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+
+            String htmlContent = String.format(
+                    """
+                    <p>Xin chào %s [%s],</p>
+                    <p>Chúng tôi xin thông báo với bạn rằng bài rao của bạn đã được gủi đi và xem xét duyệt.</p>
+                    <p>Sau đây là thông tin về bài rao cũng như bất động sản của bạn.</P>
+                    <table style="border-collapse: collapse; margin: 25px 0; font-size: 0.9em; font-family: sans-serif; min-width: 400px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+                        <thead>
+                            <tr style="background-color: #009879; color: #ffffff;">
+                                <th style="padding: 12px 15px;">Mã bài rao</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Tiêu đề bài rao</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Nội dung</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Hình thức rao</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Hạn cho thuê</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Địa chỉ bất động sản</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Đại chỉ bản đồ số</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Phân loại</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Giá tiền</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Diện tích</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Giấy tờ pháp lý</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Số phòng ngủ</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Số nhà vệ sinh</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Chiều dài lối vào</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Mặt tiền</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Hướng nhà</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Hướng ban công</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #009879;">
+                                <th style="padding: 12px 15px;">Ngày tạo</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Bài rao của bạn sẽ được xem xét duyệt đến tối đa trong vòng %s ngày tới. Hãy chú ý theo dõi email của bạn.</p>
+                    """,
+                    post.getProperty().getUser().getName(),
+                    post.getProperty().getUser().getId(),
+                    post.getId(),
+                    post.getTitle(),
+                    post.getDescription(),
+                    post.getProperty().getOffer() ? "Cho thuê": "Bán",
+                    post.getProperty().getRentalPeriod() == null ? "Không có" : post.getProperty().getRentalPeriod(),
+                    post.getProperty().getLocationDetail() + ", " + post.getProperty().getLocation(),
+                    post.getProperty().getMapUrl(),
+                    post.getProperty().getCategory(),
+                    post.getProperty().getPrice(),
+                    post.getProperty().getArea(),
+                    post.getProperty().getLegal(),
+                    post.getProperty().getBedrooms() == null ? "Không có" : post.getProperty().getBedrooms(),
+                    post.getProperty().getToilets() == null ? "Không có" : post.getProperty().getToilets(),
+                    post.getProperty().getEntrance() == null ? "Không có" : post.getProperty().getEntrance(),
+                    post.getProperty().getFrontage() == null ? "Không có" : post.getProperty().getFrontage(),
+                    post.getProperty().getHouseOrientation() == null ? "Không có" : post.getProperty().getHouseOrientation(),
+                    post.getProperty().getBalconyOrientation() == null ? "Không có" : post.getProperty().getBalconyOrientation(),
+                    VariableUtils.convertToVnTimeZoneString(post.getDateBegin()),
+                    post.getProperty().getUser().getRole() == 0 ? "3" : "2");
+
+            helper.setTo(post.getProperty().getUser().getEmail());
+            helper.setSubject("Thông báo về bài rao " + post.getId());
+            helper.setText(htmlContent, true); // `true` để bật chế độ HTML
+
+            // Sending the mail
+            javaMailSender.send(mimeMessage);
+
+        }
+        catch (MailException | MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public void sendPostApprovedEmailToOwner(String emailTo, Long postId, LocalDateTime createdAt) {
         try {
             System.out.println("[Mail proxy] Sending Post Approved Email to owner: " + emailTo);
@@ -134,10 +264,11 @@ public class EmailService implements IEmailService {
                             </tr>
                         </tbody>
                     </table>
+                    <p>Hãy truy cập ngay để xem thông tin về bài đăng của bạn trên trang web nhé!.</p>
                     """, postId, VariableUtils.convertToVnTimeZoneString(createdAt));
 
             helper.setTo(emailTo);
-            helper.setSubject("Bài rao của bạn đã được duyệt");
+            helper.setSubject("Thông báo về bài rao " + postId);
             helper.setText(htmlContent, true); // `true` để bật chế độ HTML
 
             // Sending the mail
@@ -415,6 +546,92 @@ public class EmailService implements IEmailService {
 
             helper.setTo(request.getEmail());
             helper.setSubject("Phản hồi đối với yêu cầu báo cáo " + request.getId() );
+            helper.setText(htmlContent, true);
+
+            // Sending the mail
+            javaMailSender.send(mimeMessage);
+        }
+        catch (MailException | MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendAccountLockedEmail(String emailTo, String reason) {
+        try {
+            System.out.println("[Mail proxy] Sending Ban Account Email to user: " + emailTo);
+            // Creating a MimeMessage
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            String htmlContent = String.format(
+                    """
+                    <p>Chúng tôi rất tiếc khi phải thông báo với bạn rằng tài khoản của bạn đã bị khóa.</p>
+                    <table style="border-collapse: collapse; margin: 25px 0; font-size: 0.9em; font-family: sans-serif; min-width: 400px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+                        <thead>
+                            <tr style="background-color: #009879; color: #ffffff;">
+                                <th style="padding: 12px 15px;">Thời gian khóa</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #009879;">
+                                <th style="padding: 12px 15px;">Lý do</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Nếu như bạn cho rằng đây là một sự nhầm lẫn, hãy liên hệ với quản trị viên để cung cấp thêm thông tin.</p>
+                    """, VariableUtils.convertToVnTimeZoneString(LocalDateTime.now()), reason
+            );
+
+            helper.setTo(emailTo);
+            helper.setSubject("Thông báo về việc khóa tài khoản");
+            helper.setText(htmlContent, true);
+
+            // Sending the mail
+            javaMailSender.send(mimeMessage);
+        }
+        catch (MailException | MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendPostDeletedEmail(String emailTo, Long postId, LocalDateTime createdAt, String reason) {
+        try {
+            System.out.println("[Mail proxy] Sending Remove Post Email to owner: " + emailTo);
+            // Creating a MimeMessage
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            String htmlContent = String.format(
+                    """
+                    <p>Chúng tôi rất tiếc khi phải thông báo với bạn rằng bài rao của bạn đã bị khóa.</p>
+                    <table style="border-collapse: collapse; margin: 25px 0; font-size: 0.9em; font-family: sans-serif; min-width: 400px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
+                        <thead>
+                            <tr style="background-color: #009879; color: #ffffff;">
+                                <th style="padding: 12px 15px;">Mã bài rao</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #dddddd;">
+                                <th style="padding: 12px 15px;">Thời gian xóa</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #009879;">
+                                <th style="padding: 12px 15px;">Lý do</th>
+                                <td style="padding: 12px 15px;">%s</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Nếu như bạn cho rằng đây là một sự nhầm lẫn, hãy liên hệ với quản trị viên để cung cấp thêm thông tin.</p>
+                    """, postId, VariableUtils.convertToVnTimeZoneString(LocalDateTime.now()), reason
+            );
+
+            helper.setTo(emailTo);
+            helper.setSubject("Thông báo về bài rao " + postId);
             helper.setText(htmlContent, true);
 
             // Sending the mail

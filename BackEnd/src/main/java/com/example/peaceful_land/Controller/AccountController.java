@@ -75,4 +75,14 @@ public class AccountController {
         return ResponseEntity.ok(accountService.viewPurchasesHistory(request.getUserId()));
     }
 
+    @PostMapping("/statistics")
+    public ResponseEntity<?> getStatistics(@RequestBody IdRequest request) {
+        return ResponseEntity.ok(accountService.getStatistics(request.getUserId()));
+    }
+
+    @PostMapping("/admin/ban")
+    public ResponseEntity<?> banAccount(@RequestBody AdminBanRemoveRequest request) {
+        return ResponseEntity.ok(gson.toJson(accountService.banAccount(request)));
+    }
+
 }

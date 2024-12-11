@@ -11,4 +11,5 @@ import java.util.List;
 public interface RequestContactRepository extends JpaRepository<RequestContact, Long> {
     boolean existsByPropertyAndUserAndDateBeginAfter(Property property, Account account, LocalDateTime dateTime);
     List<RequestContact> findByPropertyEqualsOrderByIdDesc(Property property);
+    Long countByPropertyAndDateBeginAfter(Property property, LocalDateTime dateTime);
 }

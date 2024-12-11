@@ -1,10 +1,7 @@
 package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.*;
-import com.example.peaceful_land.Entity.Account;
-import com.example.peaceful_land.Entity.PaymentMethod;
-import com.example.peaceful_land.Entity.Purchase;
-import com.example.peaceful_land.Entity.RequestWithdraw;
+import com.example.peaceful_land.Entity.*;
 import com.example.peaceful_land.Exception.AccountNotFoundException;
 import com.example.peaceful_land.Exception.PayMethodNotFoundException;
 import com.example.peaceful_land.Repository.*;
@@ -19,9 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_AVATAR;
 
@@ -399,18 +394,32 @@ public class AccountService implements IAccountService{
                         .filter(Files::isRegularFile) // Chỉ lấy các tệp, không lấy thư mục
                         .toList();
 
-                // Duyệt qua từng tệp
+                // Xóa tệp trên server nếu không nằm trong listAvatars
                 for (Path file : allFiles) {
                     String fileName = file.getFileName().toString();
                     // Kiểm tra xem tệp có nằm trong listAvatars không
-                    if (!listAvatars.contains(fileName)) {
+                    if (!listAvatars.contains(VariableUtils.UPLOAD_DIR_AVATAR_POSTFIX + fileName)) {
                         // Xóa tệp nếu không nằm trong danh sách
                         Files.delete(file);
                         System.out.println(VariableUtils.getServerScanPrefix() + "Delete unused avatar " + file);
                     }
                 }
 
-                System.out.println(">>>\n" + VariableUtils.getServerScanPrefix() + "Scan and delete unused avatar completed\n<<<");
+                // Đổi tệp trên database nếu không nằm trong server
+                for (String avatar : listAvatars) {
+                    Path thumbPath = Path.of(uploadDir.toString(), avatar.split("/")[1]);
+                    if (!Files.exists(thumbPath)) {
+                        System.out.println(avatar);
+                        Optional<Account> account = accountRepository.findByAvatarUrl(avatar);
+                        if (account.isPresent()){
+                            account.get().setAvatarUrl(VariableUtils.DEFAULT_AVATAR);
+                            accountRepository.save(account.get());
+                            System.out.println(VariableUtils.getServerScanPrefix() + "Change avatar of user " + account.get().getId() + " to default on database");
+                        }
+                    }
+                }
+
+                System.out.println(">>>\n" + VariableUtils.getServerStatPrefix() + "Scan and delete unused avatar completed\n<<<");
 
             } catch (IOException e) {
                 e.printStackTrace();

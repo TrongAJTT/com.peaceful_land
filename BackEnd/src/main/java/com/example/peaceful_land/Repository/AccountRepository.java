@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Optional<Account> findById(Long id);
     Optional<Account> findByEmail(String email);
+    Optional<Account> findByAvatarUrl(String avatarUrl);
     List<Account> findAllByRoleExpirationBefore(LocalDate expiration);
     boolean existsByEmail(String email);
     boolean existsByPhone(String phone);

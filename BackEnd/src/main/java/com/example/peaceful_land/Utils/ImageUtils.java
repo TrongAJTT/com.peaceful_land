@@ -24,7 +24,7 @@ public class ImageUtils {
             throw new IllegalArgumentException("Tên tập tin rỗng");
         }
         // Tạo tên file mới để tránh trùng lặp
-        String uniqueFileName = VariableUtils.getStringFromUploadType(uploadType) + "/" + UUID.randomUUID() + "_" + fileName;
+        String uniqueFileName = VariableUtils.getStringFromUploadType(uploadType) + "/" + UUID.randomUUID() + fileName.substring(fileName.lastIndexOf("."));
         // Lấy đường dẫn đầy đủ đến file
         Path filePath = Paths.get(VariableUtils.UPLOAD_DIR_ROOT, uniqueFileName);
         // Lưu file vào thư mục uploads

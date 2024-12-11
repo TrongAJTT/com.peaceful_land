@@ -23,7 +23,9 @@ public class VariableUtils {
 
     public static final String UPLOAD_DIR_ROOT = "uploads";
     public static final String UPLOAD_DIR_AVATAR = "uploads/avatars";
+    public static final String UPLOAD_DIR_AVATAR_POSTFIX = "avatars/";
     public static final String UPLOAD_DIR_PROP_IMG = "uploads/property_imgs";
+    public static final String UPLOAD_DIR_PROP_POSTFIX = "property_imgs/";
 
     public static final int TYPE_UPLOAD_AVATAR = 1;
     public static final int TYPE_UPLOAD_PROPERTY_IMAGE = 2;

@@ -6,6 +6,8 @@ import { DefaultComponent } from './default/default.component';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
+import { provideClientHydration } from '@angular/platform-browser';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 
 
 @NgModule({
@@ -18,6 +20,10 @@ import { SidebarComponent } from './sidebar/sidebar.component';
   imports: [
     CommonModule,
     AdminRoutingModule
+  ],
+  providers: [
+    provideClientHydration(),
+    provideHttpClient(withFetch()),
   ]
 })
 export class AdminModule { }

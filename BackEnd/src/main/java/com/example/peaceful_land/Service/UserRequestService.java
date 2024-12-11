@@ -1,9 +1,8 @@
 package com.example.peaceful_land.Service;
 
-import com.example.peaceful_land.DTO.PostApprovalResponse;
-import com.example.peaceful_land.DTO.ResponseUserPostReqView;
-import com.example.peaceful_land.DTO.ResponseWithdrawRequest;
+import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.*;
+import com.example.peaceful_land.Exception.RequestNotFoundException;
 import com.example.peaceful_land.Repository.*;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,7 @@ public class UserRequestService implements IUserRequestService {
     private final IEmailService emailService;
     private final AccountRepository accountRepository;
     private final PurchaseRepository purchaseRepository;
+    private final RequestReportRepository requestReportRepository;
 
     @Override
     public List<PostApprovalResponse> getPostRequestBaseOn(String requestState) {
@@ -43,7 +43,7 @@ public class UserRequestService implements IUserRequestService {
     @Override
     public ResponseUserPostReqView getPostRequestById(Long id) {
         RequestPost postRequest = requestPostRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
+                .orElseThrow(RequestNotFoundException::new);
         return postRequest.toResponseUserPostReqView();
     }
 
@@ -51,13 +51,17 @@ public class UserRequestService implements IUserRequestService {
     public void approvePostRequest(Long id) {
         // Lấy ra yêu cầu
         RequestPost postRequest = requestPostRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
+                .orElseThrow(RequestNotFoundException::new);
+        // Bài rao đã được duyệt
+        if (postRequest.getApproved() != null){
+            throw new IllegalArgumentException("Yêu cầu đã được xử lý");
+        }
         // Thay đổi trạng thái yêu cầu và lưu vào database
         postRequest.setApproved(true);
         requestPostRepository.save(postRequest);
         // Thay đổi trạng thái bài rao và lưu vào database nếu có
         Post approvedPost = postRequest.getPost();
-        if (postRequest.getHide()){
+        if (approvedPost.getHide()){
             approvedPost.setHide(false);
             postRepository.save(approvedPost);
             // Thay đổi trạng thái bất động sản và lưu vào database
@@ -92,7 +96,7 @@ public class UserRequestService implements IUserRequestService {
     public void rejectPostRequestFromId(Long id, String denyMessage) {
         // Lấy ra yêu cầu
         RequestPost postRequest = requestPostRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
+                .orElseThrow(RequestNotFoundException::new);
         rejectPostRequest(postRequest, denyMessage);
     }
 
@@ -140,7 +144,7 @@ public class UserRequestService implements IUserRequestService {
     public void approveOrRejectWithdrawRequest(Long id, Boolean isApprove, String denyMessageIfFalse) {
         // Lấy ra yêu cầu
         RequestWithdraw withdrawRequest = requestWithdrawRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy yêu cầu"));
+                .orElseThrow(RequestNotFoundException::new);
         if (withdrawRequest.getStatus() != RequestWithdraw.STATUS_PENDING){
             throw new IllegalArgumentException("Yêu cầu đã được xử lý");
         }
@@ -192,4 +196,42 @@ public class UserRequestService implements IUserRequestService {
         }).start();
     }
 
+    @Override
+    public List<ResponseReport> getReportRequestBaseOn(String requestState) {
+        List<RequestReport> requestReports = switch(requestState){
+            case VariableUtils.REQUEST_STATE_ALL -> requestReportRepository.findAllByOrderByIdDesc();
+            case VariableUtils.REQUEST_STATE_PENDING -> requestReportRepository.findAllByHideEqualsOrderByIdDesc(false);
+            case VariableUtils.REQUEST_STATE_HANDLED -> requestReportRepository.findAllByHideEqualsOrderByIdDesc(true);
+            default -> throw new IllegalStateException("Trạng thái yêu cầu không hợp lệ");
+        };
+        return requestReports.stream()
+                .map(RequestReport::toLiteResponseReport)
+                .toList();
+    }
+
+    @Override
+    public ResponseReport getReportDetailInfoId(Long id) {
+        RequestReport requestReport = requestReportRepository.findById(id)
+                .orElseThrow(RequestNotFoundException::new);
+        return requestReport.toResponseReport();
+    }
+
+    @Override
+    public void handleReport(Long id, String replyMessage) {
+        // Lấy ra yêu cầu
+        RequestReport requestReport = requestReportRepository.findById(id)
+                .orElseThrow(RequestNotFoundException::new);
+        if (requestReport.getHide()){
+            throw new IllegalArgumentException("Yêu cầu đã được xử lý");
+        }
+        // Thay đổi trạng thái yêu cầu và lưu vào database
+        requestReport.setHide(true);
+        requestReportRepository.save(requestReport);
+        // Gửi email thông báo cho người yêu cầu nếu có
+        if (replyMessage != null && !replyMessage.isEmpty()){
+            new Thread(() ->
+                emailService.sendRequestHandledEmail(requestReport, replyMessage)
+            ).start();
+        }
+    }
 }

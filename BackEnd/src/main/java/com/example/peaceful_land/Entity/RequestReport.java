@@ -1,6 +1,7 @@
 package com.example.peaceful_land.Entity;
 
 import com.example.peaceful_land.DTO.ReportRequest;
+import com.example.peaceful_land.DTO.ResponseReport;
 import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,6 +35,14 @@ public class RequestReport extends BaseEntity {
     @Column
     private String email;
 
+    public boolean isHandled() {
+        return this.getHide();
+    }
+
+    public void setHandled(boolean handled) {
+        this.setHide(handled);
+    }
+
     public static RequestReport fromReportRequestWithoutProperty(ReportRequest request) {
         return RequestReport.builder()
                 .object(request.getObject() == VariableUtils.REQUEST_REPORT_OBJECT_ID_POST ?
@@ -44,6 +53,31 @@ public class RequestReport extends BaseEntity {
                 .name(request.getName())
                 .phone(request.getPhone())
                 .email(request.getEmail())
+                .build();
+    }
+
+    public ResponseReport toLiteResponseReport() {
+        return ResponseReport.builder()
+                .id(this.id)
+                .propertyId(this.property.getId())
+                .object(this.object)
+                .reasons(this.reasons)
+                .name(this.name)
+                .isHandled(this.isHandled())
+                .build();
+    }
+
+    public ResponseReport toResponseReport() {
+        return ResponseReport.builder()
+                .id(this.id)
+                .propertyId(this.property.getId())
+                .object(this.object)
+                .reasons(this.reasons)
+                .description(this.description)
+                .name(this.name)
+                .phone(this.phone)
+                .email(this.email)
+                .isHandled(this.isHandled())
                 .build();
     }
 

@@ -43,7 +43,8 @@ public class SecurityConfig  {
                                 "/images/**",
                                 "/properties/*/get-images",
                                 "/posts/*/property-logs",
-                                "/posts/*/post-logs"
+                                "/posts/*/post-logs",
+                                "/posts/from-property/*"
                         ).permitAll()
 
                         // Secure the API endpoints that require JWT

@@ -15,16 +15,18 @@ export class UserRequestService {
     private http: HttpClient
   ) { }
 
-  getAllPost(type: string): Observable<any>{
+  getAllPostUserReq(type: string): Observable<any>{
     const token = this.authService.getToken();  // Lấy JWT từ AuthService
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${this.apiUrl}/posts?type=${type}`, 
-       {headers});
+      {}, {headers});
   }
 
   getPostById(postId: number): Observable<any>{
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${this.apiUrl}/post/${postId}`, 
-      {});
+      {}, {headers});
   }
 
   rejectOrApprovePost(postId: number,type: string, deny_message: string): Observable<any>{

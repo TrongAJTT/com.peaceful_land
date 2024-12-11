@@ -5,7 +5,7 @@
             <div class="col-6">
                 <h2 class="mb-3">Chi tiết bài rao</h2>
                 <p class="text-success" style="font-size: calc(1em + 6px)">
-                    <i class="fas fa-calendar-day"></i> Đăng vào ngày: {{ currPost.data.createdAt | date: 'dd/MM/yyyy' }}
+                    <i class="fas fa-calendar-day"></i> Đăng vào ngày: {{ currPost.createdAt | date: 'dd/MM/yyyy' }}
                   </p>
                   
                   <p class="text-danger" style="font-size: calc(1em + 6px)">
@@ -28,10 +28,10 @@
                 <div  class="row g-4">
                     <div class="col-lg-6">
                         <div class="position-relative border rounded">
-                            <a *ngIf="!currPost.data.thumbnUrl || currPost.data.thumbnUrl === ''">
+                            <a *ngIf="!currPost.thumbnUrl || currPost.thumbnUrl === ''">
                                 <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100 c-p" (click)="openModal('/assets/img/house/house-demo.jpg')" src="/assets/img/house/house-demo.jpg" alt="">
                             </a>
-                            <a *ngIf="currPost.data.thumbnUrl">
+                            <a *ngIf="currPost.thumbnUrl">
                                 <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100 c-p" (click)="openModal(postsThumbImage)" [src]="postsThumbImage || '/assets/img/house/house-demo.jpg'">
                             </a>
                         </div>
@@ -61,32 +61,32 @@
                         </div>
                     </div>
                     <div  class="col-lg-6">
-                        <p class="mb-3"><strong>Loại sản phẩm:</strong> {{currPost.data.property.category}}</p>
+                        <p class="mb-3"><strong>Loại sản phẩm:</strong> {{currPost.property.category}}</p>
                         <p class="mb-3"> <strong>Loại giao dịch:</strong> 
-                            <span *ngIf="currPost.data.property.offer"> Cho Thuê</span>
-                            <span *ngIf="!currPost.data.property.offer"> Mua bán</span>
+                            <span *ngIf="currPost.property.offer"> Cho Thuê</span>
+                            <span *ngIf="!currPost.property.offer"> Mua bán</span>
                         </p>
                         <div class="product-price mb-4">
                             <h3 class="fw-bold mb-0">
-                              {{ currPost.data.property.price | number:'1.0-0'}} VNĐ
+                              {{ currPost.property.price | number:'1.0-0'}} VNĐ
                             </h3>
                           </div>
-                        <p class="mb-3"><strong>Tiêu đề: </strong>{{currPost.data.title}}</p>
-                        <p class="mb-3"><strong>Mô tả: </strong>{{currPost.data.description}}</p>
-                        <p class="mb-3" *ngIf="currPost.data.property.offer"><strong>Thời gian thuê: </strong>{{currPost.data.property.rental_period || '(Chưa cập nhật)'}} </p>
-                        <p class="mb-3"><strong>Địa chỉ: </strong>{{currPost.data.property.location}}</p>
-                        <p class="mb-3"><strong>Địa chỉ chi tiết: </strong>{{currPost.data.property.location_detail}}</p>
-                        <p class="mb-3"><strong>Địa chỉ cụ thể: </strong>{{currPost.data.property.map_url}}</p>
-                        <p class="mb-3"><strong>Diện tích: </strong>{{currPost.data.property.area}} mét vuông</p>
+                        <p class="mb-3"><strong>Tiêu đề: </strong>{{currPost.title}}</p>
+                        <p class="mb-3"><strong>Mô tả: </strong>{{currPost.description}}</p>
+                        <p class="mb-3" *ngIf="currPost.property.offer"><strong>Thời gian thuê: </strong>{{currPost.property.rental_period || '(Chưa cập nhật)'}} </p>
+                        <p class="mb-3"><strong>Địa chỉ: </strong>{{currPost.property.location}}</p>
+                        <p class="mb-3"><strong>Địa chỉ chi tiết: </strong>{{currPost.property.location_detail}}</p>
+                        <p class="mb-3"><strong>Địa chỉ cụ thể: </strong>{{currPost.property.map_url}}</p>
+                        <p class="mb-3"><strong>Diện tích: </strong>{{currPost.property.area}} mét vuông</p>
 
                         <p class="mb-3"><strong>Hướng nhà: </strong>
-                            <span *ngIf="!currPost.data.property.house_orientation || currPost.data.property.house_orientation==''">Chưa cập nhật</span>
-                            <span *ngIf="currPost.data.property.house_orientation && currPost.data.property.house_orientation!=''">{{currPost.data.property.house_orientation}}</span>
+                            <span *ngIf="!currPost.property.house_orientation || currPost.property.house_orientation==''">Chưa cập nhật</span>
+                            <span *ngIf="currPost.property.house_orientation && currPost.property.house_orientation!=''">{{currPost.property.house_orientation}}</span>
                         </p>
                         <p class="mb-3"><strong>
                             Hướng ban công: </strong> 
-                            <span *ngIf="!currPost.data.property.balcony_orientation || currPost.data.property.balcony_orientation==''">Chưa cập nhật</span>
-                            <span *ngIf="currPost.data.property.balcony_orientation && currPost.data.property.balcony_orientation!=''">{{currPost.data.property.balcony_orientation}}</span>
+                            <span *ngIf="!currPost.property.balcony_orientation || currPost.property.balcony_orientation==''">Chưa cập nhật</span>
+                            <span *ngIf="currPost.property.balcony_orientation && currPost.property.balcony_orientation!=''">{{currPost.property.balcony_orientation}}</span>
                         </p>
                     </div>
 
@@ -111,7 +111,7 @@
                                                     <p class="mb-0">Số phòng ngủ</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="mb-0">{{currPost.data.property.bedrooms}} phòng</p>
+                                                    <p class="mb-0">{{currPost.property.bedrooms}} phòng</p>
                                                 </div>
                                             </div>
                                             <div class="row bg-light text-center align-items-center justify-content-center py-2">
@@ -119,7 +119,7 @@
                                                     <p class="mb-0">Số nhà vệ sinh</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="mb-0">{{currPost.data.property.toilets}} phòng</p>
+                                                    <p class="mb-0">{{currPost.property.toilets}} phòng</p>
                                                 </div>
                                             </div>
                                             <div class="row text-center align-items-center justify-content-center py-2">
@@ -127,7 +127,7 @@
                                                     <p class="mb-0">Số mặt tiền</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="mb-0">{{currPost.data.property.entrance}} mặt</p>
+                                                    <p class="mb-0">{{currPost.property.entrance}} mặt</p>
                                                 </div>
                                             </div>
                                             <div class="row bg-light text-center align-items-center justify-content-center py-2">
@@ -135,7 +135,7 @@
                                                     <p class="mb-0">Số lối vào</p>
                                                 </div>
                                                 <div class="col-6">
-                                                    <p class="mb-0">{{currPost.data.property.frontage}} mặt</p>
+                                                    <p class="mb-0">{{currPost.property.frontage}} mặt</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -231,7 +231,7 @@
 </div>
 
 <div *ngIf="currPost">
-    <div class="modal fade" #rejectModal *ngIf="userId!==-1" [id]="'rejectModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal fade" #rejectModal *ngIf="userId!==-1" [id]="'rejectModal'+currPost.id" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <form [formGroup]="rejectForm" (ngSubmit)="submitReject($event)">

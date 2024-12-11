@@ -26,6 +26,7 @@ export class HandlePostPendingComponent implements OnInit, AfterViewInit{
   currPost: any;
   user!: User;
   userId: number = -1;
+  userReqId!: number;
   today: any;
   postId!: number
   postsThumbImage: string = "";
@@ -79,7 +80,7 @@ export class HandlePostPendingComponent implements OnInit, AfterViewInit{
     }
 
     (this.activeRoute.params.subscribe(params => {
-      this.postId = +params['id'];
+      this.userReqId = +params['id'];
     }))
     await this.loadPost()
     const proImagesList = await this.loadProImages()
@@ -123,12 +124,14 @@ export class HandlePostPendingComponent implements OnInit, AfterViewInit{
   }
 
   async loadPost() : Promise<void>{
-    this.currPost = await firstValueFrom(this.userRequestService.getPostById(this.postId))
-    this.changeToImg(this.currPost.data.thumbnUrl);
+    const userReqPost = await firstValueFrom(this.userRequestService.getPostById(this.userReqId))
+    this.currPost = userReqPost.data
+    this.postId = this.currPost.id
+    this.changeToImg(this.currPost.thumbnUrl);
   }
 
   async loadProImages() : Promise<void>{
-    this.imagesListRaw = await firstValueFrom(this.propertyService.getProImages(this.currPost.data.property.id))
+    this.imagesListRaw = await firstValueFrom(this.propertyService.getProImages(this.currPost.property.id))
   }
 
   async changeToImg(thumbUrl: string): Promise<void> {
@@ -235,7 +238,7 @@ export class HandlePostPendingComponent implements OnInit, AfterViewInit{
   }
 
   approvePost(){
-    this.userRequestService.rejectOrApprovePost(this.postId,'approved','')
+    this.userRequestService.rejectOrApprovePost(this.userReqId,'approved','')
     .subscribe({
       next: (response) => {
         this.snackbarService.notifySuccessUser(response)
@@ -260,7 +263,7 @@ export class HandlePostPendingComponent implements OnInit, AfterViewInit{
       this.snackbarService.notifyWarningUser("Vui lòng nhập lời nhắn");
 
     }else{
-      this.userRequestService.rejectOrApprovePost(this.postId,'rejected',message)
+      this.userRequestService.rejectOrApprovePost(this.userReqId,'rejected',message)
       .subscribe({
         next: (response) => {
           this.snackbarService.notifySuccessUser(response)

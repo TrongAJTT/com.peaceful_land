@@ -1,26 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { PostService } from '../../../core/services/post.service';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { DataTablesModule } from 'angular-datatables';
 import { firstValueFrom, Subject } from 'rxjs';
 import { UserRequestService } from '../../../core/services/user-request.service';
-import { DataTablesModule } from 'angular-datatables';
+import { PostService } from '../../../core/services/post.service';
 import { Router } from '@angular/router';
 
-
 @Component({
-  selector: 'app-post-pending',
+  selector: 'app-post-approved',
   standalone: true,
-  imports: [DataTablesModule,CommonModule],
-  templateUrl: './post-pending.component.html',
-  styleUrl: './post-pending.component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.Emulated,
+  imports: [CommonModule,DataTablesModule],
+  templateUrl: './post-approved.component.html',
+  styleUrl: './post-approved.component.css'
 })
-export class PostPendingComponent implements OnInit, AfterViewInit, OnDestroy{
+export class PostApprovedComponent implements OnInit, AfterViewInit, OnDestroy{
   headerList = ['Mã yêu cầu','Trạng thái','Tiêu đề','Địa chỉ','Ngày yêu cầu'
     ,'Ngày hết hạn yêu cầu','Hiển thị'];
   dtTrigger: Subject<any> = new Subject<any>();
-  postList!: any[];
+  reqPostList!: any[];
 
   constructor(
     private userRequestService:UserRequestService,
@@ -52,12 +49,13 @@ export class PostPendingComponent implements OnInit, AfterViewInit, OnDestroy{
 
   async ngOnInit(): Promise<void> {
     try{
-      this.postList = await firstValueFrom(this.userRequestService.getAllPostUserReq('pending'));
+      this.reqPostList = await firstValueFrom(this.userRequestService.getAllPostUserReq('pending'));
     }catch(e){
-      this.postList = []
+      this.reqPostList = []
     }
     this.cdr.detectChanges();
   }
+
 
   async ngAfterViewInit(): Promise<void> {
     await (this.ngOnInit())
@@ -66,7 +64,7 @@ export class PostPendingComponent implements OnInit, AfterViewInit, OnDestroy{
   }
 
   initializeDataTable(): void {
-    $('#dataTablePostUserReq').DataTable({
+    $('#dataTablePostUserReqApproved').DataTable({
       ...this.dtOptions,
       destroy: true 
     });
@@ -75,7 +73,7 @@ export class PostPendingComponent implements OnInit, AfterViewInit, OnDestroy{
   }
 
   ngOnDestroy(): void {
-    $('#dataTablePostUserReq').DataTable({
+    $('#dataTablePostUserReqApproved').DataTable({
       destroy: true 
     });
   }
@@ -84,7 +82,7 @@ export class PostPendingComponent implements OnInit, AfterViewInit, OnDestroy{
     return post.id
   }
 
-  goToHandle(postId: number){
-    this.router.navigate([`admin/post_pending/handle/${postId}`])
+  goToDetail(reqPostId: number){
+    this.router.navigate([`admin/post_approved/detail/${reqPostId}`])
   }
 }

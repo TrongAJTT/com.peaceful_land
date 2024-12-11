@@ -425,18 +425,22 @@ footer a {
   }
   
   /* Spinner container */
-  .spinner-container {
+.spinner-container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	color: white;
-  }
+}
 
-  .mb-24{
+.mb-24{
 	margin-bottom: 24px;
-  }
+}
 
-  h1{
+h1{
 	font-size: 2.6rem !important;
-  }
+}
+
+.z--1{
+	z-index: 1;
+}

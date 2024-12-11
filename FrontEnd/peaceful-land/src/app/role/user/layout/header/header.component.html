@@ -25,16 +25,16 @@
                         <li><a class="dropdown-item" [routerLink]="['property_list', 'no_complete']">chưa bán/thuê</a></li>
                     </ul>
                 </div>
-                <div class="nav-item nav-link dropdown p-0">
+                <div *ngIf="isSaleOrUser" class="nav-item nav-link dropdown p-0">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" (click)="toggleNavbarCollapse()">
                         Quản lý bài rao
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li>
-                            <a class="dropdown-item" *ngIf="isSaleOrUser" (click)="toggleNavbarCollapse()" routerLink="post_property">Tạo bài rao</a>
+                            <a class="dropdown-item"  (click)="toggleNavbarCollapse()" routerLink="post_property">Tạo bài rao</a>
                         </li>
                         <li>
-                            <a class="dropdown-item" *ngIf="isSaleOrUser" (click)="toggleNavbarCollapse()" routerLink="post_dashboard">Danh sách bài rao</a>
+                            <a class="dropdown-item"  (click)="toggleNavbarCollapse()" routerLink="post_dashboard">Danh sách bài rao</a>
                         </li>
                     </ul>
                 </div>

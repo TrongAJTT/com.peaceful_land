@@ -103,4 +103,11 @@ export class PostService{
   getLogsOfPost(proId: number): Observable<any>{
     return this.http.get<any>(`${this.apiUrl}/${proId}/post-logs`);
   }
+
+  getAllPostByUserId(user_id: number): Observable<any> {
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.apiUrl}/my-posts`, 
+      {user_id}, {headers});
+  }
 }

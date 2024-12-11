@@ -60,4 +60,8 @@ export class PropertyService implements OnInit {
     return this.http.post<any>(`${this.apiUrl}/upload-images`, 
       formData, {headers});
   }
+
+  getProImages(proId: number): Observable<any>{
+    return this.http.get<any>(`${this.apiUrl}/${proId}/get-images`);
+  }
 }

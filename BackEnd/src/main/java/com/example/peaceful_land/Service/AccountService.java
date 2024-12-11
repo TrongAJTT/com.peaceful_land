@@ -159,9 +159,9 @@ public class AccountService implements IAccountService{
     }
 
     @Override
-    public Account purchaseRole(PurchaseRoleRequest request) {
+    public String purchaseRole(PurchaseRoleRequest request) {
         Account account = accountRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
+                .orElseThrow(AccountNotFoundException::new);
         Long requiredMoney = VariableUtils.getRolePriceFromDayRange(request.getRole(), request.getDay());
         if (account.getAccountBalance() < requiredMoney) {
             throw new RuntimeException("Số dư không đủ. Yêu cầu tối thiểu " + requiredMoney);
@@ -195,7 +195,8 @@ public class AccountService implements IAccountService{
             throw new RuntimeException("Không thể mua role thấp hơn role hiện tại");
         }
         account.setAccountBalance(account.getAccountBalance() - requiredMoney);
-        return accountRepository.save(account);
+        accountRepository.save(account);
+        return "Mua vai trò người dùng thành công";
     }
 
     @Override

@@ -709,16 +709,26 @@ public class PostService implements IPostService {
         return "Gia hạn bài rao thành công. Số ngày gia hạn: " + request.getDayExpand() + ". Số tiền trừ: " + price;
     }
 
+    @Override
+    public List<ResponsePost> viewUserPosts(Long userId) {
+        Account account = accountRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        List<Property> listProperties = propertyRepository.findByUserEqualsAndHideEquals(account, false);
+        List<ResponsePost> listPosts = new ArrayList<>();
+        for (Property property : listProperties) {
+            Post post = postRepository.findByProperty(property);
+            if (post != null) {
+                listPosts.add(ResponsePost.fromPost(post));
+            }
+        }
+        return listPosts;
+    }
+
     public void SYSTEM_scanAndDeleteUnusedThumbs() {
         new Thread(() -> {
-            List<String> listThumbs = new ArrayList<>(
-                    postRepository.findAllThumbnails().stream()
-                            .filter(avt -> !avt.equals(VariableUtils.IMAGE_NA)).toList()
-            );
-            listThumbs.addAll(
-                    postLogRepository.findAllThumbnails().stream()
-                            .filter(avt -> !avt.equals(VariableUtils.IMAGE_NA)).toList()
-            );
+            List<String> listThumbs = postRepository.findAllThumbnails().stream()
+                            .filter(avt -> !avt.equals(VariableUtils.IMAGE_NA)).toList();
+            List<String> listLogThumbs = postLogRepository.findAllThumbnails().stream()
+                            .filter(avt -> !avt.equals(VariableUtils.IMAGE_NA)).toList();
             Path uploadDir = Path.of(VariableUtils.UPLOAD_DIR_POST_THUMB);
             try {
                 // Lấy danh sách tất cả các tệp trong thư mục uploads/thumbns
@@ -730,7 +740,8 @@ public class PostService implements IPostService {
                 for (Path file : allFiles) {
                     String fileName = file.getFileName().toString();
                     // Kiểm tra xem tệp có nằm trong listThumbs không
-                    if (!listThumbs.contains(VariableUtils.UPLOAD_DIR_POST_POSTFIX + fileName)) {
+                    if (!listThumbs.contains(VariableUtils.UPLOAD_DIR_POST_POSTFIX + fileName) &&
+                            !listLogThumbs.contains(VariableUtils.UPLOAD_DIR_POST_POSTFIX + fileName)) {
                         Files.delete(file);
                         System.out.println(VariableUtils.getServerScanPrefix() + "Delete unused post thumbnail " + file);
                     }
@@ -746,7 +757,13 @@ public class PostService implements IPostService {
                             postRepository.save(post.get());
                             System.out.println(VariableUtils.getServerScanPrefix() + "Change thumbnail of post " + post.get().getId() + " to default on database");
                         }
-                        List<PostLog> postLogList = postLogRepository.findByThumbnUrl(thumb);
+                    }
+                }
+
+                for (String logThumb : listLogThumbs){
+                    Path logThumbnPath = Path.of(uploadDir.toString(), logThumb.split("/")[1]);
+                    if (!Files.exists(logThumbnPath)){
+                        List<PostLog> postLogList = postLogRepository.findByThumbnUrl(logThumb);
                         for(PostLog postLog : postLogList) {
                             postLog.setThumbnUrl(VariableUtils.IMAGE_NA);
                             postLogRepository.save(postLog);

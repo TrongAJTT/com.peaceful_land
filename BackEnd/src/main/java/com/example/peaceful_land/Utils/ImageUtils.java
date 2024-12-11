@@ -26,7 +26,7 @@ public class ImageUtils {
         // Tạo tên file mới để tránh trùng lặp
         String uniqueFileName = VariableUtils.getStringFromUploadType(uploadType) + "/" + UUID.randomUUID() + "_" + fileName;
         // Lấy đường dẫn đầy đủ đến file
-        Path filePath = Paths.get(VariableUtils.DEFAULT_UPLOAD_DIR, uniqueFileName);
+        Path filePath = Paths.get(VariableUtils.UPLOAD_DIR_ROOT, uniqueFileName);
         // Lưu file vào thư mục uploads
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         return uniqueFileName;
@@ -55,7 +55,7 @@ public class ImageUtils {
     }
 
     public static void createUploadDirIfNotExists(int uploadType) throws IOException {
-        Path uploadDir = Paths.get(VariableUtils.DEFAULT_UPLOAD_DIR, VariableUtils.getStringFromUploadType(uploadType));
+        Path uploadDir = Paths.get(VariableUtils.UPLOAD_DIR_ROOT, VariableUtils.getStringFromUploadType(uploadType));
         if (!Files.exists(uploadDir)) {
             if(!Files.exists(uploadDir)) {
                 Files.createDirectories(uploadDir);

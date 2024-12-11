@@ -30,7 +30,7 @@ public class PropertyController {
         return ResponseEntity.ok(gson.toJson(propertyService.uploadImages(request)));
     }
 
-    @PostMapping("/{id}/get-images")
+    @GetMapping("/{id}/get-images")
     public ResponseEntity<?> getPropertyImages(@PathVariable Long id){
         return ResponseEntity.ok(propertyService.getImages(id));
     }

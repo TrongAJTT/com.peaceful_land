@@ -36,7 +36,7 @@
 
 <!-- Thông tin người dùng -->
 
-<div *ngIf="authService.getAuthStatus()" >
+<div *ngIf="authService.getAuthStatus() && user" >
 	<div class="user m-48">
 		<div class="container m-0 w-100">
 			<div class="row">

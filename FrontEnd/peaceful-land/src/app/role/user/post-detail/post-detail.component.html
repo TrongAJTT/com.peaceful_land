@@ -19,7 +19,7 @@
                                 <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100 c-p" (click)="openModal('/assets/img/house/house-demo.jpg')" src="/assets/img/house/house-demo.jpg" alt="">
                             </a>
                             <a *ngIf="currPost.data.thumbnUrl">
-                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100 c-p" (click)="openModal(postsImages[currPost.data.id])" [src]="postsImages[currPost.data.id] || '/assets/img/house/house-demo.jpg'">
+                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100 c-p" (click)="openModal(postsThumbImage)" [src]="postsThumbImage || '/assets/img/house/house-demo.jpg'">
                             </a>
                         </div>
 
@@ -76,9 +76,9 @@
                             <span *ngIf="currPost.data.property.balcony_orientation && currPost.data.property.balcony_orientation!=''">{{currPost.data.property.balcony_orientation}}</span>
                         </p>
 
-                        <button (click)="toggleScheduleOrContact($event)" class="btn btn-danger btn-schedule mb-3" data-bs-toggle="modal" [attr.data-bs-target]="'#scheduleModal'+currPost.data.id">Lên lịch hẹn</button>
+                        <button (click)="toggleScheduleOrContact($event)" class="btn btn-danger btn-schedule mb-3" (click)="openScheduleModal()"  [attr.data-bs-target]="'#scheduleModal'+currPost.data.id">Lên lịch hẹn</button>
                         <br>
-                        <button (click)="toggleScheduleOrContact($event)"  class="btn btn-info btn-contact" data-bs-toggle="modal" [attr.data-bs-target]="'#contactModal'+currPost.data.id">Yêu cầu liên hệ</button>
+                        <button (click)="toggleScheduleOrContact($event)"  class="btn btn-info btn-contact" (click)="openContactModal()" [attr.data-bs-target]="'#contactModal'+currPost.data.id">Yêu cầu liên hệ</button>
                     
                     </div>
 
@@ -151,7 +151,7 @@
 </div>
 
 <div *ngIf="currPost">
-    <div class="modal fade" *ngIf="userId !== -1 && !currPost.interested" [id]="'exampleModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" *ngIf="userId !== -1 && !currPost.interested"  [id]="'exampleModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -172,13 +172,13 @@
     </div>
 
 
-    <div class="modal fade" *ngIf="userId!==-1 && isPermitGiveRequestScheduleOrRequest && isModalOverviewOpen" [id]="'scheduleModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+    <div class="modal fade" #scheduleModal *ngIf="userId!==-1 && isPermitGiveRequestScheduleOrRequest " [id]="'scheduleModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <form [formGroup]="appointmentForm" (ngSubmit)="submitSchedule($event)">
                 <div class="modal-header d-flex justify-content-between">
                     <h5 class="modal-title text-center" id="scheduleModalLabel">Đặt lịch hẹn</h5>
-                    <button type="button" class="btn btn-danger close" data-bs-dismiss="modal" aria-label="Close">
+                    <button type="button" class="btn btn-danger close" (click)="closeScheduleModal()" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -238,7 +238,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary"  data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-secondary"  (click)="closeScheduleModal()">Đóng</button>
                         <button type="button" type="submit" class="btn btn-danger" >Gửi</button>
                     </div>
                 </form>
@@ -247,13 +247,13 @@
     </div>
     
 
-    <div class="modal fade" *ngIf="userId!==-1 && isPermitGiveRequestScheduleOrRequest && isModalOverviewOpen" [id]="'contactModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal fade" #contactModal *ngIf="userId!==-1 && isPermitGiveRequestScheduleOrRequest " [id]="'contactModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <form [formGroup]="contactForm" (ngSubmit)="submitContact($event)">
                     <div class="modal-header d-flex justify-content-between">
                         <h5 class="modal-title text-center" id="contactModalLabel">Yêu cầu liên hệ</h5>
-                        <button type="button" class="btn btn-danger close" data-bs-dismiss="modal" aria-label="Close">
+                        <button type="button" class="btn btn-danger close" (click)="closeContactModal()" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -292,7 +292,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary"  data-bs-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-secondary" (click)="closeContactModal()">Đóng</button>
                         <button type="button" type="submit" class="btn btn-danger" >Gửi</button>
                     </div>
                 </form>

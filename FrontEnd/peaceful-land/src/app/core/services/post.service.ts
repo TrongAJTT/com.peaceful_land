@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { AuthService } from './auth.service';
 import { User } from '../../dto/user';
 import { Observable } from 'rxjs';
@@ -7,17 +7,13 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class PostService {
+export class PostService{
   private apiUrl = 'http://localhost:8080/api/posts';
-  user!: User;
   constructor(
     private authService: AuthService,
     private http: HttpClient
   ) { }
 
-  ngOnInit(): void {
-      this.user = this.authService.getUserDetails();
-  }
 
   createPost(property_id: number, title: string, description: string, expiration: string): Observable<any>{
     const formData: FormData = new FormData(); 
@@ -83,20 +79,20 @@ export class PostService {
       {user_id}, {headers});
   }
 
-  makeSchedule(postId: number,type: number,expected_date:string,expected_hour: number,
+  makeSchedule(user_id:number ,postId: number,type: number,expected_date:string,expected_hour: number,
     name:string,phone: string,email: string,
     interest_level:number): Observable<any>{
       const token = this.authService.getToken();  // Lấy JWT từ AuthService
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
       return this.http.post<any>(`${this.apiUrl}/${postId}/request-tour`, 
-        {type,expected_date,expected_hour,name,phone,email,interest_level}, {headers});
+        {user_id,type,expected_date,expected_hour,name,phone,email,interest_level}, {headers});
     }
 
-  makeContact(postId:number,name:string, phone: string,email: string,
+  makeContact(user_id:number ,postId:number,name:string, phone: string,email: string,
     interest_level:number,message: string): Observable<any>{
     const token = this.authService.getToken();  // Lấy JWT từ AuthService
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${this.apiUrl}/${postId}/request-contact`, 
-      {name,phone,email,interest_level,message}, {headers});
+      {user_id,name,phone,email,interest_level,message}, {headers});
   }
 }

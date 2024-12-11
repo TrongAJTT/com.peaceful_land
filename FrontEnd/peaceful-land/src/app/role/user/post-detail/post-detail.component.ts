@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
 import { PostService } from '../../../core/services/post.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -8,7 +8,8 @@ import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ImageService } from '../../../core/services/image.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import e from 'express';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-post-detail',
@@ -18,12 +19,15 @@ import e from 'express';
   styleUrl: './post-detail.component.css'
 })
 export class PostDetailComponent implements OnInit, AfterViewInit{
+  @ViewChild('contactModal') contactModal: any; 
+  @ViewChild('scheduleModal') scheduleModal: any; 
+
   currPost: any;
   user!: User;
   userId: number = -1;
   today: any;
   postId!: number
-  postsImages: { [key: number]: string } = {};
+  postsThumbImage: string = "";
   activeImageIndex = 0;  // Chỉ số của hình ảnh hiện tại
   currChildImg = 0;
   imageList = [
@@ -34,11 +38,9 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
   ];
   modalImageSrc = '';
   isModalOpen = false;  // Trạng thái của modal
-   // Đặt biến cho việc cuộn ảnh
   itemsToShow = 3;  // Số lượng ảnh hiển thị một lần
   isPermitGiveRequestScheduleOrRequest = false;
   permitMessageError = "";
-  isModalOverviewOpen = true;
 
   appointmentForm = new FormGroup({
     expected_date: new FormControl(''),
@@ -65,6 +67,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     private activeRoute: ActivatedRoute,
     private authService: AuthService,
     private imgService: ImageService,
+    private modalService: NgbModal,
   ){}
 
   async ngOnInit(): Promise<void> {
@@ -105,13 +108,14 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
       const response = await firstValueFrom(this.postService.requestPermitContact(this.userId,this.postId));
       this.isPermitGiveRequestScheduleOrRequest = true
     } catch (response:any) {
+      this.isPermitGiveRequestScheduleOrRequest = false
       this.permitMessageError = response.error.message
     }
   }
 
   async loadPost() : Promise<void>{
     this.currPost = await firstValueFrom(this.postService.getPostById(this.userId,this.postId))
-    this.changeToImg(this.currPost.data.thumbnUrl,this.currPost.data.id);
+    this.changeToImg(this.currPost.data.thumbnUrl);
   }
 
   async ngAfterViewInit(): Promise<void> {
@@ -119,14 +123,24 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     this.cdr.detectChanges();
   }
 
-  async changeToImg(thumbnUrl: string, postId: number): Promise<void> {
+  // async changeToImg(thumbnUrl: string, postId: number): Promise<void> {
+  //   try {
+  //     const response = await firstValueFrom(this.imgService.changeToImgBase64(thumbnUrl));
+  //     this.postsThumbImage[postId] = response;  // Lưu ảnh vào biến
+  //   } catch (error:any) {
+  //     this.postsThumbImage[postId] = '/assets/img/house/house-demo.jpg';  // Đặt ảnh mặc định
+  //   }
+  // }
+
+  async changeToImg(thumbUrl: string): Promise<void> {
     try {
-      const response = await firstValueFrom(this.imgService.changeToImgBase64(thumbnUrl));
-      this.postsImages[postId] = response;  // Lưu ảnh vào biến
+      const response = await firstValueFrom(this.imgService.changeToImgBase64(thumbUrl));
+      this.postsThumbImage = response;  // Lưu ảnh vào biến
     } catch (error:any) {
-      this.postsImages[postId] = '/assets/img/house/house-demo.jpg';  // Đặt ảnh mặc định
+      this.postsThumbImage = '/assets/img/house/house-demo.jpg';  // Đặt ảnh mặc định
     }
   }
+
 
   // Chỉnh ảnh con
 
@@ -300,12 +314,13 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     }else{
       const typeVal = type? 1:0
       const interestVal = interest_level? 1:0
-      this.postService.makeSchedule(this.postId,typeVal,expected_date,expected_hour,
+      this.postService.makeSchedule(this.userId,this.postId,typeVal,expected_date,expected_hour,
         name,phone,email,interestVal
       ).subscribe({
         next: (response) => {
           this.snackbarService.notifySuccessUser(response)
-          this.isModalOverviewOpen = false
+          this.closeScheduleModal()
+          this.loadPermitContact();
           this.cdr.detectChanges()
         },
         error: (response) =>{
@@ -341,11 +356,12 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     
     }else{
       const interestVal = interest_level? 1:0
-      this.postService.makeContact(this.postId,name,phone,email,interestVal,message)
+      this.postService.makeContact(this.userId,this.postId,name,phone,email,interestVal,message)
         .subscribe({
         next: (response) => {
           this.snackbarService.notifySuccessUser(response)
-          this.isModalOverviewOpen = false
+          this.closeContactModal()
+          this.loadPermitContact();
           this.cdr.detectChanges()
         },
         error: (response) =>{
@@ -355,4 +371,66 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
       })
     }
   }
+
+  openContactModal() {
+    const modalElement = this.contactModal.nativeElement as HTMLElement;
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade';
+    document.body.appendChild(backdrop); // Add the backdrop
+    modalElement.style.display = 'block';
+    setTimeout(() => {
+      modalElement.classList.add('show');
+      backdrop.classList.add('show');
+    }, 10); // Delay slightly to allow for style change before adding 'show'
+  
+    document.body.classList.add('modal-open');
+  }
+  
+  closeContactModal() {
+    const modalElement = this.contactModal.nativeElement as HTMLElement;
+    const modalBackdrop = document.querySelector('.modal-backdrop') as HTMLElement;
+    // Fade out the modal and backdrop
+    modalElement.classList.remove('show');
+    modalBackdrop?.classList.remove('show');
+    setTimeout(() => {
+      modalElement.style.display = 'none';
+      modalBackdrop?.remove();
+    }, 300); // Match the duration of the fade-out transition
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = ''; // Reset overflow to allow scrolling
+  }
+
+  openScheduleModal() {
+    const modalElement = this.scheduleModal.nativeElement as HTMLElement;
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade';
+    document.body.appendChild(backdrop); // Add the backdrop
+    modalElement.style.display = 'block';
+    setTimeout(() => {
+      modalElement.classList.add('show');
+      backdrop.classList.add('show');
+    }, 10); // Delay slightly to allow for style change before adding 'show'
+    document.body.classList.add('modal-open');
+  }
+  
+  closeScheduleModal() {
+    const modalElement = this.scheduleModal.nativeElement as HTMLElement;
+    const modalBackdrop = document.querySelector('.modal-backdrop') as HTMLElement;
+    // Fade out the modal and backdrop
+    modalElement.classList.remove('show');
+    modalBackdrop?.classList.remove('show');
+    setTimeout(() => {
+      modalElement.style.display = 'none';
+      modalBackdrop?.remove();
+    }, 300); // Match the duration of the fade-out transition
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = ''; // Reset overflow to allow scrolling
+  }
+  
+  
+  
+
+
+
+
 }

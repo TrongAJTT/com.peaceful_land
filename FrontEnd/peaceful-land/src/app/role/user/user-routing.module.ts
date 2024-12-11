@@ -14,8 +14,9 @@ const routes: Routes = [
     { path: 'property_list/:type', component: PropertyListComponent},
     { path: 'post_detail/:id', component: PostDetailComponent},
     { path: 'post_property', component: PostPropertyComponent},
-    { path: "**", redirectTo: "home", pathMatch: "full"},
-  ]}
+    { path: "", redirectTo: "home", pathMatch: "full" },
+  ]},
+  { path: "**", redirectTo: "home", pathMatch: "full"}
 ];
 
 @NgModule({

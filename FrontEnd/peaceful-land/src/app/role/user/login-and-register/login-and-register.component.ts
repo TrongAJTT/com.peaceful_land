@@ -82,17 +82,19 @@ export class LoginAndRegisterComponent implements OnInit{
   ){}
 
   ngOnInit(): void {
+    // Today
+    const now = new Date(); 
+    const month = ('0' + (now.getMonth() + 1)).slice(-2); 
+    const day = ('0' + now.getDate()).slice(-2); 
+    this.today = `${now.getFullYear()}-${month}-${day}`;
+    
     if(this.authService.getAuthStatus()){
       this.user = this.authService.getUserDetails();
     }
     this.changeToImg(this.user.avatarUrl)
     this.cdr.detectChanges()
 
-    // Today
-    const now = new Date(); 
-    const month = ('0' + (now.getMonth() + 1)).slice(-2); 
-    const day = ('0' + now.getDate()).slice(-2); 
-    this.today = `${now.getFullYear()}-${month}-${day}`;
+    
   }
 
   handleLogin(event:Event){

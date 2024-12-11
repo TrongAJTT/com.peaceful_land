@@ -24,21 +24,53 @@
                     <tbody *ngIf="postList">
                         <tr *ngFor="let post of postList; trackBy: trackById">
                             <td>{{post.id}}</td>
-                            <td [ngClass]="{'active': post.approved, 'inactive': !post.approved}">
-                                {{ post.approved ? 'Đã duyệt' : 'Chờ duyệt' }}
+                            <td>
+                                <img (click)="openModal(post.thumbnUrl)"
+                                    [src]="post.thumbnUrl" 
+                                    alt="Thumbnail" 
+                                    class="img-thumbnail"
+                                    (error)="onImageError(post)"/>
                             </td>
-                            <td>{{post.post_title}}</td>
-                            <td>{{post.property_address}}</td>
-                            <td>{{post.request_date | date: 'dd/MM/yyyy'}}</td>
-                            <td>{{post.expiry_date | date: 'dd/MM/yyyy'}}</td>
-                            <td [ngClass]="{'active': post.post_visibility, 'inactive': !post.post_visibility}">
-                                {{ post.post_visibility ? 'Hiển thị' : 'Ẩn' }}
-                            </td>
+                            <td>{{post.title}}</td>
+                            <td>{{post.property.price}}</td>
+                            <td>{{post.property.location}}</td>
+                            <td>{{post.createdAt | date: 'dd/MM/yyyy'}}</td>
+                            <td>{{post.expiration | date: 'dd/MM/yyyy'}}</td>
                             <td class="d-flex justify-content-around">
-                                <a (click)="goToHandle(post.id)" class="btn btn-outline-info">
+                                <a  (click)="openPostModal()" class="btn btn-outline-info">
                                     <i class="fas fa-wrench"></i>
                                 </a>
                             </td>
+
+                            <!-- Modal thay đổi thông tin bài đăng -->
+                            <div class="modal fade" #postModal *ngIf="userId!==-1 " [id]="'postModal'+post.id" tabindex="-1" role="dialog" aria-labelledby="postModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <form [formGroup]="postForm" (ngSubmit)="submitPost($event)">
+                                            <div class="modal-header d-flex justify-content-between">
+                                                <h5 class="modal-title text-center" id="postModalLabel">Yêu cầu liên hệ</h5>
+                                                <button type="button" class="btn btn-danger close" (click)="closePostModal()" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body" >
+                                                <div class="mb-3">
+                                                    <label for="name-post" class="form-label">Họ tên</label>
+                                                    <input type="text" class="form-control" id="name-post" formControlName="name">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="phone-post" class="form-label">Số điện thoại</label>
+                                                    <input type="tel" class="form-control" id="phone-post" formControlName="phone">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" (click)="closePostModal()">Đóng</button>
+                                                <button type="button" type="submit" class="btn btn-danger" >Gửi</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         </tr>
                     </tbody>
                 </table>
@@ -46,3 +78,10 @@
         </div>
     </div>
 </div>
+
+<div class="modal-child-image" *ngIf="isModalOpen" (click)="closeModal($event)">
+    <div class="modal-child-image-content" (click)="$event.stopPropagation()">
+        <img [src]="modalImageSrc" class="modal-child-image-img">
+    </div>
+</div>
+

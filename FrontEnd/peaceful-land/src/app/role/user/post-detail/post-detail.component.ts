@@ -306,7 +306,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
       this.postService.changeInterested(post.data.id,this.userId,currInterested,0)
         .subscribe({
           next: (response) => this.snackbarService.notifySuccessUser(response),
-          error: (response) => this.snackbarService.notifyWarningUser(response.error.message)
+          error: (response) => this.snackbarService.notifyErrorUser(response.error.message)
         })
     }
   }

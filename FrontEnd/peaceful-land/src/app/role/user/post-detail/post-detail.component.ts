@@ -9,6 +9,7 @@ import { firstValueFrom } from 'rxjs';
 import { ImageService } from '../../../core/services/image.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PropertyService } from '../../../core/services/property.service';
 declare var bootstrap: any;
 
 @Component({
@@ -64,6 +65,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
     private cdr: ChangeDetectorRef,
     private snackbarService:SnackBarService,
     private postService: PostService,
+    private propertyService: PropertyService,
     private activeRoute: ActivatedRoute,
     private authService: AuthService,
     private imgService: ImageService,
@@ -88,6 +90,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
       this.postId = +params['id'];
     }))
     await this.loadPost()
+    await this.loadProImages()
     await this.loadPermitContact();
     await this.loadInfoUserFormGroup();
     this.cdr.detectChanges();
@@ -116,6 +119,10 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
   async loadPost() : Promise<void>{
     this.currPost = await firstValueFrom(this.postService.getPostById(this.userId,this.postId))
     this.changeToImg(this.currPost.data.thumbnUrl);
+  }
+
+  async loadProImages() : Promise<void>{
+    const proImages = await firstValueFrom(this.propertyService.getProImages(this.currPost.data.property.id))
   }
 
   async ngAfterViewInit(): Promise<void> {
@@ -325,7 +332,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
         },
         error: (response) =>{
           console.log(response)
-          this.snackbarService.notifyWarningUser(response.error.message)
+          this.snackbarService.notifyErrorUser(response.error.message)
         }
       })
     }
@@ -365,8 +372,7 @@ export class PostDetailComponent implements OnInit, AfterViewInit{
           this.cdr.detectChanges()
         },
         error: (response) =>{
-          console.log(response)
-          this.snackbarService.notifyWarningUser(response.error.message)
+          this.snackbarService.notifyErrorUser(response.error.message)
         }
       })
     }

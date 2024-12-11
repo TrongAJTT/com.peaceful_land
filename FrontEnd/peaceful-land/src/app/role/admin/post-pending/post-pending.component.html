@@ -35,7 +35,7 @@
                             {{ post.post_visibility ? 'Hiển thị' : 'Ẩn' }}
                         </td>
                         <td class="d-flex justify-content-around">
-                            <a class="btn btn-outline-info">
+                            <a (click)="goToHandle(post.id)" class="btn btn-outline-info">
                                 <i class="fas fa-wrench"></i>
                             </a>
                         </td>

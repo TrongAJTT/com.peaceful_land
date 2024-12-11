@@ -1,0 +1,186 @@
+<!-- Single Product Start -->
+<div *ngIf="currPost" class="container-fluid py-5 mt-5">
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col-6">
+                <h2 class="mb-3">Chi tiết bài rao</h2>
+                <p class="text-success" style="font-size: calc(1em + 6px)">
+                    <i class="fas fa-calendar-day"></i> Đăng vào ngày: {{ currPost.data.createdAt | date: 'dd/MM/yyyy' }}
+                  </p>
+                  
+                  <p class="text-danger" style="font-size: calc(1em + 6px)">
+                    <i class="fas fa-calendar-times"></i> Ngày hết hạn duyệt: {{ currPost.expiration | date: 'dd/MM/yyyy' }}
+                  </p>
+            </div>
+            <div class="col-6 text-end">
+                <span class="fw-bold me-3">Duyệt bài</span>
+                <button class="btn btn-success me-2" (click)="approvePost()">
+                    <i class="fa fa-check-circle"></i> Đồng ý
+                </button>
+                <button class="btn btn-danger" (click)="rejectPost($event)">
+                    <i class="fa fa-times-circle"></i> Từ chối
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-12">
+                <div  class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="position-relative border rounded">
+                            <a *ngIf="!currPost.data.thumbnUrl || currPost.data.thumbnUrl === ''">
+                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100 c-p" (click)="openModal('/assets/img/house/house-demo.jpg')" src="/assets/img/house/house-demo.jpg" alt="">
+                            </a>
+                            <a *ngIf="currPost.data.thumbnUrl">
+                                <img class="img-fluid border-img-thumb img-height img-cover wd-100 w-100 c-p" (click)="openModal(postsThumbImage)" [src]="postsThumbImage || '/assets/img/house/house-demo.jpg'">
+                            </a>
+                        </div>
+
+                        <div class="row mt-3" *ngIf="imageList && imageList.length>0">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-center align-items-center position-relative">
+                                    <button *ngIf="imageList.length>3" (click)="prevImage()" class="btn-direction btn btn-light btn-sm position-absolute start-0">
+                                        <i class="fa fa-chevron-left"></i>
+                                    </button>
+                    
+                                    <div class="image-gallery-wrapper">
+                                        <div class="image-gallery d-flex">
+                                            <div *ngFor="let image of visibleImages; let i = index"
+                                                [ngClass]="{'active': i === activeImageIndex, 'inactive': i !== activeImageIndex}" 
+                                                class="image-item">
+                                                <img class="img-fluid" [src]="image.src" alt="Image" (click)="setActiveImage(i,image.src)">
+                                            </div>
+                                        </div>
+                                    </div>
+                    
+                                    <button *ngIf="imageList.length>3" (click)="nextImage()" class="btn-direction btn btn-light btn-sm position-absolute end-0">
+                                        <i class="fa fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div  class="col-lg-6">
+                        <p class="mb-3"><strong>Loại sản phẩm:</strong> {{currPost.data.property.category}}</p>
+                        <p class="mb-3"> <strong>Loại giao dịch:</strong> 
+                            <span *ngIf="currPost.data.property.offer"> Cho Thuê</span>
+                            <span *ngIf="!currPost.data.property.offer"> Mua bán</span>
+                        </p>
+                        <div class="product-price mb-4">
+                            <h3 class="fw-bold mb-0">
+                              {{ currPost.data.property.price | number:'1.0-0'}} VNĐ
+                            </h3>
+                          </div>
+                        <p class="mb-3"><strong>Tiêu đề: </strong>{{currPost.data.title}}</p>
+                        <p class="mb-3"><strong>Mô tả: </strong>{{currPost.data.description}}</p>
+                        <p class="mb-3" *ngIf="currPost.data.property.offer"><strong>Thời gian thuê: </strong>{{currPost.data.property.rental_period || '(Chưa cập nhật)'}} </p>
+                        <p class="mb-3"><strong>Địa chỉ: </strong>{{currPost.data.property.location}}</p>
+                        <p class="mb-3"><strong>Địa chỉ chi tiết: </strong>{{currPost.data.property.location_detail}}</p>
+                        <p class="mb-3"><strong>Địa chỉ cụ thể: </strong>{{currPost.data.property.map_url}}</p>
+                        <p class="mb-3"><strong>Diện tích: </strong>{{currPost.data.property.area}} mét vuông</p>
+
+                        <p class="mb-3"><strong>Hướng nhà: </strong>
+                            <span *ngIf="!currPost.data.property.house_orientation || currPost.data.property.house_orientation==''">Chưa cập nhật</span>
+                            <span *ngIf="currPost.data.property.house_orientation && currPost.data.property.house_orientation!=''">{{currPost.data.property.house_orientation}}</span>
+                        </p>
+                        <p class="mb-3"><strong>
+                            Hướng ban công: </strong> 
+                            <span *ngIf="!currPost.data.property.balcony_orientation || currPost.data.property.balcony_orientation==''">Chưa cập nhật</span>
+                            <span *ngIf="currPost.data.property.balcony_orientation && currPost.data.property.balcony_orientation!=''">{{currPost.data.property.balcony_orientation}}</span>
+                        </p>
+                    </div>
+
+
+                    <div class="col-lg-12">
+                        <nav>
+                            <div class="nav nav-tabs mb-3">
+                                <button class="nav-link active border-white border-bottom-0" type="button" role="tab"
+                                    id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about"
+                                    aria-controls="nav-about" aria-selected="true">Mô tả</button>
+                            </div>
+                        </nav>
+                        <div class="tab-content mb-5">
+                            <div class="tab-pane active" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab">
+                                <p>{{currPost.short_description}} </p>
+                                <p>{{currPost.long_description}}</p>
+                                <div class="px-2">
+                                    <div class="row g-4">
+                                        <div class="col-6">
+                                            <div class="row  align-items-center text-center justify-content-center py-2">
+                                                <div class="col-6">
+                                                    <p class="mb-0">Số phòng ngủ</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p class="mb-0">{{currPost.data.property.bedrooms}} phòng</p>
+                                                </div>
+                                            </div>
+                                            <div class="row bg-light text-center align-items-center justify-content-center py-2">
+                                                <div class="col-6">
+                                                    <p class="mb-0">Số nhà vệ sinh</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p class="mb-0">{{currPost.data.property.toilets}} phòng</p>
+                                                </div>
+                                            </div>
+                                            <div class="row text-center align-items-center justify-content-center py-2">
+                                                <div class="col-6">
+                                                    <p class="mb-0">Số mặt tiền</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p class="mb-0">{{currPost.data.property.entrance}} mặt</p>
+                                                </div>
+                                            </div>
+                                            <div class="row bg-light text-center align-items-center justify-content-center py-2">
+                                                <div class="col-6">
+                                                    <p class="mb-0">Số lối vào</p>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p class="mb-0">{{currPost.data.property.frontage}} mặt</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Single Product End -->
+
+<!-- Modal -->
+<div class="modal-child-image" *ngIf="isModalOpen" (click)="closeModal($event)">
+    <div class="modal-child-image-content" (click)="$event.stopPropagation()">
+        <img [src]="modalImageSrc" class="modal-child-image-img">
+    </div>
+</div>
+
+<div *ngIf="currPost">
+    <div class="modal fade" #rejectModal *ngIf="userId!==-1" [id]="'rejectModal'+currPost.data.id" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form [formGroup]="rejectForm" (ngSubmit)="submitReject($event)">
+                    <div class="modal-header d-flex justify-content-between">
+                        <h5 class="modal-title text-center" id="rejectModalLabel">Từ chối bài đăng</h5>
+                        <button type="button" class="btn btn-danger close" (click)="closeRejectModal()" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" >
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Lý do từ chối</label>
+                            <textarea type="text" class="form-control" id="message" formControlName="message"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" (click)="closeRejectModal()">Đóng</button>
+                        <button type="button" type="submit" class="btn btn-danger">Gửi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

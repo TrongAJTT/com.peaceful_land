@@ -4,6 +4,7 @@ import { PostService } from '../../../core/services/post.service';
 import { firstValueFrom, Subject } from 'rxjs';
 import { UserRequestService } from '../../../core/services/user-request.service';
 import { DataTablesModule } from 'angular-datatables';
+import { Router } from '@angular/router';
 // import 'datatables.net';   
 
 @Component({
@@ -13,7 +14,7 @@ import { DataTablesModule } from 'angular-datatables';
   templateUrl: './post-pending.component.html',
   styleUrl: './post-pending.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.Emulated,
 })
 export class PostPendingComponent implements OnInit, AfterViewInit{
   headerList = ['Mã bài đăng','Trạng thái','Tiêu đề','Địa chỉ','Ngày yêu cầu'
@@ -24,6 +25,7 @@ export class PostPendingComponent implements OnInit, AfterViewInit{
   constructor(
     private postService:PostService,
     private userRequestService:UserRequestService,
+    private router:Router,
     private cdr: ChangeDetectorRef,
   ){}
 
@@ -73,5 +75,7 @@ export class PostPendingComponent implements OnInit, AfterViewInit{
     return post.id
   }
 
-
+  goToHandle(postId: number){
+    this.router.navigate([`admin/post_pending/handle/${postId}`])
+  }
 }

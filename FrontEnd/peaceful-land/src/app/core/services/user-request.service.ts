@@ -22,5 +22,17 @@ export class UserRequestService {
        {headers});
   }
 
+  getPostById(postId: number): Observable<any>{
+    return this.http.post<any>(`${this.apiUrl}/post/${postId}`, 
+      {});
+  }
+
+  rejectOrApprovePost(postId: number,type: string, deny_message: string): Observable<any>{
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.apiUrl}/post/${postId}/action?type=${type}`, 
+       {deny_message},{headers});
+  }
+
 
 }

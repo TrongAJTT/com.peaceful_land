@@ -1,13 +1,21 @@
 package com.example.peaceful_land.Controller;
 
+import com.example.peaceful_land.Entity.Account;
+import com.example.peaceful_land.Entity.PaymentMethod;
+import com.example.peaceful_land.Entity.Transaction;
+import com.example.peaceful_land.Exception.UserNotFoundException;
+import com.example.peaceful_land.Repository.AccountRepository;
+import com.example.peaceful_land.Repository.PaymentMethodRepository;
+import com.example.peaceful_land.Repository.TransactionRepository;
 import com.example.peaceful_land.Service.VnPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +26,11 @@ import java.util.Map;
 public class VnPayController {
     @Autowired
     private VnPayService vnPayService;
+    private AccountRepository accountRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
+    @Autowired
+    private PaymentMethodRepository paymentMethodRepository;
 
 
     @GetMapping("")
@@ -30,10 +43,10 @@ public class VnPayController {
     public ResponseEntity<Map<String, String>> submidOrder(
             @RequestParam("amount") int orderTotal,
             @RequestParam("orderInfo") String orderInfo,
-            @RequestParam("ticketId") Long ticketId,
+            @RequestParam("userId") Long userId,
             HttpServletRequest request) {
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + "4200";
-        String vnpayUrl = vnPayService.createOrder(orderTotal, orderInfo, baseUrl, ticketId);
+        String vnpayUrl = vnPayService.createOrder(orderTotal, orderInfo, baseUrl, userId);
 
         Map<String, String> response = new HashMap<>();
         response.put("redirectUrl", vnpayUrl);
@@ -55,11 +68,52 @@ public class VnPayController {
         String vnp_TxnRef = request.getParameter("vnp_TxnRef");
         String vnp_ResponseCode = request.getParameter("vnp_ResponseCode");
 
+        String vnp_BankCode = request.getParameter("vnp_BankCode");
+        String vnp_BankTranNo = request.getParameter("vnp_BankTranNo");
+        String vnp_CardType = request.getParameter("vnp_CardType");
+
         // Tách userId từ vnp_TxnRef (giả sử vnp_TxnRef có dạng "userId-transactionId")
         String userId = vnp_TxnRef.split("-")[0];
 
+        // Lấy đối tượng người dùng
+        Account account = accountRepository.findById(Long.parseLong(userId))
+                .orElseThrow(UserNotFoundException::new);
+
+        // Lưu thông tin giao dịch vào cơ sở dữ liệu
+        Transaction trans = Transaction.builder()
+                .id(Long.parseLong(transactionId))
+                .account(account)
+                .money(Long.parseLong(totalPrice))
+                .transactionDescription(orderInfo)
+                .transactionInformation("BankCode: " + vnp_BankCode + ", BankTranNo: " + vnp_BankTranNo + ", CardType: " + vnp_CardType)
+                .status((byte) paymentStatus)
+                .build();
+        transactionRepository.save(trans);
+        // Lưu thời gian thanh toán
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        LocalDateTime paymentLocalDateTime = LocalDateTime.parse(paymentTime, formatter);
+        trans.setDateBegin(paymentLocalDateTime);
+        transactionRepository.save(trans);
+
+        // Thêm phương thức thanh toán nếu chưa tồn tại
+        if (!paymentMethodRepository.existsByAccountEqualsAndNameEqualsAndAccountNumberEqualsAndHideEquals(
+                account, vnp_BankCode, account.getPhone(), false)) {
+            PaymentMethod paymentMethod = PaymentMethod.builder()
+                    .account(account)
+                    .name(vnp_BankCode)
+                    .accountNumber(account.getPhone())
+                    .isWallet(true)
+                    .build();
+            paymentMethodRepository.save(paymentMethod);
+        }
+
         // Xử lý theo kết quả trả về của cổng thanh toán
         if ("00".equals(vnp_ResponseCode)) {
+
+            // Thêm tiền vào tài khoản người dùng nếu thanh toán thành công
+            account.setAccountBalance(account.getAccountBalance() + Long.parseLong(totalPrice));
+            accountRepository.save(account);
+
             // Thanh toán thành công, trả về ResponseEntity với thông báo thành công
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Thanh toán thành công!");

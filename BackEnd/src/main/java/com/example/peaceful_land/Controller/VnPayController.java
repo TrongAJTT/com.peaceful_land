@@ -26,6 +26,7 @@ import java.util.Map;
 public class VnPayController {
     @Autowired
     private VnPayService vnPayService;
+    @Autowired
     private AccountRepository accountRepository;
     @Autowired
     private TransactionRepository transactionRepository;
@@ -60,6 +61,7 @@ public class VnPayController {
         // Lấy kết quả thanh toán từ dịch vụ (có thể trả về trạng thái giao dịch)
         int paymentStatus = vnPayService.orderReturn(request);
 
+
         // Lấy các tham số trả về từ cổng thanh toán (VNPAY)
         String orderInfo = request.getParameter("vnp_OrderInfo");
         String paymentTime = request.getParameter("vnp_PayDate");
@@ -74,6 +76,8 @@ public class VnPayController {
 
         // Tách userId từ vnp_TxnRef (giả sử vnp_TxnRef có dạng "userId-transactionId")
         String userId = vnp_TxnRef.split("-")[0];
+        totalPrice = totalPrice.substring(0,totalPrice.length()-2);
+
 
         // Lấy đối tượng người dùng
         Account account = accountRepository.findById(Long.parseLong(userId))
@@ -88,7 +92,7 @@ public class VnPayController {
                 .transactionInformation("BankCode: " + vnp_BankCode + ", BankTranNo: " + vnp_BankTranNo + ", CardType: " + vnp_CardType)
                 .status((byte) paymentStatus)
                 .build();
-        transactionRepository.save(trans);
+        trans = transactionRepository.save(trans);
         // Lưu thời gian thanh toán
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         LocalDateTime paymentLocalDateTime = LocalDateTime.parse(paymentTime, formatter);
@@ -119,7 +123,7 @@ public class VnPayController {
             response.put("message", "Thanh toán thành công!");
             response.put("userId", userId);
             response.put("orderId", orderInfo);
-            response.put("totalPrice", totalPrice);
+            response.put("totalPrice",  totalPrice);
             response.put("paymentTime", paymentTime);
             response.put("transactionId", transactionId);
 

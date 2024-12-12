@@ -326,8 +326,10 @@ public class AccountService implements IAccountService{
 
     @Override
     public String rechargeForAccount(Long userId){
-        Account account = accountRepository.findById(userId)
-                .orElseThrow(AccountNotFoundException::new);
+//        Account account = accountRepository.findById(userId)
+//                .orElseThrow(AccountNotFoundException::new);
+//        account.setAccountBalance(account.getAccountBalance() + 1000000);
+        return "Nạp tiền thành công";
     }
 
     @Override

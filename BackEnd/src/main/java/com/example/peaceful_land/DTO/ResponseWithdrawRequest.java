@@ -14,6 +14,10 @@ public class ResponseWithdrawRequest {
     @JsonProperty("user_id")
     private Long userId;
 
+    private String name;
+
+    private Long amount;
+
     private String status;
 
     @JsonProperty("deny_message")

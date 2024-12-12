@@ -8,6 +8,7 @@ import { User } from '../../../dto/user';
 import { AccountService } from '../../../core/services/account.service';
 import { ImageService } from '../../../core/services/image.service';
 import { firstValueFrom } from 'rxjs';
+import { PaymentService } from '../../../core/services/payment.service';
 
 @Component({
   selector: 'app-login-and-register',
@@ -79,6 +80,7 @@ export class LoginAndRegisterComponent implements OnInit{
     private imgService:ImageService,
     private router:Router,
     private cdr: ChangeDetectorRef,
+    private paymentService: PaymentService,
   ){}
 
   ngOnInit(): void {
@@ -198,5 +200,20 @@ export class LoginAndRegisterComponent implements OnInit{
     } catch (error:any) {
       this.userImage = '/assets/img/testimonial-1.jpg';  // Đặt ảnh mặc định
     }
+  }
+
+  goToPay(){
+    const amount = 100000 
+    const orderInfo = "Thong tin cua hoa don dien tu"
+    const ticketId = 2
+    this.paymentService.payByVnPay(amount,orderInfo,ticketId)
+      .subscribe({
+        next: (response: any) => {
+          if (response.redirectUrl) { 
+            window.location.href = response.redirectUrl; 
+          }
+        },
+        error: (response: any) => console.log(response)
+      })
   }
 }

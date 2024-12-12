@@ -277,22 +277,50 @@ export class LoginAndRegisterComponent implements OnInit{
       this.snackbarService.notifyWarningUser("Vui lòng nhập số tiền") 
     }else if( (amount! < 0 || !Number.isInteger(amount))){
       this.snackbarService.notifyWarningUser("Số tiền không hợp lệ");
+    }else if(amount<50000){
+      this.snackbarService.notifyWarningUser("Số tiền ít nhất là 50000 đ");
+    }else{
+      const orderInfo = "Thong tin nap tien"
+      this.paymentService.payByVnPay(amount,orderInfo,this.user.id)
+        .subscribe({
+          next: (response: any) => {
+            if (response.redirectUrl) { 
+              window.location.href = response.redirectUrl; 
+            }
+          },
+          error: (response: any) => this.snackbarService.notifyErrorUser(response.error.message)
+        })
     }
-    const orderInfo = "Thong tin nap tien"
-
-
-    this.paymentService.payByVnPay(amount,orderInfo,this.user.id)
-      .subscribe({
-        next: (response: any) => {
-          if (response.redirectUrl) { 
-            window.location.href = response.redirectUrl; 
-          }
-        },
-        error: (response: any) => console.log(response)
-      })
   }
 
   submitWithdraw(event:Event){
+    event.preventDefault()
+    const paymentMethodId =  this.withdrawForm.get('payment_method')!.value
+    const amount = this.withdrawForm.get('amount')!.value;
+    if(paymentMethodId?.trim()==""){
+      this.snackbarService.notifyWarningUser("Vui lòng chọn phương thức rút tiền")  
+    }else if((amount! < 0 || !Number.isInteger(amount))){
+      this.snackbarService.notifyWarningUser("Số tiền không hợp lệ");
+    }else if(amount<50000){
+      this.snackbarService.notifyWarningUser("Số tiền ít nhất là 50000 đ");
+    }else{
+      this.accountService.withdrawAccount(this.user.id,Number.parseInt(paymentMethodId!),amount)
+        .subscribe({
+          next: (response: any) => {
+            this.snackbarService.notifySuccessUser(response.error.message)
+          },
+          error: (response: any) => this.snackbarService.notifyErrorUser(response.error.message)
+        })
+    }
+  }
 
+  onActionChangeWithdraw(){
+    const paymentMethodId =  this.withdrawForm.get('payment_method')!.value
+    if(paymentMethodId!.trim()!=''){
+      this.withdrawForm.get('amount')!.enable();
+      this.withdrawForm.get('amount')!.setValue(50000);
+    }else{
+      this.withdrawForm.get('amount')!.disable();
+    }
   }
 }

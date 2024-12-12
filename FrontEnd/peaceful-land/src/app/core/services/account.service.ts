@@ -43,7 +43,7 @@ export class AccountService {
   withdrawAccount(user_id:number, payment_method_id:number, amount:number): Observable<any>{
     const token = this.authService.getToken();  // Lấy JWT từ AuthService
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.post<{ redirectUrl: string}>(`${this.apiUrl}/request-withdraw`,
+    return this.http.post<any>(`${this.apiUrl}/request-withdraw`,
       {user_id,payment_method_id,amount}, {headers});
   }
 }

@@ -3,7 +3,7 @@ package com.example.peaceful_land.Controller;
 import com.example.peaceful_land.DTO.PropertyImagesRequest;
 import com.example.peaceful_land.DTO.PropertyRequest;
 import com.example.peaceful_land.Entity.Property;
-import com.example.peaceful_land.Service.IPropertyService;
+import com.example.peaceful_land.Service.repos.IPropertyService;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

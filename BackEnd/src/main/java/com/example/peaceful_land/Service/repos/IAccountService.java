@@ -1,4 +1,4 @@
-package com.example.peaceful_land.Service;
+package com.example.peaceful_land.Service.repos;
 
 import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.Account;
@@ -32,7 +32,7 @@ public interface IAccountService {
     void resetPassword(String email, String newPassword);
 
     // Mua vai trò
-    String purchaseRole(PurchaseRoleRequest id);
+    Account purchaseRole(PurchaseRoleRequest id);
 
     // Thay đổi avatar
     String changeAvatar(ChangeAvatarRequest request);

@@ -7,7 +7,7 @@ import com.example.peaceful_land.DTO.AccountPrimaryInfo;
 import com.example.peaceful_land.Entity.Account;
 import com.example.peaceful_land.Security.JwtResponse;
 import com.example.peaceful_land.Security.JwtTokenProvider;
-import com.example.peaceful_land.Service.IAccountService;
+import com.example.peaceful_land.Service.repos.IAccountService;
 import com.google.gson.Gson;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

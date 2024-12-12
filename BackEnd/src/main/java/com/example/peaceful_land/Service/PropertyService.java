@@ -10,6 +10,7 @@ import com.example.peaceful_land.Repository.AccountRepository;
 import com.example.peaceful_land.Repository.PropertyImageRepository;
 import com.example.peaceful_land.Repository.PropertyLogRepository;
 import com.example.peaceful_land.Repository.PropertyRepository;
+import com.example.peaceful_land.Service.repos.IPropertyService;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.transaction.Transactional;

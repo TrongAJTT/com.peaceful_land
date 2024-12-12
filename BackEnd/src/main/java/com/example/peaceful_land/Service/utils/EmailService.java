@@ -1,9 +1,10 @@
-package com.example.peaceful_land.Service;
+package com.example.peaceful_land.Service.utils;
 
 import com.example.peaceful_land.DTO.EmailDetail;
 import com.example.peaceful_land.Entity.PaymentMethod;
 import com.example.peaceful_land.Entity.Post;
 import com.example.peaceful_land.Entity.RequestReport;
+import com.example.peaceful_land.Service.repos.IEmailService;
 import com.example.peaceful_land.Utils.VariableUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

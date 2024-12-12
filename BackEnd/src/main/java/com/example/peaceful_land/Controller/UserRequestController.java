@@ -2,7 +2,7 @@ package com.example.peaceful_land.Controller;
 
 import com.example.peaceful_land.DTO.MessageRequest;
 import com.example.peaceful_land.Repository.RequestPostRepository;
-import com.example.peaceful_land.Service.IUserRequestService;
+import com.example.peaceful_land.Service.repos.IUserRequestService;
 import com.example.peaceful_land.Utils.VariableUtils;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;

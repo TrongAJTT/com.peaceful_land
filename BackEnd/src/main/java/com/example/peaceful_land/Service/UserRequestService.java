@@ -109,12 +109,12 @@ public class UserRequestService implements IUserRequestService {
         requestPostRepository.save(request);
         // Thay đổi trạng thái bài rao và lưu vào database nếu có
         Post approvedPost = request.getPost();
-        if (request.getHide()){
-            approvedPost.setHide(false);
+        if (!request.getHide()){
+            approvedPost.setHide(true);
             postRepository.save(approvedPost);
             // Thay đổi trạng thái bất động sản và lưu vào database
             Property property = approvedPost.getProperty();
-            property.setHide(false);
+            property.setHide(true);
             propertyRepository.save(property);
         }
         // Gửi email thông báo cho người đăng bài

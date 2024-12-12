@@ -36,6 +36,8 @@ public class RequestWithdraw extends BaseEntity {
         return ResponseWithdrawRequest.builder()
                 .id(this.id)
                 .userId(account.getId())
+                .name(account.getName())
+                .amount(this.amount)
                 .status(status == STATUS_PENDING ? "Đang chờ xử lý" : this.status == STATUS_APPROVED ? "Đã duyệt" : "Đã từ chối")
                 .denyMessage(resultMessage)
                 .requestDate(getDateBegin().format(VariableUtils.FORMATTER_DATE_TIME))

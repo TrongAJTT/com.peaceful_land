@@ -11,4 +11,5 @@ import java.util.List;
 public interface RequestTourRepository extends JpaRepository<RequestTour, Long> {
     boolean existsByPropertyAndUserAndDateBeginAfter(Property property, Account account, LocalDateTime date);
     List<RequestTour> findByPropertyEqualsOrderByIdDesc(Property property);
+    Long countByPropertyAndDateBeginAfter(Property property, LocalDateTime date);
 }

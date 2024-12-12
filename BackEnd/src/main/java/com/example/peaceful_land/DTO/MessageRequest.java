@@ -7,7 +7,6 @@ import lombok.Setter;
 
 @Data @Getter @Setter
 public class MessageRequest {
-
     @JsonProperty("deny_message")
     private String denyMessage;
 

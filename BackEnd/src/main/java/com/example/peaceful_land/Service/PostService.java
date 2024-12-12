@@ -2,9 +2,7 @@ package com.example.peaceful_land.Service;
 
 import com.example.peaceful_land.DTO.*;
 import com.example.peaceful_land.Entity.*;
-import com.example.peaceful_land.Exception.PostNotFoundException;
-import com.example.peaceful_land.Exception.PropertyNotFoundException;
-import com.example.peaceful_land.Exception.UserNotFoundException;
+import com.example.peaceful_land.Exception.*;
 import com.example.peaceful_land.Query.PropertySpecification;
 import com.example.peaceful_land.Repository.*;
 import com.example.peaceful_land.Utils.ImageUtils;
@@ -114,7 +112,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public RequestPost createUserPostRequestApproval(IdRequest postRequest) {
+    public String createUserPostRequestApproval(IdRequest postRequest) {
         // Kiểm tra nếu bài rao tồn tại
         Post post = postRepository.findById(postRequest.getPostId()).orElse(null);
         if (post == null) {
@@ -137,7 +135,10 @@ public class PostService implements IPostService {
                 .expiration(LocalDate.now().plusDays(noDayApprove))
                 .build();
         // Lưu yêu cầu
-        return requestPostRepository.save(requestPost);
+        requestPostRepository.save(requestPost);
+        // Gử email thông báo cho người rao bài
+        new Thread(() -> emailService.sendPostRequestConfirmation(post)).start();
+        return "Đã gửi yêu cầu duyệt bài rao thành công";
     }
 
     @Override
@@ -336,6 +337,9 @@ public class PostService implements IPostService {
         post.getProperty().setStatus(true);
         if (request.getPrice() != null) {
             post.getProperty().setPrice(request.getPrice());
+        }
+        if (isReSale && request.getRental_period() != null) {
+            post.getProperty().setRentalPeriod(request.getRental_period());
         }
         propertyRepository.save(post.getProperty());
         // Cập nhật vào bản ghi nhật ký mới nhất của bất động sản
@@ -721,6 +725,34 @@ public class PostService implements IPostService {
             }
         }
         return listPosts;
+    }
+
+    @Override
+    public String removePost(Long postId, AdminBanRemoveRequest request) {
+        // Kiểm tra xem người dùng có quyền không
+        Account doer = accountRepository.findById(request.getUserId())
+                .orElseThrow(AccountNotFoundException::new);
+        if (doer.getRole() != VariableUtils.ROLE_ADMIN) {
+            throw new NoPermissionException();
+        }
+        // Lấy thông tin bài rao
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        // Kiểm tra xem bài rao đã bị ẩn chưa
+        if (post.getHide()) {
+            throw new RuntimeException("Bài rao đã bị xóa");
+        }
+        // Ẩn bài rao
+        post.setHide(true);
+        postRepository.save(post);
+        // Ẩn bất động sản
+        post.getProperty().setHide(true);
+        propertyRepository.save(post.getProperty());
+        // Gửi email thông báo cho người rao bài
+        new Thread(() ->
+                emailService.sendPostDeletedEmail(post.getProperty().getUser().getEmail(), post.getId(), LocalDateTime.now(), request.getReason())
+        ).start();
+        // Trả về thông báo thành công
+        return "Xóa bài rao thành công";
     }
 
     public void SYSTEM_scanAndDeleteUnusedThumbs() {

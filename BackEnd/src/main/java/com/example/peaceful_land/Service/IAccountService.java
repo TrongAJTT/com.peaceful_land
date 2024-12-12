@@ -55,4 +55,10 @@ public interface IAccountService {
     // Xem lịch sử thanh toán
     List<PurchaseView> viewPurchasesHistory(Long userId);
 
+    // Thống kê
+    List<Statistics> getStatistics(Long userId);
+
+    // Khóa tài khoản
+    String banAccount(AdminBanRemoveRequest request);
+
 }

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
 import { User } from '../../../dto/user';
@@ -9,6 +9,7 @@ import { AccountService } from '../../../core/services/account.service';
 import { ImageService } from '../../../core/services/image.service';
 import { firstValueFrom } from 'rxjs';
 import { PaymentService } from '../../../core/services/payment.service';
+import { response } from 'express';
 
 @Component({
   selector: 'app-login-and-register',
@@ -36,6 +37,8 @@ export class LoginAndRegisterComponent implements OnInit{
       { days: 360, price: 1290000, img: 'vip-package' }
     ]
   };
+  paymentMethodList!: any[];
+  paymentDetails: any = {};
 
   accountDetails: any[] = [
     {
@@ -73,6 +76,16 @@ export class LoginAndRegisterComponent implements OnInit{
     birth_date: new FormControl('')
   })
 
+  rechargeForm = new FormGroup({
+    amount: new FormControl(),
+  })
+
+  withdrawForm  = new FormGroup({
+    amount: new FormControl(),
+    payment_method: new FormControl(''),
+  })
+
+
   constructor(
     private snackbarService:SnackBarService,
     public authService:AuthService,
@@ -81,6 +94,7 @@ export class LoginAndRegisterComponent implements OnInit{
     private router:Router,
     private cdr: ChangeDetectorRef,
     private paymentService: PaymentService,
+    private route: ActivatedRoute,
   ){}
 
   ngOnInit(): void {
@@ -96,7 +110,39 @@ export class LoginAndRegisterComponent implements OnInit{
     this.changeToImg(this.user.avatarUrl)
     this.cdr.detectChanges()
 
-    
+    this.withdrawForm!.get('amount')!.disable();
+    this.withdrawForm!.get('payment_method')!.disable();
+
+    this.accountService.getPaymentMethod(this.user.id)
+      .subscribe({
+        next: (response:any) => {
+          this.paymentMethodList = response
+          if(response.length > 0){
+            this.withdrawForm!.get('payment_method')!.enable();
+          }
+        },
+        error: (response:any) => {}
+      })
+
+      this.route.queryParams.subscribe(params => {
+        this.paymentDetails = {
+          orderInfo: params['vnp_OrderInfo'],
+          paymentTime: params['vnp_PayDate'],
+          transactionId: params['vnp_TransactionNo'],
+          totalPrice: params['vnp_Amount'],
+          vnp_TxnRef: params['vnp_TxnRef'],
+          vnp_ResponseCode: params['vnp_ResponseCode']
+        };
+        this.paymentService.sendPaymentResult(this.paymentDetails)
+          .subscribe({
+            next: (response:any) =>{
+              this.snackbarService.notifySuccessUser(response)
+            },
+            error: (response:any) =>{
+              this.snackbarService.notifyErrorUser(response.error.message)
+            }
+          })
+      });
   }
 
   handleLogin(event:Event){
@@ -202,11 +248,18 @@ export class LoginAndRegisterComponent implements OnInit{
     }
   }
 
-  goToPay(){
-    const amount = 100000 
-    const orderInfo = "Thong tin cua hoa don dien tu"
-    const ticketId = 2
-    this.paymentService.payByVnPay(amount,orderInfo,ticketId)
+  submitRecharge(event:Event){
+    const amount = this.rechargeForm.get('amount')!.value
+    console.log(amount)
+    if(!amount) {
+      this.snackbarService.notifyWarningUser("Vui lòng nhập số tiền") 
+    }else if( (amount! < 0 || !Number.isInteger(amount))){
+      this.snackbarService.notifyWarningUser("Số tiền không hợp lệ");
+    }
+    const orderInfo = "Thong tin nap tien"
+
+
+    this.paymentService.payByVnPay(amount,orderInfo,this.user.id)
       .subscribe({
         next: (response: any) => {
           if (response.redirectUrl) { 
@@ -215,5 +268,9 @@ export class LoginAndRegisterComponent implements OnInit{
         },
         error: (response: any) => console.log(response)
       })
+  }
+
+  submitWithdraw(event:Event){
+
   }
 }

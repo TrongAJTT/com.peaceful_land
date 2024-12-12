@@ -8,6 +8,7 @@ import { PostApprovedComponent } from './post-approved/post-approved.component';
 import { DetailPostApprovedComponent } from './post-approved/detail-post-approved/detail-post-approved.component';
 import { PostRejectedComponent } from './post-rejected/post-rejected.component';
 import { DetailPostRejectedComponent } from './post-rejected/detail-post-rejected/detail-post-rejected.component';
+import { WithdrawComponent } from './withdraw/withdraw.component';
 
 const routes: Routes = [
   {path: "", component: DefaultComponent,
@@ -31,6 +32,7 @@ const routes: Routes = [
           {path: "detail/:id", component: DetailPostRejectedComponent},
         ]
       },
+      {path: "withdraw", component: WithdrawComponent},
       {path: "", component: PostPendingComponent, pathMatch: 'full'}
     ]
   },

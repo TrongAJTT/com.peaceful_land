@@ -1,0 +1,79 @@
+@import url("../../../../../public/assets/admin/admin.css");
+.w-7rem{
+    width: 7rem;
+}
+
+.m-0 {
+    margin: 0;
+}
+
+.mat-mdc-text-field-wrapper {
+    background-color: white !important;
+    border-bottom: none !important;
+}
+
+#dataTable_wrapper .dataTables_length,
+#dataTable_wrapper .dataTables_filter,
+#dataTable_wrapper .dataTables_info,
+#dataTable_wrapper .dataTables_paginate {
+   text-align: left;
+}
+
+/* Left-align the data inside the table */
+#dataTable tbody td {
+   text-align: left;
+}
+#dataTable thead th,#dataTable tfoot th {
+    text-align: left;
+ }
+
+ .t-center{
+    text-align: center !important;
+ }
+
+.active {
+    background-color: green !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+.inactive {
+    background-color: gray !important;
+}
+
+.not-started {
+    color: blue; /* Màu xanh cho trạng thái chưa chạy */
+}
+  
+.running {
+    color: green; /* Màu xanh lá cây cho trạng thái đang chạy */
+}
+  
+.ended {
+    color: red; /* Màu đỏ cho trạng thái đã chạy */
+}
+  
+::ng-deep .cdk-overlay-container {
+    z-index: 10000 !important; 
+  }
+  
+  
+  /* Snack Bar notify */
+  
+  ::ng-deep .snackbar-success,
+  ::ng-deep .snackbar-success-user {
+    border-radius: 6px;
+    box-shadow: 0 0 0 6px rgb(100, 160, 11);
+  }
+  
+  ::ng-deep .snackbar-warning,
+  ::ng-deep .snackbar-warning-user {
+    border-radius: 6px;
+    box-shadow: 0 0 0 6px rgb(219, 219, 15);
+  }
+  
+  ::ng-deep .snackbar-error,
+  ::ng-deep .snackbar-error-user {
+    border-radius: 6px;
+    box-shadow: 0 0 0 6px rgb(255, 0, 0);
+  }

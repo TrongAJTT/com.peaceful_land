@@ -40,13 +40,24 @@
 	<div class="user m-48">
 		<div class="container m-0 w-100">
 			<div class="row">
-				<div class="row g-0 gx-5 align-items-end">
-					<div class="col-lg-6">
-					  <div class="text-start mx-auto mb-5 wow slideInLeft" data-wow-delay="0.1s">
-						<h1 class="my-3">Thông tin người dùng</h1>
+				<div class="row g-0 p-2 align-items-end">
+					<div class="col-12 col-lg-6">
+						<div class="text-start mx-auto mb-5 wow slideInLeft" data-wow-delay="0.1s">
+						  <h1 class="my-3">Thông tin người dùng</h1>
+						</div>
 					  </div>
-					</div>
-				  </div>
+					  <div class="col-12 col-lg-6">
+						<div class="payment">
+						  <div class="payment_header">
+							<h5>Nạp tiền</h5>
+							<button type="button" class="vnpay-btn mx-4">
+							  <img src="/assets/img/payment/vnpay-logo.jpg" (click)="goToPay()" alt="vnpay" class="vnpay-img">
+							</button>
+						  </div>
+						</div>
+					  </div>
+				</div>
+				  
 				<div class="col-12 col-md-6">
 					<div class="user-info mb-24">
 						<div class="user-details">

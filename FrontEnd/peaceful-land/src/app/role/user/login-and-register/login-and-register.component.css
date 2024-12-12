@@ -444,3 +444,31 @@ h1{
 .z--1{
 	z-index: 1;
 }
+
+.payment_header {
+	display: flex;
+	justify-content: flex-end; /* Aligns header and button to start and end */
+	align-items: center; /* Vertically centers items */
+  }
+  
+  .vnpay-btn {
+	border-radius: 12px;
+    overflow: hidden;/* Add rounded corners */
+	padding: 0;
+	display: inline-flex; /* Allows the image and button content to align properly */
+	justify-content: center; /* Center the content inside the button */
+	align-items: center; /* Vertically align the image in the button */
+	cursor: pointer; /* Change the cursor to a pointer to indicate it is clickable */
+	transition: background-color 0.3s, transform 0.3s; /* Add smooth transition effects */
+  }
+  
+  .vnpay-btn:hover {
+	transform: scale(1.05); /* Slightly enlarge the button on hover */
+  }
+  
+  .vnpay-img {
+    height: 80px;
+    width: 120px;
+    object-fit: cover; /* Maintain the aspect ratio of the image */
+  }
+  

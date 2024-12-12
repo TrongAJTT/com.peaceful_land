@@ -325,6 +325,12 @@ public class AccountService implements IAccountService{
     }
 
     @Override
+    public String rechargeForAccount(Long userId){
+        Account account = accountRepository.findById(userId)
+                .orElseThrow(AccountNotFoundException::new);
+    }
+
+    @Override
     public String createWithdrawRequest(WithdrawRequest request) {
         // Kiểm tra tài khoản có tồn tại không
         Account account = accountRepository.findById(request.getUserId())

@@ -550,7 +550,7 @@ DROP TABLE IF EXISTS `transactions`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `transactions` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Id giao dịch',
-  `userId` bigint NOT NULL COMMENT 'Id người dùng',
+  `user_id` bigint NOT NULL COMMENT 'Id người dùng',
   `money` bigint NOT NULL COMMENT 'Lượng tiền giao dịch',
   `transaction_description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Nội dung giao dịch được người dùng gửi',
   `transaction_information` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Thông tin giao dịch, từ đâu, đến đâu, nguồn từ ví hay ngân hàng, id giao dịch',
@@ -560,8 +560,8 @@ CREATE TABLE `transactions` (
   `order_index` int DEFAULT NULL,
   `date_begin` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `transaction_account_FK` (`userId`),
-  CONSTRAINT `transaction_account_FK` FOREIGN KEY (`userId`) REFERENCES `accounts` (`id`)
+  KEY `transaction_account_FK` (`user_id`),
+  CONSTRAINT `transaction_account_FK` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Bảng chứa thông tin về các lần nạp tiền lên trang web.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 

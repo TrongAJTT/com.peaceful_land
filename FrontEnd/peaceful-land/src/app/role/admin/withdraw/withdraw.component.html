@@ -1,14 +1,14 @@
 
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h5 class="h3 mb-0 text-gray-800">Bài rao chờ duyệt</h5>
+    <h5 class="h3 mb-0 text-gray-800">Yêu cầu rút tiền</h5>
 </div>
 
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTablewithdrawUserReq" width="100%" cellspacing="0">
+            <table class="table table-bordered" id="dataTableWithdrawUserReq" width="100%" cellspacing="0">
                 <thead>
                     <tr >
                         <th *ngFor="let header of headerList">{{header}}</th>
@@ -24,18 +24,27 @@
                 <tbody *ngIf="withdrawList">
                     <tr *ngFor="let withdraw of withdrawList; trackBy: trackById">
                         <td>{{withdraw.id}}</td>
-                        <td [ngClass]="{'active': withdraw.approved, 'inactive': !withdraw.approved}">
-                            {{ withdraw.approved ? 'Đã duyệt' : 'Chờ duyệt' }}
+                        <td [ngClass]="{'inactive': withdraw.status == 'Đang chờ xử lý', 'active': withdraw.status != 'Đang chờ xử lý'}">
+                            {{ withdraw.status  }}
                         </td>
-                        <td>{{withdraw.withdraw_title}}</td>
-                        <td>{{withdraw.property_address}}</td>
+                        <td>{{withdraw.user_id}}</td>
+                        <td>{{withdraw.name}}</td>
+                        <td>{{withdraw.amount}}</td>
+                        <td [ngClass]="{'active-err': withdraw.deny_message, 'inactive': !withdraw.deny_message}">
+                            {{ withdraw.deny_message ? withdraw.deny_message : '**Không có**' }}
+                        </td>
                         <td>{{withdraw.request_date | date: 'dd/MM/yyyy'}}</td>
-                        <td>{{withdraw.expiry_date | date: 'dd/MM/yyyy'}}</td>
-                        <td [ngClass]="{'active': withdraw.withdraw_visibility, 'inactive': !withdraw.withdraw_visibility}">
-                            {{ withdraw.withdraw_visibility ? 'Hiển thị' : 'Ẩn' }}
-                        </td>
                         <td class="d-flex justify-content-around">
-                                <i class="fas fa-wrench"></i>
+                            <a 
+                                [ngClass]="{'btn-outline-success': withdraw.status == 'Đang chờ xử lý', 'btn-success': withdraw.status != 'Đang chờ xử lý'}"
+                                (click)="acceptReq(withdraw)" class="btn ">
+                                    <i class="fa-solid fa-check"></i>
+                            </a>
+                            <a 
+                                [ngClass]="{'btn-outline-danger': withdraw.status == 'Đang chờ xử lý', 'btn-danger': withdraw.status != 'Đang chờ xử lý'}"
+                                (click)="openRejectModal(withdraw)" class="btn btn-danger">
+                                <i class="fa-solid fa-xmark"></i>
+                            </a>
                         </td>
                     </tr>
                 </tbody>
@@ -43,3 +52,34 @@
         </div>
     </div>
 </div>
+
+
+<!-- Modal Definition -->
+<div *ngFor="let withdraw of withdrawList">
+    <div class="modal fade" tabindex="-1" role="dialog" [id]="'withdrawModal' + withdraw.id" #modalElement>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+     
+                <form [formGroup]="rejectForm" (ngSubmit)="submitReject(withdraw.id,$event)">
+                    <div class="modal-header d-flex justify-content-between">
+                        <h5 class="modal-title text-center" id="rejectModalLabel">Từ chối hành động rút tiền</h5>
+                        <button type="button" class="btn btn-danger close" (click)="closeRejectModal(withdraw.id)" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" >
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Lý do từ chối</label>
+                            <textarea type="text" class="form-control" id="message" formControlName="message"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" (click)="closeRejectModal(withdraw.id)">Đóng</button>
+                        <button type="button" type="submit" class="btn btn-danger">Gửi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

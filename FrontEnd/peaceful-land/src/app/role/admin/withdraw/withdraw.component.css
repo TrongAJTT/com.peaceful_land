@@ -1,4 +1,3 @@
-@import url("../../../../../public/assets/admin/admin.css");
 .w-7rem{
     width: 7rem;
 }
@@ -33,6 +32,12 @@
 
 .active {
     background-color: green !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+.active-err{
+    background-color: red !important;
     color: white !important;
     font-weight: bold !important;
 }

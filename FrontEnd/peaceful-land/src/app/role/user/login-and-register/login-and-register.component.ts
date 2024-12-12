@@ -113,6 +113,46 @@ export class LoginAndRegisterComponent implements OnInit{
     this.withdrawForm!.get('amount')!.disable();
     this.withdrawForm!.get('payment_method')!.disable();
 
+    this.loadPaymentMethod()
+    this.loadWhenHasPayment()
+  }
+
+  loadWhenHasPayment(){
+    this.route.queryParams.subscribe(params => {
+      if (params['vnp_OrderInfo'] && params['vnp_PayDate'] && params['vnp_TransactionNo'] && 
+        params['vnp_Amount'] && params['vnp_TxnRef'] && params['vnp_ResponseCode']) {
+          this.paymentDetails = {
+            vnp_OrderInfo: params['vnp_OrderInfo'],
+            vnp_PayDate: params['vnp_PayDate'],
+            vnp_TransactionNo: params['vnp_TransactionNo'],
+            vnp_Amount: params['vnp_Amount'],
+            vnp_TxnRef: params['vnp_TxnRef'],
+            vnp_ResponseCode: params['vnp_ResponseCode'],
+            vnp_BankCode: params["vnp_BankCode"],
+            vnp_BankTranNo: params["vnp_BankTranNo"],
+            vnp_CardType: params["vnp_CardType"]
+          };
+
+          this.paymentService.sendPaymentResult(this.paymentDetails)
+            .subscribe({
+              next: (response:any) =>{
+                this.snackbarService.notifySuccessUser(response.message)
+                this.user.accountBalance += Number.parseInt(response.totalPrice)
+                this.authService.setUserDetails(this.user)
+                this.user = this.authService.getUserDetails();
+                this.setQueryParams()
+                this.loadPaymentMethod()
+                this.cdr.detectChanges()
+              },
+              error: (response:any) =>{
+                this.snackbarService.notifyErrorUser(response.error.message)
+              }
+            })
+        }
+    });
+  }
+
+  loadPaymentMethod(){
     this.accountService.getPaymentMethod(this.user.id)
       .subscribe({
         next: (response:any) => {
@@ -123,38 +163,6 @@ export class LoginAndRegisterComponent implements OnInit{
         },
         error: (response:any) => {}
       })
-
-      this.route.queryParams.subscribe(params => {
-        if (params['vnp_OrderInfo'] && params['vnp_PayDate'] && params['vnp_TransactionNo'] && 
-          params['vnp_Amount'] && params['vnp_TxnRef'] && params['vnp_ResponseCode']) {
-            this.paymentDetails = {
-              vnp_OrderInfo: params['vnp_OrderInfo'],
-              vnp_PayDate: params['vnp_PayDate'],
-              vnp_TransactionNo: params['vnp_TransactionNo'],
-              vnp_Amount: params['vnp_Amount'],
-              vnp_TxnRef: params['vnp_TxnRef'],
-              vnp_ResponseCode: params['vnp_ResponseCode'],
-              vnp_BankCode: params["vnp_BankCode"],
-              vnp_BankTranNo: params["vnp_BankTranNo"],
-              vnp_CardType: params["vnp_CardType"]
-            };
-
-            this.paymentService.sendPaymentResult(this.paymentDetails)
-              .subscribe({
-                next: (response:any) =>{
-                  this.snackbarService.notifySuccessUser(response.message)
-                  this.user.accountBalance += Number.parseInt(response.totalPrice)
-                  this.authService.setUserDetails(this.user)
-                  this.user = this.authService.getUserDetails();
-                  this.setQueryParams()
-                  this.cdr.detectChanges()
-                },
-                error: (response:any) =>{
-                  this.snackbarService.notifyErrorUser(response.error.message)
-                }
-              })
-          }
-      });
   }
 
   setQueryParams(){
@@ -307,7 +315,7 @@ export class LoginAndRegisterComponent implements OnInit{
       this.accountService.withdrawAccount(this.user.id,Number.parseInt(paymentMethodId!),amount)
         .subscribe({
           next: (response: any) => {
-            this.snackbarService.notifySuccessUser(response.error.message)
+            this.snackbarService.notifySuccessUser(response)
           },
           error: (response: any) => this.snackbarService.notifyErrorUser(response.error.message)
         })

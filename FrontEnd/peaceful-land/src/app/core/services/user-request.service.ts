@@ -43,6 +43,12 @@ export class UserRequestService {
       {}, {headers});
   }
 
+  rejectOrApproveWithdraw(withdrawId: number,type: string, deny_message: string): Observable<any>{
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.apiUrl}/withdraw/${withdrawId}/action?type=${type}`, 
+       {deny_message},{headers});
+  }
 
 
 }

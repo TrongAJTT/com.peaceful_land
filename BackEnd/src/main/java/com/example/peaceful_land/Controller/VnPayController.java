@@ -7,7 +7,7 @@ import com.example.peaceful_land.Exception.UserNotFoundException;
 import com.example.peaceful_land.Repository.AccountRepository;
 import com.example.peaceful_land.Repository.PaymentMethodRepository;
 import com.example.peaceful_land.Repository.TransactionRepository;
-import com.example.peaceful_land.Service.VnPayService;
+import com.example.peaceful_land.Service.payment.VnPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

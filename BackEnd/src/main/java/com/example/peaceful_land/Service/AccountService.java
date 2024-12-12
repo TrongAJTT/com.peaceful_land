@@ -6,6 +6,9 @@ import com.example.peaceful_land.Exception.AccountNotFoundException;
 import com.example.peaceful_land.Exception.NoPermissionException;
 import com.example.peaceful_land.Exception.PayMethodNotFoundException;
 import com.example.peaceful_land.Repository.*;
+import com.example.peaceful_land.Service.repos.IAccountService;
+import com.example.peaceful_land.Service.security.RedisService;
+import com.example.peaceful_land.Service.utils.EmailService;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +26,7 @@ import java.util.*;
 import static com.example.peaceful_land.Utils.VariableUtils.TYPE_UPLOAD_AVATAR;
 
 @Service @RequiredArgsConstructor
-public class AccountService implements IAccountService{
+public class AccountService implements IAccountService {
 
     private final RequestWithdrawRepository requestWithdrawRepository;
     private final PaymentMethodRepository paymentMethodRepository;
@@ -167,7 +170,7 @@ public class AccountService implements IAccountService{
     }
 
     @Override
-    public String purchaseRole(PurchaseRoleRequest request) {
+    public Account purchaseRole(PurchaseRoleRequest request) {
         Account account = accountRepository.findById(request.getUserId())
                 .orElseThrow(AccountNotFoundException::new);
         Long requiredMoney = VariableUtils.getRolePriceFromDayRange(request.getRole(), request.getDay());
@@ -203,8 +206,7 @@ public class AccountService implements IAccountService{
             throw new RuntimeException("Không thể mua role thấp hơn role hiện tại");
         }
         account.setAccountBalance(account.getAccountBalance() - requiredMoney);
-        accountRepository.save(account);
-        return "Mua vai trò người dùng thành công";
+        return accountRepository.save(account);
     }
 
     @Override

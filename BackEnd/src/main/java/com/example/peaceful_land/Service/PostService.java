@@ -5,6 +5,8 @@ import com.example.peaceful_land.Entity.*;
 import com.example.peaceful_land.Exception.*;
 import com.example.peaceful_land.Query.PropertySpecification;
 import com.example.peaceful_land.Repository.*;
+import com.example.peaceful_land.Service.repos.IEmailService;
+import com.example.peaceful_land.Service.repos.IPostService;
 import com.example.peaceful_land.Utils.ImageUtils;
 import com.example.peaceful_land.Utils.VariableUtils;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.peaceful_land.Service;
+package com.example.peaceful_land.Service.security;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;

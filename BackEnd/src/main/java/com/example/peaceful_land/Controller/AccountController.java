@@ -1,7 +1,7 @@
 package com.example.peaceful_land.Controller;
 
 import com.example.peaceful_land.DTO.*;
-import com.example.peaceful_land.Service.IAccountService;
+import com.example.peaceful_land.Service.repos.IAccountService;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -29,7 +29,7 @@ public class AccountController {
 
     @PostMapping("/purchase-role")
     public ResponseEntity<?> purchaseRole(@RequestBody PurchaseRoleRequest request) {
-        return ResponseEntity.ok(gson.toJson(accountService.purchaseRole(request)));
+        return ResponseEntity.ok(accountService.purchaseRole(request));
     }
 
     @PostMapping(value = "/change-avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

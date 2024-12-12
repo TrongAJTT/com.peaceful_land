@@ -6,7 +6,7 @@ import com.example.peaceful_land.Exception.PropertyNotFoundException;
 import com.example.peaceful_land.Exception.RequestInvalidException;
 import com.example.peaceful_land.Repository.PostRepository;
 import com.example.peaceful_land.Repository.PropertyRepository;
-import com.example.peaceful_land.Service.IPostService;
+import com.example.peaceful_land.Service.repos.IPostService;
 import com.example.peaceful_land.Utils.VariableUtils;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;

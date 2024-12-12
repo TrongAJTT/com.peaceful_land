@@ -1,4 +1,4 @@
-package com.example.peaceful_land.Service;
+package com.example.peaceful_land.Service.repos;
 
 import com.example.peaceful_land.DTO.PostApprovalResponse;
 import com.example.peaceful_land.DTO.ResponseReport;

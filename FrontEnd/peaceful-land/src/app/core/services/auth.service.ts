@@ -119,5 +119,4 @@ export class AuthService {
     this.authStatusChanged.emit(this.userRole);
   }
 
-
 }

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
 import { User } from '../../../dto/user';
@@ -125,25 +125,46 @@ export class LoginAndRegisterComponent implements OnInit{
       })
 
       this.route.queryParams.subscribe(params => {
-        this.paymentDetails = {
-          orderInfo: params['vnp_OrderInfo'],
-          paymentTime: params['vnp_PayDate'],
-          transactionId: params['vnp_TransactionNo'],
-          totalPrice: params['vnp_Amount'],
-          vnp_TxnRef: params['vnp_TxnRef'],
-          vnp_ResponseCode: params['vnp_ResponseCode']
-        };
-        this.paymentService.sendPaymentResult(this.paymentDetails)
-          .subscribe({
-            next: (response:any) =>{
-              this.snackbarService.notifySuccessUser(response)
-            },
-            error: (response:any) =>{
-              this.snackbarService.notifyErrorUser(response.error.message)
-            }
-          })
+        if (params['vnp_OrderInfo'] && params['vnp_PayDate'] && params['vnp_TransactionNo'] && 
+          params['vnp_Amount'] && params['vnp_TxnRef'] && params['vnp_ResponseCode']) {
+            this.paymentDetails = {
+              vnp_OrderInfo: params['vnp_OrderInfo'],
+              vnp_PayDate: params['vnp_PayDate'],
+              vnp_TransactionNo: params['vnp_TransactionNo'],
+              vnp_Amount: params['vnp_Amount'],
+              vnp_TxnRef: params['vnp_TxnRef'],
+              vnp_ResponseCode: params['vnp_ResponseCode'],
+              vnp_BankCode: params["vnp_BankCode"],
+              vnp_BankTranNo: params["vnp_BankTranNo"],
+              vnp_CardType: params["vnp_CardType"]
+            };
+
+            this.paymentService.sendPaymentResult(this.paymentDetails)
+              .subscribe({
+                next: (response:any) =>{
+                  this.snackbarService.notifySuccessUser(response.message)
+                  this.user.accountBalance += Number.parseInt(response.totalPrice)
+                  this.authService.setUserDetails(this.user)
+                  this.user = this.authService.getUserDetails();
+                  this.setQueryParams()
+                  this.cdr.detectChanges()
+                },
+                error: (response:any) =>{
+                  this.snackbarService.notifyErrorUser(response.error.message)
+                }
+              })
+          }
       });
   }
+
+  setQueryParams(){
+    const qParams: Params = {};
+    this.router.navigate(['/user/login_and_register'], {
+        relativeTo: this.route,
+        queryParams: qParams,
+        queryParamsHandling: ''
+    });
+}
 
   handleLogin(event:Event){
     event.preventDefault();
@@ -228,6 +249,7 @@ export class LoginAndRegisterComponent implements OnInit{
       .subscribe({
         next: (response:any) => {
           this.snackbarService.notifySuccessUser("Cập nhật gói thành công")
+          console.log(response)
           this.authService.reloadUserAfterBuyRole(response)
           this.user = this.authService.getUserDetails();
           this.cdr.detectChanges()

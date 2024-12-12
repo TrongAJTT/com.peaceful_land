@@ -108,7 +108,7 @@
 								<h5>Nạp tiền</h5>
 							</div>
 							<div class="d-flex">
-								<input type="number" formControlName="amount" placeholder="Nhập số tiền" class="form-control mx-2 w-fit" min="1" id="depositAmount">
+								<input type="number" formControlName="amount" placeholder="Nhập số tiền" class="form-control mx-2 w-fit" min="50000" id="depositAmount">
 								<button type="button" type="submit" class="vnpay-btn mx-4">
 								<img src="/assets/img/payment/vnpay-logo.jpg" alt="vnpay" class="vnpay-img">
 								</button>
@@ -125,14 +125,14 @@
 							</div>
 							<div class="d-flex align-items-center">
 								<!-- Select ngân hàng hoặc ví điện tử -->
-								<select formControlName="payment_method" class="form-control w-fit mx-2 h-50" id="paymentMethod">
+								<select (change)="onActionChangeWithdraw()" formControlName="payment_method" class="form-control w-fit mx-2 h-50" id="paymentMethod">
 									<option value="" disabled selected>Chọn phương thức rút tiền</option>
-									<option *ngFor="let paymentMethod of paymentMethodList" [value]="paymentMethod.id">{{paymentMethod.name}}</option>
+									<option *ngFor="let paymentMethod of paymentMethodList" min="50000" [value]="paymentMethod.id">{{paymentMethod.name}}</option>
 								</select>
 								<!-- Input số tiền -->
 								<input type="number" formControlName="amount" placeholder="Nhập số tiền" class="form-control mx-2 w-fit" min="1" id="withdrawAmount">
 								<!-- Nút rút tiền -->
-								<button type="button" type="submit" class="withdraw-btn mx-4" onclick="withdrawFunds()">
+								<button type="button" type="submit" class="withdraw-btn mx-4">
 									<img src="/assets/img/payment/withdraw-logo.jpg" alt="withdraw" class="withdraw-img">
 								</button>
 							</div>
@@ -276,5 +276,4 @@
 		  </div>
 		</div>
 	</div>
-	  
 </div>

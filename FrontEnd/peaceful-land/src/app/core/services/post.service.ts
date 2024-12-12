@@ -16,12 +16,6 @@ export class PostService{
 
 
   createPost(property_id: number, title: string, description: string, expiration: string): Observable<any>{
-    const formData: FormData = new FormData(); 
-    formData.append('property_id', property_id.toString()); 
-    formData.append('title', title); 
-    formData.append('description', description); 
-    formData.append('expiration', expiration); 
-
     const token = this.authService.getToken();  // Lấy JWT từ AuthService
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${this.apiUrl}/create-post`, 
@@ -109,5 +103,45 @@ export class PostService{
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.post<any>(`${this.apiUrl}/my-posts`, 
       {user_id}, {headers});
+  }
+
+  getUpdatePermission(postId: number, user_id: number): Observable<any>{
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.apiUrl}/${postId}/update-permission`, 
+      {user_id}, {headers});
+  }
+
+  updateDetailPost(user_id: number,postId: number ,action: string, 
+    price: number | null | undefined, rental_period: string | null | undefined): Observable<any>{
+    const formData: FormData = new FormData(); 
+    if(price!=undefined && price!=null){
+      formData.append('price', price.toString()); 
+    }
+    if(rental_period!=undefined && rental_period!=null){
+      formData.append('rental_period', rental_period); 
+    }
+    formData.append('user_id', user_id.toString()); 
+
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.apiUrl}/${postId}/update?action=${action}`, 
+      formData, {headers});
+  }
+
+  updateOveralPost(user_id: number,postId: number ,action: string, title: string, 
+    description: string,img: File): Observable<any>{
+      const formData: FormData = new FormData(); 
+      formData.append('user_id', user_id.toString()); 
+      formData.append('title', title); 
+      formData.append('description', description); 
+      if(img){
+        formData.append('thumbnail', img, img.name); 
+      }
+
+      const token = this.authService.getToken();  // Lấy JWT từ AuthService
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      return this.http.post<any>(`${this.apiUrl}/${postId}/update?action=${action}`, 
+        formData, {headers});
   }
 }

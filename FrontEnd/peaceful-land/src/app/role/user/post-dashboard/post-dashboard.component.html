@@ -28,7 +28,7 @@
                                 <img (click)="openModal(post.thumbnUrl)"
                                     [src]="post.thumbnUrl" 
                                     alt="Thumbnail" 
-                                    class="img-thumbnail"
+                                    class="img-thumbnail c-p"
                                     (error)="onImageError(post)"/>
                             </td>
                             <td>{{post.title}}</td>
@@ -37,40 +37,18 @@
                             <td>{{post.createdAt | date: 'dd/MM/yyyy'}}</td>
                             <td>{{post.expiration | date: 'dd/MM/yyyy'}}</td>
                             <td class="d-flex justify-content-around">
-                                <a  (click)="openPostModal()" class="btn btn-outline-info">
+                                <button  (click)="openPostModal(post)" class="btn btn-outline-info" [attr.data-bs-target]="'#postModal'+post.id">
                                     <i class="fas fa-wrench"></i>
-                                </a>
-                            </td>
+                                </button>
 
-                            <!-- Modal thay đổi thông tin bài đăng -->
-                            <div class="modal fade" #postModal *ngIf="userId!==-1 " [id]="'postModal'+post.id" tabindex="-1" role="dialog" aria-labelledby="postModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <form [formGroup]="postForm" (ngSubmit)="submitPost($event)">
-                                            <div class="modal-header d-flex justify-content-between">
-                                                <h5 class="modal-title text-center" id="postModalLabel">Yêu cầu liên hệ</h5>
-                                                <button type="button" class="btn btn-danger close" (click)="closePostModal()" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body" >
-                                                <div class="mb-3">
-                                                    <label for="name-post" class="form-label">Họ tên</label>
-                                                    <input type="text" class="form-control" id="name-post" formControlName="name">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="phone-post" class="form-label">Số điện thoại</label>
-                                                    <input type="tel" class="form-control" id="phone-post" formControlName="phone">
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" (click)="closePostModal()">Đóng</button>
-                                                <button type="button" type="submit" class="btn btn-danger" >Gửi</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                                <button  (click)="openPostOveralModal(post)" class="btn btn-outline-info" [attr.data-bs-target]="'#postModal'+post.id">
+                                    <i class="fa-solid fa-image"></i>
+                                </button>
+
+                                <button  (click)="gotToDetailPost(post)" class="btn btn-outline-info" [attr.data-bs-target]="'#postModal'+post.id">
+                                    <i class="fa-solid fa-star"></i>
+                                </button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -82,6 +60,90 @@
 <div class="modal-child-image" *ngIf="isModalOpen" (click)="closeModal($event)">
     <div class="modal-child-image-content" (click)="$event.stopPropagation()">
         <img [src]="modalImageSrc" class="modal-child-image-img">
+    </div>
+</div>
+
+<!-- Modal Definition -->
+<div *ngFor="let post of postList">
+    <div class="modal fade" tabindex="-1" role="dialog" [id]="'postModal' + post.id" #modalElement>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form [formGroup]="postForm" (ngSubmit)="submitPost(post.id, $event)">
+                    <div class="modal-header d-flex justify-content-between">
+                        <h5 class="modal-title" id="postModalLabel">Thay đổi chi tiết</h5>
+                        <button type="button" class="btn btn-danger" (click)="closePostModal(post.id)" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Box chọn hành động -->
+                        <div class="mb-3">
+                            <label for="action-post" class="form-label">Hành động</label>
+                            <select class="form-control" id="action-post" formControlName="action" (change)="onActionChange(post)">
+                                <option *ngFor="let option of updateOption" [value]="option">{{dictOption[option]}}</option>
+                            </select>
+                        </div>
+                        <!-- Ô nhập giá mới, hạn thuê mới -->
+                        <div class="mb-3">
+                            <label for="price-post" class="form-label">Giá mới</label>
+                            <input type="number" class="form-control" id="price-post" formControlName="price" [disabled]="isPriceDisabled">
+                        </div>
+                        <div class="mb-3">
+                            <label for="rental-period-post" class="form-label">Hạn thuê mới</label>
+                            <input type="date" class="form-control" id="rental-period-post" formControlName="rentalPeriod" [min]="today" [disabled]="isRentalPeriodDisabled">
+                        </div>
+                        <!-- Textbox thông tin hành động -->
+                        <div class="mb-3">
+                            <label for="action-info" class="form-label">Thông tin hành động</label>
+                            <input type="text" class="form-control" id="action-info" formControlName="actionInfo" [readonly]="true">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" (click)="closePostModal(post.id)">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Gửi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Definition -->
+<div *ngFor="let post of postList">
+    <div class="modal fade" tabindex="-1" role="dialog" [id]="'postModalOveral' + post.id" #modalOveralElement>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form [formGroup]="postOveralForm" (ngSubmit)="submitPostOveral(post.id, $event)">
+                    <div class="modal-header d-flex justify-content-between">
+                        <h5 class="modal-title" id="postModalOveralLabel">Thay đổi tổng quan</h5>
+                        <button type="button" class="btn btn-danger" (click)="closePostOveralModal(post.id)" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="title-post" class="form-label">Tiêu đề</label>
+                            <input type="text" class="form-control" id="title-post" formControlName="title" >
+                        </div>
+                        <div class="mb-3">
+                            <label for="description-post" class="form-label">Mô tả</label>
+                            <textarea type="text" class="form-control h-164" id="description-post" formControlName="description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image">Hình ảnh đại diện</label>
+                            <input type="file" id="image" (change)="onImageSelected($event)" class="form-control">
+                            <div *ngIf="imagePreview" class="mt-2">
+                                <img [src]="imagePreview" alt="Image Preview" class="img-fluid img-contain c-p" style="max-height: 400px; object-fit: contain; width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" (click)="closePostOveralModal(post.id)">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Gửi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 

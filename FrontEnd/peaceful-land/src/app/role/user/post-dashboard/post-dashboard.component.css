@@ -1,4 +1,3 @@
-@import url("../../../../../public/assets/admin/admin.css");
 .w-7rem{
     width: 7rem;
 }
@@ -143,4 +142,28 @@
 
 .modal-backdrop.show {
   opacity: 1;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close {
+  margin-left: auto;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.c-p{
+  cursor: pointer;
+}
+
+.h-164{
+  height: 164px;
 }

@@ -74,7 +74,7 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public String changeThumbnail(ChangePostThumbnailRequest request) {
+    public String changeThumbnail(ChangePostThumbnailRequest request, boolean updateLog) {
         // Kiểm tra tài khoản tồn tại
         Post post = postRepository.findById(request.getPost_id()).orElse(null);
         if (post == null) throw new PostNotFoundException();
@@ -96,15 +96,11 @@ public class PostService implements IPostService {
             // Cập nhật đường dẫn file mới vào database
             post.setThumbnUrl(fileName);
             postRepository.save(post);
-            // Cập nhật vào bản ghi nhật ký mới nhất của bài rao
-            PostLog postLog = postLogRepository.findTopByPostEqualsOrderByDateBeginDesc(post);
-            postLog.setThumbnUrl(fileName);
-            postLogRepository.save(postLog);
-            // Xóa file cũ nếu không có postLog nào sử dụng
-            if (!oldThumbnail.equals(VariableUtils.IMAGE_NA)) {
-                if (!postLogRepository.existsByThumbnUrl(oldThumbnail)) {
-                    ImageUtils.deleteFileServer(oldThumbnail);
-                }
+            // Cập nhật vào bản ghi nhật ký mới nhất của bài rao (nếu cần)
+            if (updateLog) {
+                PostLog postLog = postLogRepository.findTopByPostEqualsOrderByDateBeginDesc(post);
+                postLog.setThumbnUrl(fileName);
+                postLogRepository.save(postLog);
             }
             // Trả về thông báo thành công
             return "Đổi ảnh bìa của bài rao thành công. Đường dẫn mới: " + fileName;
@@ -439,7 +435,7 @@ public class PostService implements IPostService {
                 changeThumbnail(ChangePostThumbnailRequest.builder()
                         .post_id(post.getId())
                         .image(request.getThumbnail())
-                        .build());
+                        .build(), false);
                 contentUpdate += " Cập nhật ảnh bìa mới thành công";
             } catch (Exception e) {
                 contentUpdate += " Lỗi khi cập nhật ảnh bìa: " + e.getMessage();

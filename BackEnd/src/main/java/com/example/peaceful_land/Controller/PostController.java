@@ -37,7 +37,7 @@ public class PostController {
 
     @PostMapping(value = "/change-thumbnail", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> changeThumbnail(@ModelAttribute ChangePostThumbnailRequest request) {
-        String result = postService.changeThumbnail(request);
+        String result = postService.changeThumbnail(request, true);
         return ok(gson.toJson(result));
     }
 

@@ -12,7 +12,7 @@ public interface IPostService {
     // Kiểm tra bài rao tồn tại hay không
     Post checkPostExists(Long id);
     // Thay đổi ảnh đại diện bài rao
-    String changeThumbnail(ChangePostThumbnailRequest request);
+    String changeThumbnail(ChangePostThumbnailRequest request, boolean updateLog);
     // Yêu cầu phê duyệt bài rao
     String createUserPostRequestApproval(IdRequest postRequest);
     // Xem thông tin

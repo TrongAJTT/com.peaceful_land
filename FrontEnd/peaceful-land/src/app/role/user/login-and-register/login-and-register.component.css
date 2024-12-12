@@ -447,11 +447,11 @@ h1{
 
 .payment_header {
 	display: flex;
-	justify-content: flex-end; /* Aligns header and button to start and end */
+	justify-content: flex-start; /* Aligns header and button to start and end */
 	align-items: center; /* Vertically centers items */
   }
   
-  .vnpay-btn {
+  .vnpay-btn,.withdraw-btn {
 	border-radius: 12px;
     overflow: hidden;/* Add rounded corners */
 	padding: 0;
@@ -462,13 +462,25 @@ h1{
 	transition: background-color 0.3s, transform 0.3s; /* Add smooth transition effects */
   }
   
-  .vnpay-btn:hover {
+  .vnpay-btn:hover,.withdraw-btn:hover {
 	transform: scale(1.05); /* Slightly enlarge the button on hover */
   }
   
-  .vnpay-img {
-    height: 80px;
+  .vnpay-img,.withdraw-img {
+    height: 52px;
     width: 120px;
     object-fit: cover; /* Maintain the aspect ratio of the image */
   }
   
+  .m-h-200{
+	min-height: 200px ;
+  }
+
+
+  .w-fit{
+	width: fit-content;
+  }
+
+  .h-50{
+	height: 50px;
+  }

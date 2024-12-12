@@ -31,4 +31,19 @@ export class AccountService {
       {user_id},
       { headers });
   }
+
+  getPaymentMethod(user_id: number): Observable<any>{
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.apiUrl}/payment-methods`,
+      {user_id},
+      { headers });
+  }
+
+  withdrawAccount(user_id:number, payment_method_id:number, amount:number): Observable<any>{
+    const token = this.authService.getToken();  // Lấy JWT từ AuthService
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<{ redirectUrl: string}>(`${this.apiUrl}/request-withdraw`,
+      {user_id,payment_method_id,amount}, {headers});
+  }
 }

@@ -1,0 +1,45 @@
+
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h5 class="h3 mb-0 text-gray-800">Bài rao chờ duyệt</h5>
+</div>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTablewithdrawUserReq" width="100%" cellspacing="0">
+                <thead>
+                    <tr >
+                        <th *ngFor="let header of headerList">{{header}}</th>
+                        <th class="t-center">Hành động</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr >
+                        <th *ngFor="let header of headerList">{{header}}</th>
+                        <th class="t-center">Hành động</th>
+                    </tr>
+                </tfoot>
+                <tbody *ngIf="withdrawList">
+                    <tr *ngFor="let withdraw of withdrawList; trackBy: trackById">
+                        <td>{{withdraw.id}}</td>
+                        <td [ngClass]="{'active': withdraw.approved, 'inactive': !withdraw.approved}">
+                            {{ withdraw.approved ? 'Đã duyệt' : 'Chờ duyệt' }}
+                        </td>
+                        <td>{{withdraw.withdraw_title}}</td>
+                        <td>{{withdraw.property_address}}</td>
+                        <td>{{withdraw.request_date | date: 'dd/MM/yyyy'}}</td>
+                        <td>{{withdraw.expiry_date | date: 'dd/MM/yyyy'}}</td>
+                        <td [ngClass]="{'active': withdraw.withdraw_visibility, 'inactive': !withdraw.withdraw_visibility}">
+                            {{ withdraw.withdraw_visibility ? 'Hiển thị' : 'Ẩn' }}
+                        </td>
+                        <td class="d-flex justify-content-around">
+                                <i class="fas fa-wrench"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

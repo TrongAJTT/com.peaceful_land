@@ -62,58 +62,60 @@ Dự án này được xây dựng sử dụng các công nghệ **Docker**, **M
 - **Redis**: CSDL mã nguồn mở, hoạt động trên bộ nhớ (in-memory database) và được sử dụng rộng rãi để lưu trữ dữ liệu với hiệu suất cao.
 
 ## Cấu trúc thư mục của dự án Spring Boot (Backend)
-BackEnd/<br>
-│<br>
-├── src/<br>
-│   ├── main/<br>
-│   │   ├── java/<br>
-│   │   │   └── com.example.peaceful_land/<br>
-│   │   │       ├── config/            # Chứa các lớp cấu hình<br>
-│   │   │       ├── controller/        # Chứa các lớp điều khiển, nhận và xử lý yêu cầu HTTP từ client<br>
-│   │   │       ├── DTO/               # Chứa các lớp đối tượng dùng để truyền dữ liệu giữa các tầng trong ứng dụng<br>
-│   │   │       ├── entity/            # Chứa các lớp đại diện cho đối tượng trong CSDL, ánh xạ lên CSDL.<br>
-│   │   │       ├── errorhandler/      # Chứa các lớp xử lí lỗi nhằm trả về phản hồi phù hợp lên client.<br>
-│   │   │       ├── exception/         # Chứa các lớp ngoại lệ tự định nghĩa trong dự án.<br>
-│   │   │       ├── query/             # Chứa các lớp dùng để xây dựng các câu truy vấn pức tạp trong JPA.<br>
-│   │   │       ├── repository/        # Chứa các lớp repository thực hiện các thao tác CRUD lên cơ sở dữ liệu.<br>
-│   │   │       ├── security/          # Chứa các lớp liên quan đến bảo mật: Xử lý các vấn đề về xác thực, ủy quyền, tec.<br>
-│   │   │       ├── service/           # Chứa các lớp dịch vụ xử lý logic nghiệp vụ<br>
-│   │   │       ├── utils/             # Các lớp chứa các biến, hàm hỗ trợ chung được sử dụng trong nhiều phần của ứng dụng.<br>
-│   │   │       └── application.java   # Lớp chính khởi tạo ứng dụng Spring Boot<br>
-│   │   └── resources/<br>
-│   │       ├── application.properties # Tập tin cấu hình cho ứng dụng (cấu hình kết nối cơ sở dữ liệu, cấu hình server, etc.)<br>
-│   │       └── static/                # Chứa các tệp tài nguyên tĩnh (nếu có)<br>
-│   └── test/                          # Chứa các bài kiểm thử cho ứng dụng<br>
-│<br>
-├── pom.xml                            # Quản lý các thư viện và cấu hình xây dựng ứng dụng Spring Boot<br>
-│<br>
+```
+BackEnd/
+│
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com.example.peaceful_land/
+│   │   │       ├── config/            # Chứa các lớp cấu hình
+│   │   │       ├── controller/        # Chứa các lớp điều khiển, nhận và xử lý yêu cầu HTTP từ client
+│   │   │       ├── DTO/               # Chứa các lớp đối tượng dùng để truyền dữ liệu giữa các tầng trong ứng dụng
+│   │   │       ├── entity/            # Chứa các lớp đại diện cho đối tượng trong CSDL, ánh xạ lên CSDL.
+│   │   │       ├── errorhandler/      # Chứa các lớp xử lí lỗi nhằm trả về phản hồi phù hợp lên client.
+│   │   │       ├── exception/         # Chứa các lớp ngoại lệ tự định nghĩa trong dự án.
+│   │   │       ├── query/             # Chứa các lớp dùng để xây dựng các câu truy vấn pức tạp trong JPA.
+│   │   │       ├── repository/        # Chứa các lớp repository thực hiện các thao tác CRUD lên cơ sở dữ liệu.
+│   │   │       ├── security/          # Chứa các lớp liên quan đến bảo mật: Xử lý các vấn đề về xác thực, ủy quyền, tec.
+│   │   │       ├── service/           # Chứa các lớp dịch vụ xử lý logic nghiệp vụ
+│   │   │       ├── utils/             # Các lớp chứa các biến, hàm hỗ trợ chung được sử dụng trong nhiều phần của ứng dụng.
+│   │   │       └── application.java   # Lớp chính khởi tạo ứng dụng Spring Boot
+│   │   └── resources/
+│   │       ├── application.properties # Tập tin cấu hình cho ứng dụng (cấu hình kết nối cơ sở dữ liệu, cấu hình server, etc.)
+│   │       └── static/                # Chứa các tệp tài nguyên tĩnh (nếu có)
+│   └── test/                          # Chứa các bài kiểm thử cho ứng dụng
+│
+├── pom.xml                            # Quản lý các thư viện và cấu hình xây dựng ứng dụng Spring Boot
+│
 └── uploads/                           # Chứa các tập tin ảnh được tải lên trên hệ thống
-
+```
 
 
 ## Cấu trúc thư mục của dự án Angular (Frontend)
-
-peaceful_land/<br>
-│<br>
-├── public/<br>
-│   └── assets/                  # Chứa các tài nguyên tĩnh như hình ảnh, CSS, fonts.<br>
-├── src/                         # Thư mục mã nguồn của ứng dụng.<br>
-│   ├── app/                     # Các component đại diện cho giao diện người dùng (UI).<br>
-│   │   ├── core/                # Chứa các dịch vụ, lớp, giao diện chung cho toàn bộ ứng dụng.<br>
-│   │   │   ├── guards/          # Chứa các guard để bảo vệ các route, kiểm soát quyền truy cập.<br>
-│   │   │   ├── interceptors/    # Chứa các interceptor để chặn và xử lý các request/response.<br>
-│   │   │   ├── pipes/           # Các pipes có tác dụng định dạng dữ liệu hiển thị.<br>
-│   │   │   └── services/        # Chứa các dịch vụ cung cấp các chức năng nghiệp vụ.<br>
-│   │   ├── dto/                 # Chứa các lớp đối tượng truyền dữ liệu giữa các thành phần.<br>
-│   │   ├── role/                # Chứa vai trò người dùng, nhằm kiểm soát quyền truy cập<br>
-│   │   │   ├── admin/           # Vai trò quản trị viên<br>
-│   │   │   └── user/            # Vai trò người dùng thông thường<br>
-│   │   ├── app.module.ts        # File module chính của ứng dụng, nơi khai báo các component, service, module con, etc.<br>
-│   │   ├── share/               # Chứa các thành phần được chia sẻ giữa nhiều module<br>
-│   │   └── app.component.ts     # Component gốc của ứng dụng<br>
-│   └── index.html               # File HTML gốc của ứng dụng, nơi Angular sẽ render ra giao diện.<br>
-│── angular.json                 # Cấu hình dự án Angular<br>
-└── proxy.conf.json              # Cấu hình CORS để gọi được api từ khác đường localhost<br>
+```
+peaceful_land/
+│
+├── public/
+│   └── assets/                  # Chứa các tài nguyên tĩnh như hình ảnh, CSS, fonts.
+├── src/                         # Thư mục mã nguồn của ứng dụng.
+│   ├── app/                     # Các component đại diện cho giao diện người dùng (UI).
+│   │   ├── core/                # Chứa các dịch vụ, lớp, giao diện chung cho toàn bộ ứng dụng.
+│   │   │   ├── guards/          # Chứa các guard để bảo vệ các route, kiểm soát quyền truy cập.
+│   │   │   ├── interceptors/    # Chứa các interceptor để chặn và xử lý các request/response.
+│   │   │   ├── pipes/           # Các pipes có tác dụng định dạng dữ liệu hiển thị.
+│   │   │   └── services/        # Chứa các dịch vụ cung cấp các chức năng nghiệp vụ.
+│   │   ├── dto/                 # Chứa các lớp đối tượng truyền dữ liệu giữa các thành phần.
+│   │   ├── role/                # Chứa vai trò người dùng, nhằm kiểm soát quyền truy cập.
+│   │   │   ├── admin/           # Vai trò quản trị viên
+│   │   │   └── user/            # Vai trò người dùng thông thường
+│   │   ├── app.module.ts        # File module chính của ứng dụng, nơi khai báo các component, service, module con, etc.
+│   │   ├── share/               # Chứa các thành phần được chia sẻ giữa nhiều module
+│   │   └── app.component.ts     # Component gốc của ứng dụng
+│   └── index.html               # File HTML gốc của ứng dụng, nơi Angular sẽ render ra giao diện.
+│── angular.json                 # Cấu hình dự án Angular
+└── proxy.conf.json              # Cấu hình CORS để gọi được api từ khác đường localhost
+```
 
 ## Các Bước Cần Thiết Để Chạy Ứng Dụng Trên Máy Tính Cục Bộ
 
